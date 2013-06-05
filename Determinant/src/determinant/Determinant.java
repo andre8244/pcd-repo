@@ -16,5 +16,6 @@ public class Determinant {
     public static void main(String[] args) {
         int ciccio = 1;
         System.out.println("ciao "+ciccio);
+        ciccio++;
     }
 }
