@@ -3,6 +3,7 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.actor.TypedActor;
 import akka.actor.TypedProps;
+import com.typesafe.config.ConfigFactory;
 import typed.ITypedMaster;
 import typed.TypedMaster;
 import untyped.Messages.Start;
@@ -10,8 +11,8 @@ import untyped.UntypedMaster;
 
 public class Main {
 	public static void main(String args[]) {
-		ActorSystem system = ActorSystem.create("Determinant_akka_dummy");
-		boolean typed = true;
+		ActorSystem system = ActorSystem.create("akkaTestPerformance", ConfigFactory.load().getConfig("testPerformance"));
+		boolean typed = false;
 		
 		if (typed) {
 			ITypedMaster master = TypedActor.get(system).typedActorOf(
