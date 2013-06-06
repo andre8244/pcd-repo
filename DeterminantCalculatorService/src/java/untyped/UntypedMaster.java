@@ -67,10 +67,11 @@ public class UntypedMaster extends UntypedActor {
                 } else if (msg instanceof Result) {
                         Result result = (Result)msg;
                         String reqId = result.getReqId();
-                        results.get(reqId);
+                        log("result: "+results.get(reqId));
                 } else if (msg instanceof PercentageDone) {
                         PercentageDone percent = (PercentageDone)msg;
                         String reqId = percent.getReqId();
+                        log("percentage done: "+(done.get(reqId)*100/workers.size()));
                 } else {
 			unhandled(msg);
 		}
