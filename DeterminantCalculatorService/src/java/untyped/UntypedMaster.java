@@ -18,12 +18,13 @@ public class UntypedMaster extends UntypedActor {
 	private Random rand;
 	private ArrayList<Worker> workers;
         private HashMap<String,Double> results;
-	private int nWorkersDone;
+        private HashMap<String,Integer> done;
 	private long startTime;
 	
         public UntypedMaster(){
             workers = new ArrayList<Worker>();
             results = new HashMap<String,Double>();
+            done = new HashMap<String,Integer>();
         }
         
 	@Override
@@ -36,11 +37,13 @@ public class UntypedMaster extends UntypedActor {
                         JobResult jb = (JobResult)msg;
                         String reqId = jb.getReqId();
                         log("received jobresult from [" + getSender().path().name() + "]: "+jb.getList().get(0));
+			int nWorkersDone = done.get(reqId);
 			nWorkersDone++;
-			
+                        done.put(reqId, nWorkersDone);
 			if (nWorkersDone == workers.size()) {
 				log("Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000)
 						+ " sec");
+                                results.put(reqId, jb.getList().get(0));
 			}
 		} else if (msg instanceof RegisterWorker) {
                         RegisterWorker worker = (RegisterWorker)msg;
@@ -64,6 +67,7 @@ public class UntypedMaster extends UntypedActor {
                 } else if (msg instanceof Result) {
                         Result result = (Result)msg;
                         String reqId = result.getReqId();
+                        results.get(reqId);
                 } else if (msg instanceof PercentageDone) {
                         PercentageDone percent = (PercentageDone)msg;
                         String reqId = percent.getReqId();
@@ -77,7 +81,7 @@ public class UntypedMaster extends UntypedActor {
                 //URL fileValue = compute.getFileValues();
                 String reqId = compute.getReqId();
 		rand = new Random();
-		nWorkersDone = 0;
+		done.put(reqId, 0);
 		for (int i = 0; i < workers.size(); i++) {
 			final ArrayList<Double> jobList = new ArrayList<Double>(order);
 			
