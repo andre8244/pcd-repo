@@ -5,21 +5,25 @@ import java.util.Random;
 
 import akka.actor.UntypedActor;
 import java.net.URL;
+import java.util.HashMap;
 import untyped.Messages.Job;
 import untyped.Messages.JobResult;
 import untyped.Messages.Compute;
+import untyped.Messages.PercentageDone;
 import untyped.Messages.RegisterWorker;
 import untyped.Messages.RemoveWorker;
+import untyped.Messages.Result;
 
 public class UntypedMaster extends UntypedActor {
-	private static final int jobSize = 10000;//500000;
 	private Random rand;
 	private ArrayList<Worker> workers;
+        private HashMap<String,Double> results;
 	private int nWorkersDone;
 	private long startTime;
 	
         public UntypedMaster(){
             workers = new ArrayList<Worker>();
+            results = new HashMap<String,Double>();
         }
         
 	@Override
@@ -30,6 +34,7 @@ public class UntypedMaster extends UntypedActor {
 			compute(compute);
 		} else if (msg instanceof JobResult) {
                         JobResult jb = (JobResult)msg;
+                        String reqId = jb.getReqId();
                         log("received jobresult from [" + getSender().path().name() + "]: "+jb.getList().get(0));
 			nWorkersDone++;
 			
@@ -44,7 +49,7 @@ public class UntypedMaster extends UntypedActor {
                         String ip = worker.getIp();
                         int port = worker.getPort();
                         workers.add(new Worker(name,ip,port,getContext().actorFor("akka://"+name+"@"+ip+":"+port+"/user/"+name)));
-                        System.out.println("Size: "+workers.size());
+                        System.out.println("Workers size: "+workers.size());
                 } else if (msg instanceof RemoveWorker) {
                         RemoveWorker worker = (RemoveWorker)msg;
                         String name = worker.getName();
@@ -55,7 +60,13 @@ public class UntypedMaster extends UntypedActor {
                                 workers.remove(i);
                             }
                         }
-                        System.out.println("Size: "+workers.size());
+                        System.out.println("Worker size: "+workers.size());
+                } else if (msg instanceof Result) {
+                        Result result = (Result)msg;
+                        String reqId = result.getReqId();
+                } else if (msg instanceof PercentageDone) {
+                        PercentageDone percent = (PercentageDone)msg;
+                        String reqId = percent.getReqId();
                 } else {
 			unhandled(msg);
 		}
@@ -63,14 +74,14 @@ public class UntypedMaster extends UntypedActor {
 	
 	private void compute(Compute compute) {
                 int order = compute.getOrder();
-                URL fileValue = compute.getFileValues();
+                //URL fileValue = compute.getFileValues();
                 String reqId = compute.getReqId();
 		rand = new Random();
 		nWorkersDone = 0;
 		for (int i = 0; i < workers.size(); i++) {
-			final ArrayList<Double> jobList = new ArrayList<Double>(jobSize);
+			final ArrayList<Double> jobList = new ArrayList<Double>(order);
 			
-			for (int j = 0; j < jobSize; j++) {
+			for (int j = 0; j < order; j++) {
 				Double val = new Double(rand.nextInt(100) + rand.nextDouble());
 				jobList.add(val);
 			}

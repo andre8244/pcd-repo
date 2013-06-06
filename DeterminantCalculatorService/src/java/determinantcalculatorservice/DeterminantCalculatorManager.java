@@ -11,8 +11,10 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import com.typesafe.config.ConfigFactory;
 import java.net.URL;
+import untyped.Messages.PercentageDone;
 import untyped.Messages.RegisterWorker;
 import untyped.Messages.RemoveWorker;
+import untyped.Messages.Result;
 
 /**
  *
@@ -45,13 +47,13 @@ public class DeterminantCalculatorManager {
     
     public synchronized int getPercentageDone(String reqId){
         int percentage = 0;
-        
+        master.tell(new PercentageDone(reqId));
         return percentage;
     }
         
     public synchronized double getResult(String reqId){
         int result = 0;
-        
+        master.tell(new Result(reqId));
         return result;
     }
 
