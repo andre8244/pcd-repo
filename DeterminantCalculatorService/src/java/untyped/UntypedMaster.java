@@ -9,10 +9,8 @@ import java.util.HashMap;
 import untyped.Messages.Job;
 import untyped.Messages.JobResult;
 import untyped.Messages.Compute;
-import untyped.Messages.PercentageDone;
 import untyped.Messages.RegisterWorker;
 import untyped.Messages.RemoveWorker;
-import untyped.Messages.Result;
 
 public class UntypedMaster extends UntypedActor {
 	private Random rand;
@@ -65,14 +63,6 @@ public class UntypedMaster extends UntypedActor {
                             }
                         }
                         System.out.println("Worker size: "+workers.size());
-                } else if (msg instanceof Result) {
-                        Result result = (Result)msg;
-                        String reqId = result.getReqId();
-                        log("result: "+results.get(reqId));
-                } else if (msg instanceof PercentageDone) {
-                        PercentageDone percent = (PercentageDone)msg;
-                        String reqId = percent.getReqId();
-                        log("percentage done: "+(done.get(reqId)*100/workers.size()));
                 } else {
 			unhandled(msg);
 		}

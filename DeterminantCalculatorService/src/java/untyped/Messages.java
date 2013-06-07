@@ -111,29 +111,5 @@ public class Messages {
                 public int getPort() {
 			return port;
 		}
-	}     
-        
-	public static class Result implements Serializable{
-                private final String reqId;
-                
-                public Result(String reqId) {
-			this.reqId = reqId;
-		}
-                
-                public String getReqId() {
-			return reqId;
-		} 
-	}        
-        
-	public static class PercentageDone implements Serializable{
-                private final String reqId;
-                
-                public PercentageDone(String reqId) {
-			this.reqId = reqId;
-		}
-                
-                public String getReqId() {
-			return reqId;
-		} 
-	}       
+	}
 }

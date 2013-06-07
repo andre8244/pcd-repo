@@ -11,10 +11,10 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import com.typesafe.config.ConfigFactory;
 import java.net.URL;
-import untyped.Messages.PercentageDone;
+import java.util.HashMap;
 import untyped.Messages.RegisterWorker;
 import untyped.Messages.RemoveWorker;
-import untyped.Messages.Result;
+import untyped.Request;
 
 /**
  *
@@ -25,11 +25,13 @@ public class DeterminantCalculatorManager {
     private static DeterminantCalculatorManager instance;
     private int reqNumber;
     private ActorRef master;
+    private HashMap<String,Request> requests;
     
     private DeterminantCalculatorManager(){
         reqNumber=0;
         ActorSystem system = ActorSystem.create("master",ConfigFactory.load().getConfig("master"));
-        master = system.actorOf(new Props(UntypedMaster.class), "untyped-master");  
+        master = system.actorOf(new Props(UntypedMaster.class), "untyped-master");
+        requests = new HashMap<String,Request>();
     }
     
     public synchronized static DeterminantCalculatorManager getInstance(){
@@ -41,20 +43,17 @@ public class DeterminantCalculatorManager {
     public synchronized String computeDeterminant(int order, URL fileValues){
         String reqId = "req"+reqNumber;
         reqNumber=reqNumber+1;
+        requests.put(reqId, new Request());
         master.tell(new Compute(order,fileValues,reqId));
         return reqId;
     }
     
     public synchronized int getPercentageDone(String reqId){
-        int percentage = 0;
-        master.tell(new PercentageDone(reqId));
-        return percentage;
+        return requests.get(reqId).getPercentageDone();
     }
         
     public synchronized double getResult(String reqId){
-        int result = 0;
-        master.tell(new Result(reqId));
-        return result;
+        return requests.get(reqId).getResult();
     }
 
     public synchronized boolean registerWorker(String name, String ip, int port) {
