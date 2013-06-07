@@ -55,7 +55,7 @@ public class DeterminantCalculatorUser {
 			servicePort.registerWorker("worker" + i, "127.0.0.1", (2553 + i));
 		}
 
-		String reqId = servicePort.computeDeterminant(300000, null);
+		String reqId = servicePort.computeDeterminant(50000, null);
 		int percentage = servicePort.getPercentageDone(reqId);
 
 		while (percentage != 100) {
@@ -72,7 +72,7 @@ public class DeterminantCalculatorUser {
 		System.out.println("RESULT for " + reqId + ": " + servicePort.getResult(reqId));
 
 		try {
-			Thread.sleep(3000);
+			Thread.sleep(500);
 		} catch (InterruptedException ex) {
 			ex.printStackTrace();
 		}
