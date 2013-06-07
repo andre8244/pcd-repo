@@ -15,22 +15,43 @@ import untyped.UntypedWorker;
  * @author Marco
  */
 public class DeterminantCalculatorUser {
+	// Alessi
+	//determinantcalculatorservice.DeterminantCalculatorService servicePort;
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        int nWorkers = 5;
-        for (int i=0; i<nWorkers; i++){
-            ActorSystem system = ActorSystem.create("worker"+i,ConfigFactory.load().getConfig("worker"+i));
-            ActorRef worker = system.actorOf(new Props(UntypedWorker.class), "worker"+i);
-            register("worker"+i,"127.0.0.1",(2553+i));
-        }
-    }
+	// Leardini
+	leardini_web_service_client.DeterminantCalculatorService servicePort;
 
-    private static boolean register(String name, String ip, int port) {
-        determinantcalculatorservice.DeterminantCalculatorService_Service service = new determinantcalculatorservice.DeterminantCalculatorService_Service();
-        determinantcalculatorservice.DeterminantCalculatorService servicePort = service.getDeterminantCalculatorServicePort();
-        return servicePort.registerWorker(name,ip,port);
-    }
+	// Fortibuoni
+	// ...
+	private DeterminantCalculatorUser() {
+
+		// Leardini
+		leardini_web_service_client.DeterminantCalculatorService_Service service =
+				new leardini_web_service_client.DeterminantCalculatorService_Service();
+		servicePort = service.getDeterminantCalculatorServicePort();
+
+		// Alessi
+		// determinantcalculatorservice.DeterminantCalculatorService_Service service =
+		//		new determinantcalculatorservice.DeterminantCalculatorService_Service();
+		// servicePort = service.getDeterminantCalculatorServicePort();
+
+		// Fortibuoni
+		// ..
+
+		int nWorkers = 5;
+
+		for (int i = 0; i < nWorkers; i++) {
+			ActorSystem system = ActorSystem.create("worker" + i, ConfigFactory.load().getConfig("worker" + i));
+			final ActorRef worker = system.actorOf(new Props(UntypedWorker.class), "worker" + i);
+			// TODO usare il path del worker al posto di passargli nome, ip e porta
+			servicePort.registerWorker("worker" + i, "127.0.0.1", (2553 + i));
+		}
+
+		servicePort.computeDeterminant(1000, null);
+		System.out.println("RESULT: " + servicePort.getResult("req0"));
+	}
+
+	public static void main(String[] args) {
+		new DeterminantCalculatorUser();
+	}
 }
