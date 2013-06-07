@@ -22,13 +22,15 @@ public class UntypedWorker extends UntypedActor {
 		log("received job from [" + getSender().path().name() + "]: "+job.getList().get(0));
 		final ArrayList<Double> list = job.getList();
                 final String reqId = job.getReqId();
+                double result = 0;
                 
+                // per ora come job calcolo la media dei valori della lista
 		for (int i = 0; i < list.size(); i++) {
-			Double val = Math.sqrt(list.get(i) * Math.sqrt(2));
-			list.set(i, val);
+			result = result+list.get(i);
 		}
+                result = result/list.size();
                 
-                final JobResult jr = new JobResult(list,reqId);
+                final JobResult jr = new JobResult(result,reqId);
 		getSender().tell(jr, getSelf());
 	}
 	
