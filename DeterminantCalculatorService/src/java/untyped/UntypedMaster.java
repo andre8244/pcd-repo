@@ -35,15 +35,16 @@ public class UntypedMaster extends UntypedActor {
 			compute(compute);
 		} else if (msg instanceof JobResult) {
                         JobResult jb = (JobResult)msg;
+                        double result = jb.getResult();
                         String reqId = jb.getReqId();
-                        log("received jobresult from [" + getSender().path().name() + "]: "+jb.getList().get(0));
+                        log("received jobresult from [" + getSender().path().name() + "]: "+result);
 			int nWorkersDone = done.get(reqId);
 			nWorkersDone++;
                         done.put(reqId, nWorkersDone);
 			if (nWorkersDone == workers.size()) {
 				log("Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000)
 						+ " sec");
-                                results.put(reqId, jb.getList().get(0));
+                                results.put(reqId, result);
 			}
 		} else if (msg instanceof RegisterWorker) {
                         RegisterWorker worker = (RegisterWorker)msg;
@@ -78,8 +79,9 @@ public class UntypedMaster extends UntypedActor {
 	}
 	
 	private void compute(Compute compute) {
+                // utilizzo per ora order come dimensione della lista
                 int order = compute.getOrder();
-                //URL fileValue = compute.getFileValues();
+                URL fileValue = compute.getFileValues();
                 String reqId = compute.getReqId();
 		rand = new Random();
 		done.put(reqId, 0);

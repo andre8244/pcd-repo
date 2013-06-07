@@ -48,16 +48,16 @@ public class Messages {
 	}
 	
 	public static class JobResult implements Serializable{
-		private final ArrayList<Double> list;
+		private final double result;
                 private final String reqId;
                 
-                public JobResult(ArrayList<Double> list, String reqId) {
-			this.list = list;
+                public JobResult(double result, String reqId) {
+			this.result = result;
                         this.reqId = reqId;
 		}
 		
-		public ArrayList<Double> getList() {
-			return list;
+		public double getResult() {
+			return result;
 		}
                 
                 public String getReqId() {
