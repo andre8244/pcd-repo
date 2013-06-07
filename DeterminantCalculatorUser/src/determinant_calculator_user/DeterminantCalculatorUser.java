@@ -9,8 +9,6 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import com.typesafe.config.ConfigFactory;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import untyped.UntypedWorker;
 
 /**
@@ -50,20 +48,21 @@ public class DeterminantCalculatorUser {
 		int nWorkers = 5;
 
 		for (int i = 0; i < nWorkers; i++) {
-			ActorSystem system = ActorSystem.create("worker" + i, ConfigFactory.load().getConfig("worker" + i));
+			ActorSystem system = ActorSystem
+					.create("worker" + i, ConfigFactory.load().getConfig("worker" + i));
 			final ActorRef worker = system.actorOf(new Props(UntypedWorker.class), "worker" + i);
 			// TODO usare il path del worker al posto di passargli nome, ip e porta
 			servicePort.registerWorker("worker" + i, "127.0.0.1", (2553 + i));
 		}
 
-		String reqId = servicePort.computeDeterminant(30000, null);
+		String reqId = servicePort.computeDeterminant(300000, null);
 		int percentage = servicePort.getPercentageDone(reqId);
 
 		while (percentage != 100) {
 			L.log(name, reqId + " percentage: " + percentage + " %");
 
 			try {
-				Thread.sleep(500);
+				Thread.sleep(20);
 			} catch (InterruptedException ex) {
 				ex.printStackTrace();
 			}

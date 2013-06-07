@@ -8,17 +8,23 @@ import untyped.Messages.JobResult;
 
 public class UntypedWorker extends UntypedActor {
 
+	private String me;
+
+	public UntypedWorker() {
+		me = getSelf().path().name();
+	}
+
 	@Override
 	public void onReceive(Object msg) throws Exception {
 		if (msg instanceof Job) {
 			Job job = (Job) msg;
-			compute(job);
+			handleJob(job);
 		} else {
 			unhandled(msg);
 		}
 	}
 
-	private void compute(Job job) {
+	private void handleJob(Job job) {
 		//log("received job from [" + getSender().path().name() + "]");
 		final ArrayList<Double> list = job.getList();
 		final String reqId = job.getReqId();
@@ -32,9 +38,5 @@ public class UntypedWorker extends UntypedActor {
 
 		final JobResult jr = new JobResult(result, reqId);
 		getSender().tell(jr, getSelf());
-	}
-
-	private void log(String msg) {
-		System.out.println("[" + getSelf().path().name() + "] " + msg);
 	}
 }
