@@ -19,7 +19,7 @@ public class UntypedWorker extends UntypedActor {
 	}
 
 	private void compute(Job job) {
-		log("received job from [" + getSender().path().name() + "]");
+		//log("received job from [" + getSender().path().name() + "]");
 		final ArrayList<Double> list = job.getList();
 		final String reqId = job.getReqId();
 		double result = 0;

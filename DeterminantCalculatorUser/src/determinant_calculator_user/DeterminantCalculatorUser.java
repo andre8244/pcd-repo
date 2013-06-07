@@ -47,8 +47,9 @@ public class DeterminantCalculatorUser {
 			servicePort.registerWorker("worker" + i, "127.0.0.1", (2553 + i));
 		}
 
-		servicePort.computeDeterminant(5000, null);
+		servicePort.computeDeterminant(100000, null);
 		System.out.println("RESULT: " + servicePort.getResult("req0"));
+		System.exit(0);
 	}
 
 	public static void main(String[] args) {
