@@ -23,16 +23,16 @@ public class DeterminantCalculatorUser {
 	// Alessi
 	//determinantcalculatorservice.DeterminantCalculatorService servicePort;
 	// Leardini
-	leardini_web_service_client.DeterminantCalculatorService servicePort;
+	//leardini_web_service_client.DeterminantCalculatorService servicePort;
 
 	// Fortibuoni
-	// ...
+	fortibuoni_WS_client.DeterminantCalculatorService servicePort;
 	private DeterminantCalculatorUser() {
 
 		// Leardini
-		leardini_web_service_client.DeterminantCalculatorService_Service service =
-				new leardini_web_service_client.DeterminantCalculatorService_Service();
-		servicePort = service.getDeterminantCalculatorServicePort();
+		//leardini_web_service_client.DeterminantCalculatorService_Service service =
+		//		new leardini_web_service_client.DeterminantCalculatorService_Service();
+		//servicePort = service.getDeterminantCalculatorServicePort();
 
 		// Alessi
 		// determinantcalculatorservice.DeterminantCalculatorService_Service service =
@@ -40,7 +40,9 @@ public class DeterminantCalculatorUser {
 		// servicePort = service.getDeterminantCalculatorServicePort();
 
 		// Fortibuoni
-		// ..
+		fortibuoni_WS_client.DeterminantCalculatorService_Service service =
+				new fortibuoni_WS_client.DeterminantCalculatorService_Service();
+		servicePort = service.getDeterminantCalculatorServicePort();
 
 		int nWorkers = 5;
 
