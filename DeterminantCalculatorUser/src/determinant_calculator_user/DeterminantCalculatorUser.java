@@ -20,29 +20,32 @@ import untyped.UntypedWorker;
 public class DeterminantCalculatorUser {
 
 	private String name = "user";
+
 	// Alessi
 	//determinantcalculatorservice.DeterminantCalculatorService servicePort;
+
 	// Leardini
-	//leardini_web_service_client.DeterminantCalculatorService servicePort;
+	leardini_web_service_client.DeterminantCalculatorService servicePort;
 
 	// Fortibuoni
-	fortibuoni_WS_client.DeterminantCalculatorService servicePort;
+	//fortibuoni_WS_client.DeterminantCalculatorService servicePort;
+
 	private DeterminantCalculatorUser() {
 
 		// Leardini
-		//leardini_web_service_client.DeterminantCalculatorService_Service service =
-		//		new leardini_web_service_client.DeterminantCalculatorService_Service();
-		//servicePort = service.getDeterminantCalculatorServicePort();
+		leardini_web_service_client.DeterminantCalculatorService_Service service =
+				new leardini_web_service_client.DeterminantCalculatorService_Service();
+		servicePort = service.getDeterminantCalculatorServicePort();
 
 		// Alessi
-		// determinantcalculatorservice.DeterminantCalculatorService_Service service =
-		//		new determinantcalculatorservice.DeterminantCalculatorService_Service();
-		// servicePort = service.getDeterminantCalculatorServicePort();
+		/*determinantcalculatorservice.DeterminantCalculatorService_Service service =
+				new determinantcalculatorservice.DeterminantCalculatorService_Service();
+		servicePort = service.getDeterminantCalculatorServicePort();
 
 		// Fortibuoni
-		fortibuoni_WS_client.DeterminantCalculatorService_Service service =
+		/*fortibuoni_WS_client.DeterminantCalculatorService_Service service =
 				new fortibuoni_WS_client.DeterminantCalculatorService_Service();
-		servicePort = service.getDeterminantCalculatorServicePort();
+		servicePort = service.getDeterminantCalculatorServicePort();*/
 
 		int nWorkers = 5;
 
