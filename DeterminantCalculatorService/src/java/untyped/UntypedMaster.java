@@ -1,5 +1,6 @@
 package untyped;
 
+import Log.L;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -21,66 +22,39 @@ public class UntypedMaster extends UntypedActor {
 	private HashMap<String, Double> results;
 	private long startTime;
 	private DeterminantCalculatorManager manager;
+	private String me;
 
 	public UntypedMaster() {
 		workers = new ArrayList<Worker>();
 		done = new HashMap<String, Integer>();
 		results = new HashMap<String, Double>();
+		me = getSelf().path().name();
 	}
 
 	@Override
 	public void onReceive(Object msg) throws Exception {
 		if (msg instanceof Compute) {
-			Compute compute = (Compute) msg;
-
-			if (manager == null) {
-				manager = compute.getManager();
-			}
-			startTime = System.currentTimeMillis();
-			compute(compute);
+			Compute c = (Compute) msg;
+			handleCompute(c);
 		} else if (msg instanceof JobResult) {
-			JobResult jb = (JobResult) msg;
-			double result = jb.getResult();
-			String reqId = jb.getReqId();
-			//log("received jobresult from [" + getSender().path().name() + "]: " + result);
-			int nWorkersDone = done.get(reqId);
-			nWorkersDone++;
-			done.put(reqId, nWorkersDone);
-			manager.setPercentageDone(reqId, nWorkersDone * 100 / workers.size());
-			double precRes = results.get(reqId);
-			results.put(reqId, precRes + result);
-			if (nWorkersDone == workers.size()) {
-				log("Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000)
-						+ " sec");
-				manager.setResult(reqId, results.get(reqId) / workers.size());
-			}
+			JobResult jr = (JobResult) msg;
+			handleJobResult(jr);
 		} else if (msg instanceof RegisterWorker) {
-			RegisterWorker worker = (RegisterWorker) msg;
-			// worker registration
-			String name = worker.getName();
-			String ip = worker.getIp();
-			int port = worker.getPort();
-			workers.add(new Worker(name, ip, port, getContext().actorFor("akka://" + name + "@" + ip + ":" + port + "/user/" + name)));
-			System.out.println("Workers size: " + workers.size());
+			RegisterWorker rw = (RegisterWorker) msg;
+			handleRegisterWorker(rw);
 		} else if (msg instanceof RemoveWorker) {
-			RemoveWorker worker = (RemoveWorker) msg;
-			String name = worker.getName();
-			String ip = worker.getIp();
-			int port = worker.getPort();
-
-			// TODO si potrebbe usare una hashmap per rendere la ricerca più performante
-			for (int i = 0; i < workers.size(); i++) {
-				if (workers.get(i).getName().equals(name) && workers.get(i).getIp().equals(ip) && workers.get(i).getPort() == port) {
-					workers.remove(i);
-				}
-			}
-			System.out.println("Worker size: " + workers.size());
+			RemoveWorker rw = (RemoveWorker) msg;
+			handleRemoveWorker(rw);
 		} else {
 			unhandled(msg);
 		}
 	}
 
-	private void compute(Compute compute) {
+	private void handleCompute(Compute compute) {
+		if (manager == null) {
+			manager = compute.getManager();
+		}
+		startTime = System.currentTimeMillis();
 		// utilizzo per ora order come dimensione della lista
 		int order = compute.getOrder();
 		URL fileValue = compute.getFileValues();
@@ -100,7 +74,46 @@ public class UntypedMaster extends UntypedActor {
 		}
 	}
 
-	private void log(String msg) {
-		System.out.println("[" + getSelf().path().name() + "] " + msg);
+	private void handleJobResult(JobResult jr) {
+		double result = jr.getResult();
+		String reqId = jr.getReqId();
+		//log("received jobresult from [" + getSender().path().name() + "]: " + result);
+		int nWorkersDone = done.get(reqId);
+		nWorkersDone++;
+		done.put(reqId, nWorkersDone);
+		int percentageDone = nWorkersDone * 100 / workers.size();
+		manager.setPercentageDone(reqId, percentageDone);
+		double precRes = results.get(reqId);
+		results.put(reqId, precRes + result);
+		L.log(me, "received jobResult, nWorkersDone="+nWorkersDone + "  workers.size="+workers.size());
+
+		if (nWorkersDone == workers.size()) {
+			L.log(me, "Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
+			manager.setResult(reqId, results.get(reqId) / workers.size());
+		}
+	}
+
+	private void handleRegisterWorker(RegisterWorker rw) {
+		String name = rw.getName();
+		String ip = rw.getIp();
+		int port = rw.getPort();
+		workers.add(new Worker(name, ip, port, getContext()
+				.actorFor("akka://" + name + "@" + ip + ":" + port + "/user/" + name)));
+		L.log(me, "workers size: " + workers.size());
+	}
+
+	private void handleRemoveWorker(RemoveWorker rw) {
+		String name = rw.getName();
+		String ip = rw.getIp();
+		int port = rw.getPort();
+
+		// TODO si potrebbe usare una hashmap per rendere la ricerca più performante
+		for (int i = 0; i < workers.size(); i++) {
+			if (workers.get(i).getName().equals(name) && workers.get(i).getIp().equals(ip)
+					&& workers.get(i).getPort() == port) {
+				workers.remove(i);
+			}
+		}
+		L.log(me, "workers size: " + workers.size());
 	}
 }

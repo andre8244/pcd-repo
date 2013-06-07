@@ -4,6 +4,7 @@
  */
 package determinantcalculatorservice;
 
+import Log.L;
 import untyped.Messages.Compute;
 import untyped.UntypedMaster;
 import akka.actor.ActorRef;
@@ -26,6 +27,7 @@ public class DeterminantCalculatorManager {
 	private ActorRef master;
 	private HashMap<String, Double> results;
 	private HashMap<String, Integer> done;
+	private String me = "manager";
 
 	private DeterminantCalculatorManager() {
 		reqNumber = 0;
@@ -78,7 +80,9 @@ public class DeterminantCalculatorManager {
 	}
 
 	public void setPercentageDone(String reqId, int percentageDone) {
-		done.put(reqId, percentageDone);
+		// TODO edit
+		int oldValue = done.put(reqId, percentageDone);
+		L.log(me, "setPercentage: oldValue=" + oldValue + "  newValue=" + percentageDone);
 	}
 
 	public void setResult(String reqId, double result) {
