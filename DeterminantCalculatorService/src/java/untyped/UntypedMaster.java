@@ -6,6 +6,7 @@ import java.util.Random;
 
 import akka.actor.UntypedActor;
 import determinantcalculatorservice.DeterminantCalculatorManager;
+import determinantcalculatorservice.MatrixUtil;
 import java.net.URL;
 import java.util.HashMap;
 import untyped.Messages.Job;
@@ -58,6 +59,10 @@ public class UntypedMaster extends UntypedActor {
 		// utilizzo per ora order come dimensione della lista
 		int order = compute.getOrder();
 		URL fileValue = compute.getFileValues();
+
+//		String path = System.getProperty("user.home") + System.getProperty("file.separator");
+//		MatrixUtil.genAndWriteToFile(5, 20,  path + "matrix.txt");
+
 		String reqId = compute.getReqId();
 		rand = new Random();
 		done.put(reqId, 0);
@@ -85,7 +90,7 @@ public class UntypedMaster extends UntypedActor {
 		manager.setPercentageDone(reqId, percentageDone);
 		double precRes = results.get(reqId);
 		results.put(reqId, precRes + result);
-		L.log(me, "received jobResult, nWorkersDone="+nWorkersDone + "  workers.size="+workers.size());
+		L.log(me, "received jobResult, nWorkersDone=" + nWorkersDone + "  workers.size=" + workers.size());
 
 		if (nWorkersDone == workers.size()) {
 			L.log(me, "Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
