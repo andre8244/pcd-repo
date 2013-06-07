@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package determinantcalculatoruser;
+package determinant_calculator_user;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -47,7 +47,7 @@ public class DeterminantCalculatorUser {
 			servicePort.registerWorker("worker" + i, "127.0.0.1", (2553 + i));
 		}
 
-		servicePort.computeDeterminant(1000, null);
+		servicePort.computeDeterminant(5000, null);
 		System.out.println("RESULT: " + servicePort.getResult("req0"));
 	}
 
