@@ -132,15 +132,15 @@ public class Messages {
 	}
       
 	public static class Result implements Serializable{
-		private final int result;
+		private final double result;
                 private final String reqId;
                 
-                public Result(String reqId, int result) {
+                public Result(String reqId, double result) {
                         this.reqId = reqId;
 			this.result = result;
 		}
 		
-		public int getResult() {
+		public double getResult() {
 			return result;
 		}
                 
