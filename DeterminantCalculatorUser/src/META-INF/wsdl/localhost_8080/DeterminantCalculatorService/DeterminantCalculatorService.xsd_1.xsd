@@ -46,6 +46,19 @@
 </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="computeDeterminant">
+<xs:sequence>
+<xs:element name="order" type="xs:int"/>
+<xs:element name="fileValues" type="xs:anyURI" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="computeDeterminantResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="removeWorker">
 <xs:sequence>
 <xs:element name="name" type="xs:string" minOccurs="0"/>
@@ -57,19 +70,6 @@
 <xs:complexType name="removeWorkerResponse">
 <xs:sequence>
 <xs:element name="return" type="xs:boolean"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="computeDeterminant">
-<xs:sequence>
-<xs:element name="order" type="xs:int"/>
-<xs:element name="fileValues" type="xs:anyURI" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="computeDeterminantResponse">
-<xs:sequence>
-<xs:element name="return" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
