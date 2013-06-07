@@ -42,7 +42,7 @@ public class UntypedMaster extends UntypedActor {
 			JobResult jb = (JobResult) msg;
 			double result = jb.getResult();
 			String reqId = jb.getReqId();
-			log("received jobresult from [" + getSender().path().name() + "]: " + result);
+			//log("received jobresult from [" + getSender().path().name() + "]: " + result);
 			int nWorkersDone = done.get(reqId);
 			nWorkersDone++;
 			done.put(reqId, nWorkersDone);
@@ -93,7 +93,7 @@ public class UntypedMaster extends UntypedActor {
 			final ArrayList<Double> jobList = new ArrayList<Double>(order);
 
 			for (int j = 0; j < order; j++) {
-				Double val = new Double(rand.nextInt(100) + rand.nextDouble());
+				Double val = new Double(rand.nextInt(1000) + rand.nextDouble());
 				jobList.add(val);
 			}
 			workers.get(i).getActorRef().tell(new Job(jobList, reqId), getSelf());

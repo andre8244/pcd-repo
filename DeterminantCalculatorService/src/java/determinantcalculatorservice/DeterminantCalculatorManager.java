@@ -62,6 +62,7 @@ public class DeterminantCalculatorManager {
 		if (results.get(reqId) != null) {
 			return results.get(reqId);
 		} else {
+			// TODO questa operazione potrebbe essere sospensiva, oppure restituire un Future
 			return -1;
 		}
 	}
