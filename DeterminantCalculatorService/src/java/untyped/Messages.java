@@ -119,40 +119,4 @@ public class Messages {
 			return port;
 		}
 	}
-
-	public static class PercentageDone implements Serializable{
-		private final int percentageDone;
-                private final String reqId;
-                
-                public PercentageDone(String reqId, int percentageDone) {
-                        this.reqId = reqId;
-			this.percentageDone = percentageDone;
-		}
-		
-		public int getPercentageDone() {
-			return percentageDone;
-		}   
-                
-                public String getReqId() {
-			return reqId;
-		}                 
-	}
-      
-	public static class Result implements Serializable{
-		private final double result;
-                private final String reqId;
-                
-                public Result(String reqId, double result) {
-                        this.reqId = reqId;
-			this.result = result;
-		}
-		
-		public double getResult() {
-			return result;
-		}
-                
-                public String getReqId() {
-			return reqId;
-		}                 
-	}
 }
