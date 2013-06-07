@@ -50,11 +50,19 @@ public class DeterminantCalculatorManager{
     }
     
     public synchronized int getPercentageDone(String reqId){
-        return done.get(reqId);
+        if (done.get(reqId)!=null){
+            return done.get(reqId);
+        } else {
+            return -1;
+        }
     }
         
     public synchronized double getResult(String reqId){
-        return results.get(reqId);
+        if (results.get(reqId)!=null){
+            return results.get(reqId);
+        } else {
+            return -1;
+        }
     }
 
     public synchronized boolean registerWorker(String name, String ip, int port) {
