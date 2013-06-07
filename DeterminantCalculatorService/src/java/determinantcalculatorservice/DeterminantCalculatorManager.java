@@ -9,20 +9,17 @@ import untyped.UntypedMaster;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import akka.actor.UntypedActor;
 import com.typesafe.config.ConfigFactory;
 import java.net.URL;
 import java.util.HashMap;
-import untyped.Messages.PercentageDone;
 import untyped.Messages.RegisterWorker;
 import untyped.Messages.RemoveWorker;
-import untyped.Messages.Result;
 
 /**
  *
  * @author Marco
  */
-public class DeterminantCalculatorManager extends UntypedActor{
+public class DeterminantCalculatorManager{
     
     private static DeterminantCalculatorManager instance;
     private int reqNumber;
@@ -48,7 +45,7 @@ public class DeterminantCalculatorManager extends UntypedActor{
         String reqId = "req"+reqNumber;
         reqNumber=reqNumber+1;
         done.put(reqId, 0);
-        master.tell(new Compute(order,fileValues,reqId),getSelf());
+        master.tell(new Compute(order,fileValues,reqId,this));
         return reqId;
     }
     
@@ -61,27 +58,20 @@ public class DeterminantCalculatorManager extends UntypedActor{
     }
 
     public synchronized boolean registerWorker(String name, String ip, int port) {
-        master.tell(new RegisterWorker(name,ip,port), getSelf());
+        master.tell(new RegisterWorker(name,ip,port));
         return true;
     }
     
     public synchronized boolean removeWorker(String name, String ip, int port) {
-        master.tell(new RemoveWorker(name,ip,port), getSelf());
+        master.tell(new RemoveWorker(name,ip,port));
         return true;
     }    
 
-    @Override
-    public void onReceive(Object msg) throws Exception {
-        if (msg instanceof PercentageDone) {
-            PercentageDone pd = (PercentageDone)msg;
-            int percentageDone = pd.getPercentageDone();
-            String reqId = pd.getReqId();
-            done.put(reqId, percentageDone);
-        } else if (msg instanceof Result) {
-            Result res = (Result)msg;
-            double result = res.getResult();
-            String reqId = res.getReqId();
-            results.put(reqId, result);
-	}
+    public void setPercentageDone(String reqId, int percentageDone) {
+        done.put(reqId, percentageDone);
     }
+    
+    public void setResult(String reqId, double result) {
+        results.put(reqId, result);
+    }    
 }

@@ -1,19 +1,22 @@
 package untyped;
 
+import determinantcalculatorservice.DeterminantCalculatorManager;
 import java.util.ArrayList;
 import java.io.Serializable;
 import java.net.URL;
 
 public class Messages {
-	public static class Compute implements Serializable{
+	public static class Compute {
                 private final int order;
                 private final URL fileValues;
             	private final String reqId;
+                private DeterminantCalculatorManager manager;
                 
-                public Compute(int order, URL fileValues, String reqId) {
+                public Compute(int order, URL fileValues, String reqId, DeterminantCalculatorManager manager) {
 			this.order = order;
                         this.fileValues = fileValues;
                         this.reqId = reqId;
+                        this.manager = manager;
 		}
 		
 		public int getOrder() {
@@ -27,6 +30,10 @@ public class Messages {
                 public String getReqId() {
 			return reqId;
 		}
+                
+                public DeterminantCalculatorManager getManager() {
+			return manager;
+		}                
 	}
 	
 	public static class Job implements Serializable{
