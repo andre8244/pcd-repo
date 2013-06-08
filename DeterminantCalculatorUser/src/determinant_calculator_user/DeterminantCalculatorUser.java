@@ -7,6 +7,7 @@ package determinant_calculator_user;
 import Log.L;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import akka.actor.Address;
 import akka.actor.Props;
 import com.typesafe.config.ConfigFactory;
 import untyped.UntypedWorker;
@@ -17,7 +18,7 @@ import untyped.UntypedWorker;
  */
 public class DeterminantCalculatorUser {
 
-	private String name = "user";
+	private String me = "user";
 
 	// Alessi
 	//determinantcalculatorservice.DeterminantCalculatorService servicePort;
@@ -51,28 +52,32 @@ public class DeterminantCalculatorUser {
 			ActorSystem system = ActorSystem
 					.create("worker" + i, ConfigFactory.load().getConfig("worker" + i));
 			final ActorRef worker = system.actorOf(new Props(UntypedWorker.class), "worker" + i);
-			// TODO usare il path del worker al posto di passargli nome, ip e porta
 			servicePort.registerWorker("worker" + i, "127.0.0.1", (2553 + i));
 		}
 
 		String reqId = servicePort.computeDeterminant(5000, null);
 		int percentage = servicePort.getPercentageDone(reqId);
+		L.log(me, reqId + " percentage: " + percentage + " %");
+		int lastPercentage = percentage;
 
 		while (percentage != 100) {
-			L.log(name, reqId + " percentage: " + percentage + " %");
+			if (percentage != lastPercentage){
+				L.log(me, reqId + " percentage: " + percentage + " %");
+			}
 
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException ex) {
 				ex.printStackTrace();
 			}
+			lastPercentage = percentage;
 			percentage = servicePort.getPercentageDone(reqId);
 		}
 
 		System.out.println("RESULT for " + reqId + ": " + servicePort.getResult(reqId));
 
 		try {
-			Thread.sleep(500);
+			Thread.sleep(3000);
 		} catch (InterruptedException ex) {
 			ex.printStackTrace();
 		}
