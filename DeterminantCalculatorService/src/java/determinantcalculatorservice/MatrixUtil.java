@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class MatrixUtil {
 
@@ -135,9 +133,10 @@ public class MatrixUtil {
 
 	private static void testMatrix(ArrayList<ArrayList<Double>> matrix) {
 		L.log("matrix util", "matrix size: "+matrix.size());
+		// TODO
 	}
 
 	private static void testMatrix(HashMap<Integer, HashMap<Integer, Double>> matrix) {
-		
+		// TODO
 	}
 }

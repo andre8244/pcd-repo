@@ -1,5 +1,6 @@
-package untyped;
+package messages;
 
+import determinantcalculatorservice.DeterminantCalculatorManager;
 import determinantcalculatorservice.DeterminantCalculatorManager;
 import java.util.ArrayList;
 import java.io.Serializable;
@@ -78,51 +79,27 @@ public class Messages {
 
 	public static class RegisterWorker implements Serializable {
 
-		private final String name;
-		private final String ip;
-		private final int port;
+		private final String remoteAddress;
 
-		public RegisterWorker(String name, String ip, int port) {
-			this.name = name;
-			this.ip = ip;
-			this.port = port;
+		public RegisterWorker(String remoteAddress) {
+			this.remoteAddress = remoteAddress;
 		}
 
-		public String getName() {
-			return name;
-		}
-
-		public String getIp() {
-			return ip;
-		}
-
-		public int getPort() {
-			return port;
+		public String getRemoteAddress() {
+			return remoteAddress;
 		}
 	}
 
 	public static class RemoveWorker implements Serializable {
 
-		private final String name;
-		private final String ip;
-		private final int port;
+		private final String remoteAddress;
 
-		public RemoveWorker(String name, String ip, int port) {
-			this.name = name;
-			this.ip = ip;
-			this.port = port;
+		public RemoveWorker(String remoteAddress) {
+			this.remoteAddress = remoteAddress;
 		}
 
-		public String getName() {
-			return name;
-		}
-
-		public String getIp() {
-			return ip;
-		}
-
-		public int getPort() {
-			return port;
+		public String getRemoteAddress() {
+			return remoteAddress;
 		}
 	}
 }

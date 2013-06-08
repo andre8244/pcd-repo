@@ -1,4 +1,4 @@
-<%-- 
+<%--
     Document   : index
     Created on : 6-giu-2013, 14.10.07
     Author     : Marco
@@ -9,9 +9,9 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Determinant Calculator Page</title>
+        <title>Determinant Calculator Service</title>
     </head>
     <body>
-        <h1>Determinant Calculator Service</h1>
+        <h1>Determinant Calculator Service running</h1>
     </body>
 </html>

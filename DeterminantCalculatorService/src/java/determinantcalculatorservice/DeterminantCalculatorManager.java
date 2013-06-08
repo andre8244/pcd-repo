@@ -5,16 +5,15 @@
 package determinantcalculatorservice;
 
 import Log.L;
-import untyped.Messages.Compute;
-import untyped.UntypedMaster;
+import messages.Messages.Compute;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import com.typesafe.config.ConfigFactory;
 import java.net.URL;
 import java.util.HashMap;
-import untyped.Messages.RegisterWorker;
-import untyped.Messages.RemoveWorker;
+import messages.Messages.RegisterWorker;
+import messages.Messages.RemoveWorker;
 
 /**
  *
@@ -32,7 +31,7 @@ public class DeterminantCalculatorManager {
 	private DeterminantCalculatorManager() {
 		reqNumber = 0;
 		ActorSystem system = ActorSystem.create("masterSystem", ConfigFactory.load().getConfig("masterSystem"));
-		master = system.actorOf(new Props(UntypedMaster.class), "untyped-master");
+		master = system.actorOf(new Props(Master.class), "untyped-master");
 		results = new HashMap<String, Double>();
 		done = new HashMap<String, Integer>();
 	}
@@ -69,13 +68,14 @@ public class DeterminantCalculatorManager {
 		}
 	}
 
-	public synchronized boolean registerWorker(String name, String ip, int port) {
-		master.tell(new RegisterWorker(name, ip, port));
+	public synchronized boolean registerWorker(String remoteAddress) {
+		master.tell(new RegisterWorker(remoteAddress));
+		// TODO ha senso che restituisca sempre true?
 		return true;
 	}
 
-	public synchronized boolean removeWorker(String name, String ip, int port) {
-		master.tell(new RemoveWorker(name, ip, port));
+	public synchronized boolean removeWorker(String remoteAddress) {
+		master.tell(new RemoveWorker(remoteAddress));
 		return true;
 	}
 
@@ -87,9 +87,4 @@ public class DeterminantCalculatorManager {
 		results.put(reqId, result);
 	}
 
-	// TODO DA ELIMINAREEEE!!
-	public static void main(String args[]){
-		DeterminantCalculatorManager manager = DeterminantCalculatorManager.getInstance();
-		manager.computeDeterminant(1000, null);
-	}
 }

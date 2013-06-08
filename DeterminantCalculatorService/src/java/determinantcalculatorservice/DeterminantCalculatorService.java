@@ -44,15 +44,15 @@ public class DeterminantCalculatorService {
 	 * Registrazione di un worker al servizio
 	 */
 	@WebMethod(operationName = "registerWorker")
-	public boolean registerWorker(@WebParam(name = "name") String name, @WebParam(name = "ip") String ip, @WebParam(name = "port") int port) {
-		return DeterminantCalculatorManager.getInstance().registerWorker(name, ip, port);
+	public boolean registerWorker(@WebParam(name = "remoteAddress") String remoteAddress) {
+		return DeterminantCalculatorManager.getInstance().registerWorker(remoteAddress);
 	}
 
 	/**
 	 * Rimozione di un worker dal servizio
 	 */
 	@WebMethod(operationName = "removeWorker")
-	public boolean removeWorker(@WebParam(name = "name") String name, @WebParam(name = "ip") String ip, @WebParam(name = "port") int port) {
-		return DeterminantCalculatorManager.getInstance().removeWorker(name, ip, port);
+	public boolean removeWorker(@WebParam(name = "remoteAddress") String remoteAddress) {
+		return DeterminantCalculatorManager.getInstance().removeWorker(remoteAddress);
 	}
 }
