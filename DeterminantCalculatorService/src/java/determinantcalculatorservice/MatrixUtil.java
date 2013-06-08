@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,17 +65,79 @@ public class MatrixUtil {
 	}
 
 	public static ArrayList<ArrayList<Double>> fromFileToArrayList(String fileName) {
+		ArrayList<ArrayList<Double>> matrix = new ArrayList<ArrayList<Double>>();
+
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(fileName));
+			String line = reader.readLine();
+			StringTokenizer tokenizer;
+
+			while (line != null) {
+				tokenizer = new StringTokenizer(line, " ");
+				ArrayList<Double> row = new ArrayList<Double>();
+				matrix.add(row);
+
+				while (tokenizer.hasMoreTokens()) {
+					row.add(Double.parseDouble(tokenizer.nextToken()));
+				}
+				line = reader.readLine();
+			}
 		} catch (FileNotFoundException ex) {
-			Logger.getLogger(MatrixUtil.class.getName()).log(Level.SEVERE, null, ex);
+			ex.printStackTrace();
+		} catch (IOException ex) {
+			ex.printStackTrace();
 		}
-		// TODO
-		return null;
+		testMatrix(matrix);
+		return matrix;
 	}
 
-	public static HashMap<Integer,HashMap<Integer, Double>> fromFileToHashMap(String fileName){
-		// TODO
-		return null;
+	public static HashMap<Integer, HashMap<Integer, Double>> fromFileToHashMap(String fileName) {
+		HashMap<Integer, HashMap<Integer, Double>> matrix = new HashMap<Integer, HashMap<Integer, Double>>();
+		int i;
+		int j;
+
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(fileName));
+			String line = reader.readLine();
+			StringTokenizer tokenizer;
+			i = 0;
+
+			while (line != null) {
+				tokenizer = new StringTokenizer(line, " ");
+				HashMap<Integer, Double> row = new HashMap<Integer, Double>();
+				matrix.put(i, row);
+				j = 0;
+
+				while (tokenizer.hasMoreTokens()) {
+					row.put(j, Double.parseDouble(tokenizer.nextToken()));
+					j++;
+				}
+				line = reader.readLine();
+				i++;
+			}
+		} catch (FileNotFoundException ex) {
+			ex.printStackTrace();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+		testMatrix(matrix);
+		return matrix;
+	}
+
+	public static void printMatrix(ArrayList<ArrayList<Double>> matrix) {
+		for (ArrayList<Double> row : matrix) {
+			for (Double elem : row) {
+				System.out.print(elem + " ");
+			}
+			System.out.print("\n");
+		}
+	}
+
+	private static void testMatrix(ArrayList<ArrayList<Double>> matrix) {
+		L.log("matrix util", "matrix size: "+matrix.size());
+	}
+
+	private static void testMatrix(HashMap<Integer, HashMap<Integer, Double>> matrix) {
+		
 	}
 }

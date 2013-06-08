@@ -60,8 +60,10 @@ public class UntypedMaster extends UntypedActor {
 		int order = compute.getOrder();
 		URL fileValue = compute.getFileValues();
 
-//		String path = System.getProperty("user.home") + System.getProperty("file.separator");
-//		MatrixUtil.genAndWriteToFile(5, 20,  path + "matrix.txt");
+		String path = System.getProperty("user.home") + System.getProperty("file.separator");
+		String fileName = path + "matrix.txt";
+		MatrixUtil.genAndWriteToFile(3, 20, fileName);
+		MatrixUtil.fromFileToArrayList(fileName);
 
 		String reqId = compute.getReqId();
 		rand = new Random();
@@ -90,7 +92,6 @@ public class UntypedMaster extends UntypedActor {
 		manager.setPercentageDone(reqId, percentageDone);
 		double precRes = results.get(reqId);
 		results.put(reqId, precRes + result);
-		L.log(me, "received jobResult, nWorkersDone=" + nWorkersDone + "  workers.size=" + workers.size());
 
 		if (nWorkersDone == workers.size()) {
 			L.log(me, "Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");

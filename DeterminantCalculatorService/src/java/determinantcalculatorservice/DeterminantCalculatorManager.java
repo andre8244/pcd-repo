@@ -80,12 +80,16 @@ public class DeterminantCalculatorManager {
 	}
 
 	public void setPercentageDone(String reqId, int percentageDone) {
-		// TODO edit
-		int oldValue = done.put(reqId, percentageDone);
-		L.log(me, "setPercentage: oldValue=" + oldValue + "  newValue=" + percentageDone);
+		done.put(reqId, percentageDone);
 	}
 
 	public void setResult(String reqId, double result) {
 		results.put(reqId, result);
+	}
+
+	// TODO DA ELIMINAREEEE!!
+	public static void main(String args[]){
+		DeterminantCalculatorManager manager = DeterminantCalculatorManager.getInstance();
+		manager.computeDeterminant(1000, null);
 	}
 }
