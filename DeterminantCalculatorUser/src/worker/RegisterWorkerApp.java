@@ -1,4 +1,4 @@
-package deploy_worker;
+package worker;
 
 import akka.actor.ActorSystem;
 import akka.actor.Props;
@@ -8,10 +8,10 @@ import com.typesafe.config.ConfigFactory;
  * This class deploys one (or more) workers on a network node.
  *
  */
-public class DeployWorker {
+public class RegisterWorkerApp {
 
 	// TODO in futuro forse sarà meglio poter installare un solo worker su ogni nodo di rete per valutare le performance
-	private static final int nWorkersToDeploy = 5;
+	private static final int nWorkersToDeploy = 7;
 
 	// TODO in futuro questo metodo dovrebbe essere eliminato, s
 	public static void deploy(int nWorkers) {
