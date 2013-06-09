@@ -1,6 +1,6 @@
 package user;
 
-import Log.L;
+import log.l;
 
 public class UserApp {
 
@@ -33,12 +33,12 @@ public class UserApp {
 
 		String reqId = servicePort.computeDeterminant(20000, null);
 		int percentage = servicePort.getPercentageDone(reqId);
-		L.log(me, reqId + " percentage: " + percentage + " %");
+		l.l(me, reqId + " percentage: " + percentage + " %");
 		int lastPercentage = percentage;
 
 		while (percentage != 100) {
 			if (percentage != lastPercentage){
-				L.log(me, reqId + " percentage: " + percentage + " %");
+				l.l(me, reqId + " percentage: " + percentage + " %");
 				lastPercentage = percentage;
 			}
 
