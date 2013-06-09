@@ -14,10 +14,10 @@ public class Worker extends UntypedActor {
 	//private determinantcalculatorservice.DeterminantCalculatorService servicePort;
 
 	// Leardini
-	private leardini_ws_client.DeterminantCalculatorService servicePort;
+	//private leardini_ws_client.DeterminantCalculatorService servicePort;
 
 	// Fortibuoni
-	//private fortibuoni_WS_client.DeterminantCalculatorService servicePort;
+	private fortibuoni_WS_client.DeterminantCalculatorService servicePort;
 
 	@Override
 	public void preStart() {
@@ -25,9 +25,9 @@ public class Worker extends UntypedActor {
 		me = getSelf().path().name();
 
 		// Leardini
-		leardini_ws_client.DeterminantCalculatorService_Service service =
-				new leardini_ws_client.DeterminantCalculatorService_Service();
-		servicePort = service.getDeterminantCalculatorServicePort();
+		//leardini_ws_client.DeterminantCalculatorService_Service service =
+		//		new leardini_ws_client.DeterminantCalculatorService_Service();
+		//servicePort = service.getDeterminantCalculatorServicePort();
 
 		// Alessi
 		/*determinantcalculatorservice.DeterminantCalculatorService_Service service =
@@ -35,9 +35,9 @@ public class Worker extends UntypedActor {
 		servicePort = service.getDeterminantCalculatorServicePort();*/
 
 		// Fortibuoni
-		/*fortibuoni_WS_client.DeterminantCalculatorService_Service service =
+		fortibuoni_WS_client.DeterminantCalculatorService_Service service =
 				new fortibuoni_WS_client.DeterminantCalculatorService_Service();
-		servicePort = service.getDeterminantCalculatorServicePort();*/
+		servicePort = service.getDeterminantCalculatorServicePort();
 
 		Address systemRemoteAddress = ((RemoteActorRefProvider) context().provider()).transport().address();
 		String remoteAddress = getSelf().path().toStringWithAddress(systemRemoteAddress);
