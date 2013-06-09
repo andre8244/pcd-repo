@@ -10,16 +10,16 @@ public class UserApp {
 	//private determinantcalculatorservice.DeterminantCalculatorService servicePort;
 
 	// Leardini
-	private leardini_ws_client.DeterminantCalculatorService servicePort;
+	//private leardini_ws_client.DeterminantCalculatorService servicePort;
 
 	// Fortibuoni
-	//private fortibuoni_WS_client.DeterminantCalculatorService servicePort;
+	private fortibuoni_WS_client.DeterminantCalculatorService servicePort;
 
 	public UserApp(){
 		// Leardini
-		leardini_ws_client.DeterminantCalculatorService_Service service =
-				new leardini_ws_client.DeterminantCalculatorService_Service();
-		servicePort = service.getDeterminantCalculatorServicePort();
+		//leardini_ws_client.DeterminantCalculatorService_Service service =
+		//		new leardini_ws_client.DeterminantCalculatorService_Service();
+		//servicePort = service.getDeterminantCalculatorServicePort();
 
 		// Alessi
 		/*determinantcalculatorservice.DeterminantCalculatorService_Service service =
@@ -27,9 +27,9 @@ public class UserApp {
 		servicePort = service.getDeterminantCalculatorServicePort();*/
 
 		// Fortibuoni
-		/*fortibuoni_WS_client.DeterminantCalculatorService_Service service =
+		fortibuoni_WS_client.DeterminantCalculatorService_Service service =
 				new fortibuoni_WS_client.DeterminantCalculatorService_Service();
-		servicePort = service.getDeterminantCalculatorServicePort();*/
+		servicePort = service.getDeterminantCalculatorServicePort();
 
 		String reqId = servicePort.computeDeterminant(20000, null);
 		int percentage = servicePort.getPercentageDone(reqId);

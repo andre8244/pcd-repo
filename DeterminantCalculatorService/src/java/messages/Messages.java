@@ -1,7 +1,6 @@
 package messages;
 
 import determinantcalculatorservice.DeterminantCalculatorManager;
-import determinantcalculatorservice.DeterminantCalculatorManager;
 import java.util.ArrayList;
 import java.io.Serializable;
 import java.net.URL;
