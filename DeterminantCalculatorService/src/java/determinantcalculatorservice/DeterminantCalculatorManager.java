@@ -4,7 +4,7 @@
  */
 package determinantcalculatorservice;
 
-import Log.L;
+import log.l;
 import messages.Messages.Compute;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;

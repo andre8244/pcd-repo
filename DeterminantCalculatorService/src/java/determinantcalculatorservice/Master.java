@@ -1,6 +1,6 @@
 package determinantcalculatorservice;
 
-import Log.L;
+import log.l;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -51,7 +51,7 @@ public class Master extends UntypedActor {
 	}
 
 	private void handleCompute(Compute compute) {
-		L.log(me, "handleCompute, workers.size():" + workers.size());
+		l.l(me, "handleCompute, workers.size():" + workers.size());
 		if (manager == null) {
 			manager = compute.getManager();
 		}
@@ -71,7 +71,7 @@ public class Master extends UntypedActor {
 		results.put(reqId, 0.0);
 
 		if (workers.size() == 0){
-			L.log(me, "\nWORKERS.SIZE() = 0 !!!!\n");
+			l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
 		}
 
 		for (int i = 0; i < workers.size(); i++) {
@@ -93,7 +93,7 @@ public class Master extends UntypedActor {
 		nWorkersDone++;
 		done.put(reqId, nWorkersDone);
 
-		L.log(me, "nWorkersDone: " + nWorkersDone);
+		l.l(me, "nWorkersDone: " + nWorkersDone);
 
 		int percentageDone = nWorkersDone * 100 / workers.size();
 		manager.setPercentageDone(reqId, percentageDone);
@@ -101,7 +101,7 @@ public class Master extends UntypedActor {
 		results.put(reqId, precRes + result);
 
 		if (nWorkersDone == workers.size()) {
-			L.log(me, "Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
+			l.l(me, "Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
 			manager.setResult(reqId, results.get(reqId) / workers.size());
 		}
 	}
@@ -110,7 +110,7 @@ public class Master extends UntypedActor {
 		String remoteAddress = rw.getRemoteAddress();
 		RemoteWorker worker = new RemoteWorker(remoteAddress, getContext().actorFor(remoteAddress));
 		workers.add(worker);
-		L.log(me, "worker added, workers size: " + workers.size());
+		l.l(me, "worker added, workers size: " + workers.size());
 	}
 
 	private void handleRemoveWorker(RemoveWorker rw) {
@@ -122,6 +122,6 @@ public class Master extends UntypedActor {
 				workers.remove(i);
 			}
 		}
-		L.log(me, "worker removed, workers size: " + workers.size());
+		l.l(me, "worker removed, workers size: " + workers.size());
 	}
 }

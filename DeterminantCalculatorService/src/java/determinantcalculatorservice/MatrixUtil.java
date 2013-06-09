@@ -1,6 +1,6 @@
 package determinantcalculatorservice;
 
-import Log.L;
+import log.l;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -26,7 +26,7 @@ public class MatrixUtil {
 		rand = new Random();
 
 		File file = new File(fileName);
-		L.log("MATRIXUTIL", file.getAbsolutePath());
+		l.l("MATRIXUTIL", file.getAbsolutePath());
 
 		try {
 			writer = new BufferedWriter(new FileWriter(fileName));
@@ -132,7 +132,7 @@ public class MatrixUtil {
 	}
 
 	private static void testMatrix(ArrayList<ArrayList<Double>> matrix) {
-		L.log("matrix util", "matrix size: "+matrix.size());
+		l.l("matrix util", "matrix size: "+matrix.size());
 		// TODO
 	}
 
