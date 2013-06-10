@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.2.0-1 (tags/2.2.0u1-7139; 2012-06-02T10:55:19+0000) JAXWS-RI/2.2.6-2 JAXWS/2.2 svn-revision#unknown. --><xs:schema xmlns:tns="http://determinantcalculatorservice/" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="http://determinantcalculatorservice/">
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.2.0-1 (tags/2.2.0u1-7139; 2012-06-02T10:55:19+0000) JAXWS-RI/2.2.6-2 JAXWS/2.2 svn-revision#unknown. --><xs:schema xmlns:tns="http://determinant_calculator_service/" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="http://determinant_calculator_service/">
 
 <xs:element name="computeDeterminant" type="tns:computeDeterminant"/>
 
@@ -20,6 +20,18 @@
 
 <xs:element name="removeWorkerResponse" type="tns:removeWorkerResponse"/>
 
+<xs:complexType name="registerWorker">
+<xs:sequence>
+<xs:element name="remoteAddress" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="registerWorkerResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:boolean"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="getResult">
 <xs:sequence>
 <xs:element name="reqId" type="xs:string" minOccurs="0"/>
@@ -32,15 +44,15 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="registerWorker">
+<xs:complexType name="getPercentageDone">
 <xs:sequence>
-<xs:element name="remoteAddress" type="xs:string" minOccurs="0"/>
+<xs:element name="reqId" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="registerWorkerResponse">
+<xs:complexType name="getPercentageDoneResponse">
 <xs:sequence>
-<xs:element name="return" type="xs:boolean"/>
+<xs:element name="return" type="xs:int"/>
 </xs:sequence>
 </xs:complexType>
 
@@ -66,18 +78,6 @@
 <xs:complexType name="computeDeterminantResponse">
 <xs:sequence>
 <xs:element name="return" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="getPercentageDone">
-<xs:sequence>
-<xs:element name="reqId" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="getPercentageDoneResponse">
-<xs:sequence>
-<xs:element name="return" type="xs:int"/>
 </xs:sequence>
 </xs:complexType>
 </xs:schema>

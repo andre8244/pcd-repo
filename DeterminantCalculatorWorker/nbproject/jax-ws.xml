@@ -5,7 +5,7 @@
     <client name="DeterminantCalculatorService">
       <wsdl-url>http://localhost:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsdl-url>
       <local-wsdl-file>localhost_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl</local-wsdl-file>
-      <package-name forceReplace="true">leardini_ws_client</package-name>
+      <package-name forceReplace="true">determinant_ws_client</package-name>
       <catalog-file>catalog.xml</catalog-file>
       <wsimport-options>
         <wsimport-option>
@@ -30,7 +30,7 @@
         </wsimport-option>
         <wsimport-option>
           <wsimport-option-name>package</wsimport-option-name>
-          <wsimport-option-value>leardini_ws_client</wsimport-option-value>
+          <wsimport-option-value>determinant_ws_client</wsimport-option-value>
         </wsimport-option>
       </wsimport-options>
     </client>
