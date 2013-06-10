@@ -62,8 +62,9 @@ public class Master extends UntypedActor {
 
 		String path = System.getProperty("user.home") + System.getProperty("file.separator");
 		String fileName = path + "matrix.txt";
-		MatrixUtil.genAndWriteToFile(1000, 20, fileName);
+		MatrixUtil.genAndWriteToFile(3000, 20, fileName);
 		MatrixUtil.fromFileToArrayList(fileName);
+		MatrixUtil.fromFileToHashMap(fileName);
 
 		String reqId = compute.getReqId();
 		rand = new Random();

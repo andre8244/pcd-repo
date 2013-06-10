@@ -90,13 +90,16 @@ public class MatrixUtil {
 			ex.printStackTrace();
 		}
 
-		l.l(me, "finished writing arraylist" + (System.currentTimeMillis()-startTime));
+		l.l(me, "finished writing arraylist " + ((System.currentTimeMillis()-startTime) / (double) 1000) + " sec");
 
 		testMatrix(matrix);
 		return matrix;
 	}
 
 	public static HashMap<Integer, HashMap<Integer, Double>> fromFileToHashMap(String fileName) {
+		l.l(me, "writing hashmap");
+		long startTime = System.currentTimeMillis();
+
 		HashMap<Integer, HashMap<Integer, Double>> matrix = new HashMap<Integer, HashMap<Integer, Double>>();
 		int i;
 		int j;
@@ -125,6 +128,9 @@ public class MatrixUtil {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
+
+		l.l(me, "finished writing arraylist " + ((System.currentTimeMillis()-startTime) / (double) 1000) + " sec");
+
 		testMatrix(matrix);
 		return matrix;
 	}
@@ -139,7 +145,7 @@ public class MatrixUtil {
 	}
 
 	private static void testMatrix(ArrayList<ArrayList<Double>> matrix) {
-		l.l("matrix util", "matrix size: "+matrix.size());
+		//l.l("matrix util", "matrix size: "+matrix.size());
 		// TODO
 	}
 
