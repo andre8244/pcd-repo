@@ -24,6 +24,7 @@ public class MatrixUtil {
 	}
 
 	public static void genAndWriteToFile(int order, int maxAbs, String fileName) {
+		long startTime = System.currentTimeMillis();
 		rand = new Random();
 
 		File file = new File(fileName);
@@ -49,7 +50,7 @@ public class MatrixUtil {
 					log((int) ((double) row / order * 100) + " %");
 				}
 			}
-			log("Matrix wrote to file");
+			log("Matrix wrote to file, duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -73,15 +74,22 @@ public class MatrixUtil {
 			BufferedReader reader = new BufferedReader(new FileReader(fileName));
 			String line = reader.readLine();
 			StringTokenizer tokenizer;
+			ArrayList<Double> row;
+			int lineNumber = 0;
 
 			while (line != null) {
 				tokenizer = new StringTokenizer(line, " ");
-				ArrayList<Double> row = new ArrayList<Double>();
-				matrix.add(row);
+				row = new ArrayList<Double>();
+				lineNumber++;
+
+				if (lineNumber % 100 == 0){
+					l.l(me, "wrote " + lineNumber + " lines in arraylist");
+				}
 
 				while (tokenizer.hasMoreTokens()) {
 					row.add(Double.parseDouble(tokenizer.nextToken()));
 				}
+				matrix.add(row);
 				line = reader.readLine();
 			}
 		} catch (FileNotFoundException ex) {
@@ -89,10 +97,10 @@ public class MatrixUtil {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
-
-		l.l(me, "finished writing arraylist " + ((System.currentTimeMillis()-startTime) / (double) 1000) + " sec");
-
-		testMatrix(matrix);
+		l.l(me, "finished writing arraylist " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
+		startTime = System.currentTimeMillis();
+		testReadMatrix(matrix);
+		l.l(me, "finished reading arraylist " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
 		return matrix;
 	}
 
@@ -122,16 +130,17 @@ public class MatrixUtil {
 				}
 				line = reader.readLine();
 				i++;
+				l.l(me, "wrote " + i + " lines in hashmap");
 			}
 		} catch (FileNotFoundException ex) {
 			ex.printStackTrace();
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
-
-		l.l(me, "finished writing arraylist " + ((System.currentTimeMillis()-startTime) / (double) 1000) + " sec");
-
-		testMatrix(matrix);
+		l.l(me, "finished writing hashmap " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
+		startTime = System.currentTimeMillis();
+		testReadMatrix(matrix);
+		l.l(me, "finished reading hashmap " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
 		return matrix;
 	}
 
@@ -144,12 +153,23 @@ public class MatrixUtil {
 		}
 	}
 
-	private static void testMatrix(ArrayList<ArrayList<Double>> matrix) {
-		//l.l("matrix util", "matrix size: "+matrix.size());
-		// TODO
+	private static void testReadMatrix(ArrayList<ArrayList<Double>> matrix) {
+		long dummy = 0;
+
+		for (int i = 0; i < matrix.size(); i++) {
+			for (int j = 0; j < matrix.get(i).size(); j++) {
+				dummy++;
+			}
+		}
 	}
 
-	private static void testMatrix(HashMap<Integer, HashMap<Integer, Double>> matrix) {
-		// TODO
+	private static void testReadMatrix(HashMap<Integer, HashMap<Integer, Double>> matrix) {
+		long dummy = 0;
+
+		for (int i = 0; i < matrix.size(); i++) {
+			for (int j = 0; j < matrix.get(i).size(); j++) {
+				dummy++;
+			}
+		}
 	}
 }
