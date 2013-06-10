@@ -10,15 +10,15 @@ public class UserApp {
 	//private determinantcalculatorservice.DeterminantCalculatorService servicePort;
 
 	// Leardini
-	private leardini_ws_client.DeterminantCalculatorService servicePort;
+	private determinant_ws_client.DeterminantCalculatorService servicePort;
 
 	// Fortibuoni
 	//private fortibuoni_WS_client.DeterminantCalculatorService servicePort;
 
 	public UserApp(){
 		// Leardini
-		leardini_ws_client.DeterminantCalculatorService_Service service =
-				new leardini_ws_client.DeterminantCalculatorService_Service();
+		determinant_ws_client.DeterminantCalculatorService_Service service =
+				new determinant_ws_client.DeterminantCalculatorService_Service();
 		servicePort = service.getDeterminantCalculatorServicePort();
 
 		// Alessi
