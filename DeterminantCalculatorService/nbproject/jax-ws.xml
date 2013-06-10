@@ -2,7 +2,7 @@
 <jax-ws xmlns="http://www.netbeans.org/ns/jax-ws/1">
   <services>
     <service name="DeterminantCalculatorService">
-      <implementation-class>determinantcalculatorservice.DeterminantCalculatorService</implementation-class>
+      <implementation-class>determinant_calculator_service.DeterminantCalculatorService</implementation-class>
     </service>
   </services>
   <clients/>

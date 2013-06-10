@@ -1,4 +1,4 @@
-package determinantcalculatorservice;
+package determinant_calculator_service;
 
 import log.l;
 import java.io.BufferedReader;
@@ -17,6 +17,7 @@ public class MatrixUtil {
 
 	private static BufferedWriter writer;
 	private static Random rand;
+	private static String me = "matrixUtil";
 
 	private static void log(String msg) {
 		System.out.println("" + msg);
@@ -63,6 +64,9 @@ public class MatrixUtil {
 	}
 
 	public static ArrayList<ArrayList<Double>> fromFileToArrayList(String fileName) {
+		l.l(me, "writing arraylist");
+		long startTime = System.currentTimeMillis();
+
 		ArrayList<ArrayList<Double>> matrix = new ArrayList<ArrayList<Double>>();
 
 		try {
@@ -85,6 +89,9 @@ public class MatrixUtil {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
+
+		l.l(me, "finished writing arraylist" + (System.currentTimeMillis()-startTime));
+
 		testMatrix(matrix);
 		return matrix;
 	}

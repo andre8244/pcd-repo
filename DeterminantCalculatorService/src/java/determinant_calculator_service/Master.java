@@ -1,4 +1,4 @@
-package determinantcalculatorservice;
+package determinant_calculator_service;
 
 import log.l;
 import java.util.ArrayList;
@@ -60,10 +60,10 @@ public class Master extends UntypedActor {
 		int order = compute.getOrder();
 		URL fileValue = compute.getFileValues();
 
-//		String path = System.getProperty("user.home") + System.getProperty("file.separator");
-//		String fileName = path + "matrix.txt";
-//		MatrixUtil.genAndWriteToFile(3, 20, fileName);
-//		MatrixUtil.fromFileToArrayList(fileName);
+		String path = System.getProperty("user.home") + System.getProperty("file.separator");
+		String fileName = path + "matrix.txt";
+		MatrixUtil.genAndWriteToFile(1000, 20, fileName);
+		MatrixUtil.fromFileToArrayList(fileName);
 
 		String reqId = compute.getReqId();
 		rand = new Random();

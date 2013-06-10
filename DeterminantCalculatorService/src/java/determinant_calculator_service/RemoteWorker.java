@@ -1,4 +1,4 @@
-package determinantcalculatorservice;
+package determinant_calculator_service;
 
 import akka.actor.ActorRef;
 
