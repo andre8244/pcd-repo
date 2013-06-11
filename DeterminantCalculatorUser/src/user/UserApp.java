@@ -9,11 +9,16 @@ public class UserApp {
 
 	public UserApp(){
 
-                determinant_ws_client.DeterminantCalculatorService_Service service =
+        determinant_ws_client.DeterminantCalculatorService_Service service =
 				new determinant_ws_client.DeterminantCalculatorService_Service();
 		servicePort = service.getDeterminantCalculatorServicePort();
 
-                String reqId = servicePort.computeDeterminant(2, null);
+        String path = System.getProperty("user.home") + System.getProperty("file.separator");
+        String fileName = path + "matrix.txt";
+        int order = 100;
+		MatrixUtil.genAndWriteToFile(order, 20, fileName);
+                        
+        String reqId = servicePort.computeDeterminant(order, null);
 		int percentage = servicePort.getPercentageDone(reqId);
 		l.l(me, reqId + " percentage: " + percentage + " %");
 		int lastPercentage = percentage;
@@ -33,12 +38,7 @@ public class UserApp {
 		}
 
 		System.out.println("Result for " + reqId + ": " + servicePort.getResult(reqId));
-
-
-                //String path = System.getProperty("user.home") + System.getProperty("file.separator");
-                //String fileName = path + "matrix.txt";
-		//MatrixUtil.genAndWriteToFile(10000, 20, fileName);
-
+            
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException ex) {
