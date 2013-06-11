@@ -15,7 +15,7 @@ public class UserApp {
 
         String path = System.getProperty("user.home") + System.getProperty("file.separator");
         String fileName = path + "matrix.txt";
-        int order = 100;
+        int order = 1000;
 		MatrixUtil.genAndWriteToFile(order, 20, fileName);
                         
         String reqId = servicePort.computeDeterminant(order, null);
