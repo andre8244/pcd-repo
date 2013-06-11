@@ -7,9 +7,9 @@ import akka.actor.UntypedActor;
 import akka.remote.RemoteActorRefProvider;
 
 public class Worker extends UntypedActor {
-	
-        private String me;
-        private determinant_ws_client.DeterminantCalculatorService servicePort;
+
+	private String me;
+	private determinant_ws_client.DeterminantCalculatorService servicePort;
 
 	@Override
 	public void preStart() {
@@ -20,40 +20,39 @@ public class Worker extends UntypedActor {
 				new determinant_ws_client.DeterminantCalculatorService_Service();
 		servicePort = service.getDeterminantCalculatorServicePort();
 
-                Address systemRemoteAddress = ((RemoteActorRefProvider) context().provider()).transport().address();
+		Address systemRemoteAddress = ((RemoteActorRefProvider) context().provider()).transport().address();
 		String remoteAddress = getSelf().path().toStringWithAddress(systemRemoteAddress);
 		boolean result = servicePort.registerWorker(remoteAddress);
 
-		if (result){
+		if (result) {
 			l.l(me, "worker registered");
 		}
 	}
 
 	@Override
 	public void onReceive(Object msg) throws Exception {
-		if (msg instanceof Messages.Job) {
-			Messages.Job job = (Messages.Job) msg;
-			handleJob(job);
+		if (msg instanceof Messages.OneRow) {
+			Messages.OneRow oneRow = (Messages.OneRow) msg;
+			handleOneRow(oneRow);
 		} else {
 			unhandled(msg);
 		}
 	}
 
-	private void handleJob(Messages.Job job) {
-		final double[] list = job.getList();
-		final String reqId = job.getReqId();
-		double result = 0;
+	private void handleOneRow(Messages.OneRow oneRow) {
+		final String reqId = oneRow.getReqId();
+		final double[] firstRow = oneRow.getFirstRow();
+		final double[] row = oneRow.getRow();
+		final int rowNumber = oneRow.getRowNumber();
 
-		for (int i = 0; i < list.length; i++) {
-			//l.l(me, "received element " + list[i]);
-			result += list[i];
+		double factor = -row[0] / firstRow[0];
+		l.l(me, "factor: " + factor);
+
+		for (int i = 0; i < firstRow.length; i++) {
+			row[i] = row[i] + factor * firstRow[i];
 		}
-                
-                result = result/list.length;
 
-
-		final Messages.JobResult jr = new Messages.JobResult(result, reqId);
-		getSender().tell(jr, getSelf());
+		final Messages.OneRowResult oneRowResult = new Messages.OneRowResult(reqId, row, rowNumber);
+		getSender().tell(oneRowResult, getSelf());
 	}
-
 }
