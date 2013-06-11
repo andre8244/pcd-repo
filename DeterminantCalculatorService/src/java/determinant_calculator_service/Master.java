@@ -14,13 +14,14 @@ import messages.Messages.RemoveWorker;
 
 public class Master extends UntypedActor {
 
+    private HashMap<String, MatrixInfo> matricesInfo;
 	private ArrayList<RemoteWorker> workers;
 	private HashMap<String, Integer> done;
-	private HashMap<String, Double> results;
 	private long startTime;
 	private DeterminantCalculatorManager manager;
 	private String me;
 	private HashMap<String, double[][]> matrices;
+    private HashMap<String, Integer> matricesLength;
 	private HashMap<String, Double> determinants;
 	private HashMap<String, Boolean> changeSign;
 	// TODO fare un unica struttura dati che comprende una richiesta, la matrice, lo stadio a cui si è arrivati ecc
@@ -29,11 +30,12 @@ public class Master extends UntypedActor {
 		// TODO è meglio che i workers stiano dentro al manager?
 		workers = new ArrayList<RemoteWorker>();
 		done = new HashMap<String, Integer>();
-		results = new HashMap<String, Double>();
 		me = getSelf().path().name();
 		matrices = new HashMap<String, double[][]>();
+        matricesLength = new HashMap<String, Integer>();
 		determinants = new HashMap<String, Double>();
 		changeSign = new HashMap<String, Boolean>();
+        matricesInfo = new HashMap<String, MatrixInfo>();
 	}
 
 	@Override
@@ -62,32 +64,21 @@ public class Master extends UntypedActor {
 			manager = compute.getManager();
 		}
 		startTime = System.currentTimeMillis();
-		// utilizzo per ora order come dimensione della lista
-		int order = compute.getOrder();
+		
+        int order = compute.getOrder();
 		URL fileValue = compute.getFileValues();
 		String reqId = compute.getReqId();
 
 		String path = System.getProperty("user.home") + System.getProperty("file.separator");
 		String fileName = path + "matrix.txt";
 
-		//MatrixUtil.genAndWriteToFile(order, 20, fileName);
-
-		matrices.put(reqId, MatrixUtil.fromFileToList(order, path + "matrix2.txt"));
-
-		l.l(me, "Matrix length: " + matrices.get(reqId).length);
-
-		// calcolo media per verifica
-//		double media = 0;
-//		for (int i = 0; i < matrices.get(reqId).length; i++) {
-//			for (int j = 0; j < (matrices.get(reqId))[i].length; j++) {
-//				media = media + (matrices.get(reqId))[i][j];
-//			}
-//		}
-//		media = media / (matrices.get(reqId).length * matrices.get(reqId).length);
-//		l.l(me, "Matrix media: " + media);
+		matrices.put(reqId, MatrixUtil.fromFileToList(order, fileName));
+        
+        int length = matrices.get(reqId).length;
+        matricesLength.put(reqId,length);
+		l.l(me, "Matrix length: " + length);
 
 		done.put(reqId, 0);
-		results.put(reqId, 0.0);
 		determinants.put(reqId, 1.0);
 		changeSign.put(reqId, false);
 
@@ -96,35 +87,21 @@ public class Master extends UntypedActor {
 			return;
 		}
 
-//		for (int i = 0; i < matrix.get(reqId).length; i++) {
-//			double[] row = matrix.get(reqId)[i];
-//			workers.get((i%workers.size())).getActorRef().tell(new Job(row, reqId), getSelf());
-//			if (i % 500 == 0) {
-//					l.l(me, "sent row " + i + " to worker" + (i%workers.size()));
-//			}
-//		}
-
-		gauss(reqId);
+        gauss(reqId);
 	}
 
 	private void handleOneRowResult(OneRowResult orr) {
 		String reqId = orr.getReqId();
 		double[] row = orr.getRow();
 		int rowNumber = orr.getRowNumber();
-		//log("received jobresult from [" + getSender().path().name() + "]: " + result);
-		int nRowsDone = done.get(reqId);
+		
+        int nRowsDone = done.get(reqId);
 		nRowsDone++;
 		done.put(reqId, nRowsDone);
 
-		//if (nRowsDone % 500 == 0) {
+		/*if (nRowsDone % 500 == 0) {
 			l.l(me, "nRowsDone: " + nRowsDone);
-		//}
-
-		// TODO aggiornare
-		//int percentageDone = nRowsDone * 100 / (matrices.get(reqId).length - 1);
-		//manager.setPercentageDone(reqId, percentageDone);
-		//double precRes = results.get(reqId);
-		//results.put(reqId, precRes + result);
+		}*/
 
 		double[][] matrix = matrices.get(reqId);
 		matrix[rowNumber] = row;
@@ -132,14 +109,16 @@ public class Master extends UntypedActor {
 		matrices.put(reqId, matrix);
 
 		if (nRowsDone == matrix.length - 1) {
-			l.l(me, "Received all rows for submatrix " + matrices.get(reqId).length + ". Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
-
+            if (matrix.length % 500 == 0){
+                l.l(me, "Received all rows for submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
+            }
+                
 			if (matrix.length > 2){
 				done.put(reqId, 0);
 				subMatrix(reqId, matrix);
 				gauss(reqId);
-				//manager.setResult(reqId, results.get(reqId) / matrices.get(reqId).length);
 			} else {
+                l.l(me, "Received all rows for submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
 				double oldDeterminant = determinants.get(reqId);
 				double determinant = oldDeterminant * matrix[1][1];
 
@@ -150,8 +129,9 @@ public class Master extends UntypedActor {
 					determinants.put(reqId, -determinant);
 					manager.setResult(reqId, -determinant); // TODO
 				}
-				manager.setPercentageDone(reqId, 100);
+				//manager.setPercentageDone(reqId, 100);
 			}
+            manager.setPercentageDone(reqId, (matricesLength.get(reqId)-matrices.get(reqId).length)*100/(matricesLength.get(reqId)-2));
 		}
 	}
 
@@ -192,9 +172,9 @@ public class Master extends UntypedActor {
 		for (int i = 1; i < matrix.length; i++) {
 			double[] row = matrix[i];
 			workers.get(((i - 1) % workers.size())).getActorRef().tell(new OneRow(reqId, firstRow, row, i), getSelf());
-			//if (i % 500 == 0) {
-				l.l(me, "sent row " + (i - 1) + " to worker" + (i % workers.size()));
-			//}
+			/*if (i % 500 == 0) {
+				l.l(me, "sent row " + i + " to worker" + ((i - 1) % workers.size()));
+			}*/
 		}
 	}
 
