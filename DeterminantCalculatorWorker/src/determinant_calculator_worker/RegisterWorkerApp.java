@@ -11,7 +11,7 @@ import com.typesafe.config.ConfigFactory;
 public class RegisterWorkerApp {
 
 	// TODO in futuro forse sarà meglio poter installare un solo worker su ogni nodo di rete per valutare le performance
-	private static final int nWorkersToDeploy = 7;
+	private static final int nWorkersToDeploy = 10;
 
 	// TODO in futuro questo metodo dovrebbe essere eliminato, s
 	public static void deploy(int nWorkers) {
@@ -19,7 +19,7 @@ public class RegisterWorkerApp {
 		ActorSystem system = ActorSystem.create("workerSystem_" + id, ConfigFactory.load().getConfig("worker"));
 
 		for (int i = 0; i < nWorkers; i++) {
-			system.actorOf(new Props(Worker.class), "worker-" + i);
+			system.actorOf(new Props(Worker.class), "worker" + i);
 		}
 	}
 

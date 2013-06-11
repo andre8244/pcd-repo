@@ -7,15 +7,15 @@ public class Messages {
 
 	public static class Job implements Serializable {
 
-		private final ArrayList<Double> list;
+		private final double[] list;
 		private final String reqId;
 
-		public Job(ArrayList<Double> list, String reqId) {
+		public Job(double[] list, String reqId) {
 			this.list = list;
 			this.reqId = reqId;
 		}
 
-		public ArrayList<Double> getList() {
+		public double[] getList() {
 			return list;
 		}
 

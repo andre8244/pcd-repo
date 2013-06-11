@@ -59,15 +59,16 @@ public class Worker extends UntypedActor {
 	}
 
 	private void handleJob(Messages.Job job) {
-		final ArrayList<Double> list = job.getList();
+		final double[] list = job.getList();
 		final String reqId = job.getReqId();
 		double result = 0;
 
-		// per ora come job calcolo la media dei valori della lista
-		for (int i = 0; i < list.size(); i++) {
-			result = result + list.get(i);
+		for (int i = 0; i < list.length; i++) {
+			l.l(me, "received element " + list[i]);
+			result += list[i];
 		}
-		result = result / list.size();
+
+
 		final Messages.JobResult jr = new Messages.JobResult(result, reqId);
 		getSender().tell(jr, getSelf());
 	}
