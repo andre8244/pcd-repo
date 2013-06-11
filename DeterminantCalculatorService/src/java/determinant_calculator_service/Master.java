@@ -16,26 +16,15 @@ public class Master extends UntypedActor {
 
     private HashMap<String, MatrixInfo> matricesInfo;
 	private ArrayList<RemoteWorker> workers;
-	private HashMap<String, Integer> done;
 	private long startTime;
 	private DeterminantCalculatorManager manager;
 	private String me;
-	private HashMap<String, double[][]> matrices;
-    private HashMap<String, Integer> matricesLength;
-	private HashMap<String, Double> determinants;
-	private HashMap<String, Boolean> changeSign;
-	// TODO fare un unica struttura dati che comprende una richiesta, la matrice, lo stadio a cui si è arrivati ecc
-
+	
 	public Master() {
 		// TODO è meglio che i workers stiano dentro al manager?
 		workers = new ArrayList<RemoteWorker>();
-		done = new HashMap<String, Integer>();
 		me = getSelf().path().name();
-		matrices = new HashMap<String, double[][]>();
-        matricesLength = new HashMap<String, Integer>();
-		determinants = new HashMap<String, Double>();
-		changeSign = new HashMap<String, Boolean>();
-        matricesInfo = new HashMap<String, MatrixInfo>();
+		matricesInfo = new HashMap<String, MatrixInfo>();
 	}
 
 	@Override
@@ -72,17 +61,12 @@ public class Master extends UntypedActor {
 		String path = System.getProperty("user.home") + System.getProperty("file.separator");
 		String fileName = path + "matrix.txt";
 
-		matrices.put(reqId, MatrixUtil.fromFileToList(order, fileName));
+		matricesInfo.put(reqId, new MatrixInfo(MatrixUtil.fromFileToList(order, fileName)));
         
-        int length = matrices.get(reqId).length;
-        matricesLength.put(reqId,length);
-		l.l(me, "Matrix length: " + length);
+        int length = matricesInfo.get(reqId).getMatrixLength();
+        l.l(me, "Matrix length: " + length);
 
-		done.put(reqId, 0);
-		determinants.put(reqId, 1.0);
-		changeSign.put(reqId, false);
-
-		if (workers.isEmpty()) {
+        if (workers.isEmpty()) {
 			l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
 			return;
 		}
@@ -95,18 +79,19 @@ public class Master extends UntypedActor {
 		double[] row = orr.getRow();
 		int rowNumber = orr.getRowNumber();
 		
-        int nRowsDone = done.get(reqId);
+        MatrixInfo matrixInfo = matricesInfo.get(reqId);
+        
+        int nRowsDone = matrixInfo.getRowsDone();
 		nRowsDone++;
-		done.put(reqId, nRowsDone);
+		matrixInfo.setRowsDone(nRowsDone);
 
 		/*if (nRowsDone % 500 == 0) {
 			l.l(me, "nRowsDone: " + nRowsDone);
 		}*/
 
-		double[][] matrix = matrices.get(reqId);
+		double[][] matrix = matrixInfo.getMatrix();
 		matrix[rowNumber] = row;
-		// TODO è necessario fare la put o è implicita come side effect?
-		matrices.put(reqId, matrix);
+		matrixInfo.setMatrix(matrix);
 
 		if (nRowsDone == matrix.length - 1) {
             if (matrix.length % 500 == 0){
@@ -114,24 +99,23 @@ public class Master extends UntypedActor {
             }
                 
 			if (matrix.length > 2){
-				done.put(reqId, 0);
-				subMatrix(reqId, matrix);
+				matrixInfo.setRowsDone(0);
+                matrixInfo.setMatrix(subMatrix(reqId, matrix));
 				gauss(reqId);
 			} else {
                 l.l(me, "Received all rows for submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
-				double oldDeterminant = determinants.get(reqId);
+				double oldDeterminant = matrixInfo.getDeterminant();
 				double determinant = oldDeterminant * matrix[1][1];
 
-				if (!changeSign.get(reqId)){
-					determinants.put(reqId, determinant);
+				if (!matrixInfo.getChangeSign()){
+					matrixInfo.setDeterminant(determinant);
 					manager.setResult(reqId, determinant); // TODO
 				} else {
-					determinants.put(reqId, -determinant);
+					matrixInfo.setDeterminant(-determinant);
 					manager.setResult(reqId, -determinant); // TODO
 				}
-				//manager.setPercentageDone(reqId, 100);
 			}
-            manager.setPercentageDone(reqId, (matricesLength.get(reqId)-matrices.get(reqId).length)*100/(matricesLength.get(reqId)-2));
+            manager.setPercentageDone(reqId, (matrixInfo.getMatrixLength()-matrixInfo.getMatrix().length)*100/(matrixInfo.getMatrixLength()-2));
 		}
 	}
 
@@ -179,7 +163,8 @@ public class Master extends UntypedActor {
 	}
 
 	private void gauss(String reqId){
-		double[][] matrix = matrices.get(reqId);
+		MatrixInfo matrixInfo = matricesInfo.get(reqId);
+        double[][] matrix = matrixInfo.getMatrix();
 		boolean swapped = false;
 
 		if (matrix[0][0] == 0) {
@@ -192,14 +177,14 @@ public class Master extends UntypedActor {
 		}
 
 		if (swapped){
-			changeSign.put(reqId, !changeSign.get(reqId));
+			matrixInfo.setChangeSign();
 		}
-		double oldDeterminant = determinants.get(reqId);
-		determinants.put(reqId, oldDeterminant * matrix[0][0]);
+		double oldDeterminant = matrixInfo.getDeterminant();
+		matrixInfo.setDeterminant(oldDeterminant * matrix[0][0]);
 		sendOneRowPerMsg(reqId, matrix); // TODO provare a passare solo reqId
 	}
 
-	private void subMatrix(String reqId, double[][] matrix){
+	private double[][] subMatrix(String reqId, double[][] matrix){
 		double[][] subMatrix = new double[matrix.length-1][matrix.length-1];
 
 		for (int i = 0; i < subMatrix.length; i++){
@@ -207,6 +192,6 @@ public class Master extends UntypedActor {
 				subMatrix[i][j] = matrix[i + 1][j + 1];
 			}
 		}
-		matrices.put(reqId, subMatrix);
+		return subMatrix;
 	}
 }
