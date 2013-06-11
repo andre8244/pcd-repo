@@ -22,6 +22,7 @@ public class Master extends UntypedActor {
 	private String me;
 	private HashMap<String, double[][]> matrices;
 	private HashMap<String, Double> determinants;
+	private HashMap<String, Boolean> changeSign;
 	// TODO fare un unica struttura dati che comprende una richiesta, la matrice, lo stadio a cui si è arrivati ecc
 
 	public Master() {
@@ -32,6 +33,7 @@ public class Master extends UntypedActor {
 		me = getSelf().path().name();
 		matrices = new HashMap<String, double[][]>();
 		determinants = new HashMap<String, Double>();
+		changeSign = new HashMap<String, Boolean>();
 	}
 
 	@Override
@@ -55,6 +57,7 @@ public class Master extends UntypedActor {
 
 	private void handleCompute(Compute compute) {
 		l.l(me, "handleCompute, workers.size():" + workers.size());
+
 		if (manager == null) {
 			manager = compute.getManager();
 		}
@@ -86,6 +89,7 @@ public class Master extends UntypedActor {
 		done.put(reqId, 0);
 		results.put(reqId, 0.0);
 		determinants.put(reqId, 1.0);
+		changeSign.put(reqId, false);
 
 		if (workers.isEmpty()) {
 			l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
@@ -131,14 +135,21 @@ public class Master extends UntypedActor {
 			l.l(me, "Received all rows for submatrix " + matrices.get(reqId).length + ". Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
 
 			if (matrix.length > 2){
+				done.put(reqId, 0);
 				subMatrix(reqId, matrix);
 				gauss(reqId);
 				//manager.setResult(reqId, results.get(reqId) / matrices.get(reqId).length);
 			} else {
 				double oldDeterminant = determinants.get(reqId);
 				double determinant = oldDeterminant * matrix[1][1];
-				determinants.put(reqId, determinant);
-				manager.setResult(reqId, determinant);
+
+				if (!changeSign.get(reqId)){
+					determinants.put(reqId, determinant);
+					manager.setResult(reqId, determinant); // TODO
+				} else {
+					determinants.put(reqId, -determinant);
+					manager.setResult(reqId, -determinant); // TODO
+				}
 				manager.setPercentageDone(reqId, 100);
 			}
 		}
@@ -180,9 +191,9 @@ public class Master extends UntypedActor {
 
 		for (int i = 1; i < matrix.length; i++) {
 			double[] row = matrix[i];
-			workers.get((i % workers.size())).getActorRef().tell(new OneRow(reqId, firstRow, row, i), getSelf());
+			workers.get(((i - 1) % workers.size())).getActorRef().tell(new OneRow(reqId, firstRow, row, i), getSelf());
 			//if (i % 500 == 0) {
-				l.l(me, "sent row " + i + " to worker" + (i % workers.size()));
+				l.l(me, "sent row " + (i - 1) + " to worker" + (i % workers.size()));
 			//}
 		}
 	}
@@ -193,15 +204,19 @@ public class Master extends UntypedActor {
 
 		if (matrix[0][0] == 0) {
 			swapped = swapFirtsRow(matrix);
+
+			if (!swapped) {
+				manager.setResult(reqId, 0.0);
+				return;
+			}
 		}
 
-		if (!swapped) {
-			manager.setResult(reqId, 0.0);
-		} else {
-			double oldDeterminant = determinants.get(reqId);
-			determinants.put(reqId, oldDeterminant * matrix[0][0]);
-			sendOneRowPerMsg(reqId, matrix); // TODO provare a passare solo reqId
+		if (swapped){
+			changeSign.put(reqId, !changeSign.get(reqId));
 		}
+		double oldDeterminant = determinants.get(reqId);
+		determinants.put(reqId, oldDeterminant * matrix[0][0]);
+		sendOneRowPerMsg(reqId, matrix); // TODO provare a passare solo reqId
 	}
 
 	private void subMatrix(String reqId, double[][] matrix){
