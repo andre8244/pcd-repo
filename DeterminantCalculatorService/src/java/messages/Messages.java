@@ -37,41 +37,59 @@ public class Messages {
 		}
 	}
 
-	public static class Job implements Serializable {
+	public static class OneRow implements Serializable {
 
-		private final double[] list;
+		private final double[] firstRow;
+		private final double[] row;
 		private final String reqId;
+		private final int rowNumber;
 
-		public Job(double[] list, String reqId) {
-			this.list = list;
+		public OneRow(String reqId, double[] firstRow, double[] row, int rowNumber) {
+			this.firstRow = firstRow;
+			this.row = row;
 			this.reqId = reqId;
+			this.rowNumber = rowNumber;
 		}
 
-		public double[] getList() {
-			return list;
+		public int getRowNumber(){
+			return rowNumber;
 		}
 
-		public String getReqId() {
+		public String getReqId(){
 			return reqId;
+		}
+
+		public double[] getFirstRow() {
+			return firstRow;
+		}
+
+		public double[] getRow() {
+			return row;
 		}
 	}
 
-	public static class JobResult implements Serializable {
+	public static class OneRowResult implements Serializable {
 
-		private final double result;
+		private final double[] row;
 		private final String reqId;
+		private final int rowNumber;
 
-		public JobResult(double result, String reqId) {
-			this.result = result;
+		public OneRowResult(String reqId, double[]row, int rowNumber) {
+			this.row = row;
 			this.reqId = reqId;
+			this.rowNumber = rowNumber;
 		}
 
-		public double getResult() {
-			return result;
+		public int getRowNumber(){
+			return rowNumber;
 		}
 
-		public String getReqId() {
+		public String getReqId(){
 			return reqId;
+		}
+
+		public double[] getRow() {
+			return row;
 		}
 	}
 

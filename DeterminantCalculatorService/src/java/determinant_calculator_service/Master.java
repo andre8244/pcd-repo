@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import akka.actor.UntypedActor;
 import java.net.URL;
 import java.util.HashMap;
-import messages.Messages.Job;
-import messages.Messages.JobResult;
 import messages.Messages.Compute;
+import messages.Messages.OneRow;
+import messages.Messages.OneRowResult;
 import messages.Messages.RegisterWorker;
 import messages.Messages.RemoveWorker;
 
@@ -20,7 +20,9 @@ public class Master extends UntypedActor {
 	private long startTime;
 	private DeterminantCalculatorManager manager;
 	private String me;
-        private HashMap<String, double[][]> matrix;
+	private HashMap<String, double[][]> matrices;
+	private HashMap<String, Double> determinants;
+	// TODO fare un unica struttura dati che comprende una richiesta, la matrice, lo stadio a cui si è arrivati ecc
 
 	public Master() {
 		// TODO è meglio che i workers stiano dentro al manager?
@@ -28,7 +30,8 @@ public class Master extends UntypedActor {
 		done = new HashMap<String, Integer>();
 		results = new HashMap<String, Double>();
 		me = getSelf().path().name();
-                matrix = new HashMap<String, double[][]>();
+		matrices = new HashMap<String, double[][]>();
+		determinants = new HashMap<String, Double>();
 	}
 
 	@Override
@@ -36,9 +39,9 @@ public class Master extends UntypedActor {
 		if (msg instanceof Compute) {
 			Compute c = (Compute) msg;
 			handleCompute(c);
-		} else if (msg instanceof JobResult) {
-			JobResult jr = (JobResult) msg;
-			handleJobResult(jr);
+		} else if (msg instanceof OneRowResult) {
+			OneRowResult orr = (OneRowResult) msg;
+			handleOneRowResult(orr);
 		} else if (msg instanceof RegisterWorker) {
 			RegisterWorker rw = (RegisterWorker) msg;
 			handleRegisterWorker(rw);
@@ -59,69 +62,85 @@ public class Master extends UntypedActor {
 		// utilizzo per ora order come dimensione della lista
 		int order = compute.getOrder();
 		URL fileValue = compute.getFileValues();
-                String reqId = compute.getReqId();
+		String reqId = compute.getReqId();
 
 		String path = System.getProperty("user.home") + System.getProperty("file.separator");
 		String fileName = path + "matrix.txt";
 
-		MatrixUtil.genAndWriteToFile(order, 20, fileName);
+		//MatrixUtil.genAndWriteToFile(order, 20, fileName);
 
-                matrix.put(reqId,MatrixUtil.fromFileToList(order, fileName));
-                
-                l.l(me, "Matrix length: "+matrix.get(reqId).length);
-                
-                // calcolo media per verifica 
-                double media = 0;
-                for (int i=0; i<matrix.get(reqId).length; i++){
-                    for (int j=0; j<(matrix.get(reqId))[i].length; j++){
-                        media = media + (matrix.get(reqId))[i][j];
-                    }
-                }
-                media = media /(matrix.get(reqId).length*matrix.get(reqId).length);
-                l.l(me, "Matrix media: "+media);
+		matrices.put(reqId, MatrixUtil.fromFileToList(order, path + "matrix2.txt"));
 
-                done.put(reqId, 0);
+		l.l(me, "Matrix length: " + matrices.get(reqId).length);
+
+		// calcolo media per verifica
+//		double media = 0;
+//		for (int i = 0; i < matrices.get(reqId).length; i++) {
+//			for (int j = 0; j < (matrices.get(reqId))[i].length; j++) {
+//				media = media + (matrices.get(reqId))[i][j];
+//			}
+//		}
+//		media = media / (matrices.get(reqId).length * matrices.get(reqId).length);
+//		l.l(me, "Matrix media: " + media);
+
+		done.put(reqId, 0);
 		results.put(reqId, 0.0);
+		determinants.put(reqId, 1.0);
 
-		if (workers.isEmpty()){
+		if (workers.isEmpty()) {
 			l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
-                        return;
-		}
-
-		if (workers.size() > order){
-			l.l(me, "\nWORKERS.SIZE() > ORDER !!!!\n");
 			return;
 		}
 
-		for (int i = 0; i < matrix.get(reqId).length; i++) {
-			double[] row = matrix.get(reqId)[i];
-			workers.get((i%workers.size())).getActorRef().tell(new Job(row, reqId), getSelf());
-			if (i % 500 == 0) { 
-                                l.l(me, "sent row " + i + " to worker" + (i%workers.size()));
-                        }
-		}
+//		for (int i = 0; i < matrix.get(reqId).length; i++) {
+//			double[] row = matrix.get(reqId)[i];
+//			workers.get((i%workers.size())).getActorRef().tell(new Job(row, reqId), getSelf());
+//			if (i % 500 == 0) {
+//					l.l(me, "sent row " + i + " to worker" + (i%workers.size()));
+//			}
+//		}
+
+		gauss(reqId);
 	}
 
-	private void handleJobResult(JobResult jr) {
-		double result = jr.getResult();
-		String reqId = jr.getReqId();
+	private void handleOneRowResult(OneRowResult orr) {
+		String reqId = orr.getReqId();
+		double[] row = orr.getRow();
+		int rowNumber = orr.getRowNumber();
 		//log("received jobresult from [" + getSender().path().name() + "]: " + result);
 		int nRowsDone = done.get(reqId);
 		nRowsDone++;
 		done.put(reqId, nRowsDone);
-                
-                if (nRowsDone % 500 == 0) {
-                        l.l(me, "nRowsDone: " + nRowsDone);
-		}
 
-		int percentageDone = nRowsDone * 100 / matrix.get(reqId).length;
-		manager.setPercentageDone(reqId, percentageDone);
-		double precRes = results.get(reqId);
-		results.put(reqId, precRes + result);
+		//if (nRowsDone % 500 == 0) {
+			l.l(me, "nRowsDone: " + nRowsDone);
+		//}
 
-		if (nRowsDone == matrix.get(reqId).length) {
-			l.l(me, "Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
-			manager.setResult(reqId, results.get(reqId) / matrix.get(reqId).length);
+		// TODO aggiornare
+		//int percentageDone = nRowsDone * 100 / (matrices.get(reqId).length - 1);
+		//manager.setPercentageDone(reqId, percentageDone);
+		//double precRes = results.get(reqId);
+		//results.put(reqId, precRes + result);
+
+		double[][] matrix = matrices.get(reqId);
+		matrix[rowNumber] = row;
+		// TODO è necessario fare la put o è implicita come side effect?
+		matrices.put(reqId, matrix);
+
+		if (nRowsDone == matrix.length - 1) {
+			l.l(me, "Received all rows for submatrix " + matrices.get(reqId).length + ". Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
+
+			if (matrix.length > 2){
+				subMatrix(reqId, matrix);
+				gauss(reqId);
+				//manager.setResult(reqId, results.get(reqId) / matrices.get(reqId).length);
+			} else {
+				double oldDeterminant = determinants.get(reqId);
+				double determinant = oldDeterminant * matrix[1][1];
+				determinants.put(reqId, determinant);
+				manager.setResult(reqId, determinant);
+				manager.setPercentageDone(reqId, 100);
+			}
 		}
 	}
 
@@ -142,5 +161,57 @@ public class Master extends UntypedActor {
 			}
 		}
 		l.l(me, "worker removed, workers size: " + workers.size());
+	}
+
+	private boolean swapFirtsRow(double[][] matrix) {
+		for (int i = 1; i < matrix.length; i++) {
+			if (matrix[i][0] != 0) {
+				double[] tempRow = matrix[i];
+				matrix[i] = matrix[0];
+				matrix[0] = tempRow;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void sendOneRowPerMsg(String reqId, double[][] matrix) {
+		double[] firstRow = matrix[0];
+
+		for (int i = 1; i < matrix.length; i++) {
+			double[] row = matrix[i];
+			workers.get((i % workers.size())).getActorRef().tell(new OneRow(reqId, firstRow, row, i), getSelf());
+			//if (i % 500 == 0) {
+				l.l(me, "sent row " + i + " to worker" + (i % workers.size()));
+			//}
+		}
+	}
+
+	private void gauss(String reqId){
+		double[][] matrix = matrices.get(reqId);
+		boolean swapped = false;
+
+		if (matrix[0][0] == 0) {
+			swapped = swapFirtsRow(matrix);
+		}
+
+		if (!swapped) {
+			manager.setResult(reqId, 0.0);
+		} else {
+			double oldDeterminant = determinants.get(reqId);
+			determinants.put(reqId, oldDeterminant * matrix[0][0]);
+			sendOneRowPerMsg(reqId, matrix); // TODO provare a passare solo reqId
+		}
+	}
+
+	private void subMatrix(String reqId, double[][] matrix){
+		double[][] subMatrix = new double[matrix.length-1][matrix.length-1];
+
+		for (int i = 0; i < subMatrix.length; i++){
+			for (int j = 0; j < subMatrix.length; j++){
+				subMatrix[i][j] = matrix[i + 1][j + 1];
+			}
+		}
+		matrices.put(reqId, subMatrix);
 	}
 }
