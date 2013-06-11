@@ -56,18 +56,6 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="removeWorker">
-<xs:sequence>
-<xs:element name="remoteAddress" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="removeWorkerResponse">
-<xs:sequence>
-<xs:element name="return" type="xs:boolean"/>
-</xs:sequence>
-</xs:complexType>
-
 <xs:complexType name="computeDeterminant">
 <xs:sequence>
 <xs:element name="order" type="xs:int"/>
@@ -78,6 +66,18 @@
 <xs:complexType name="computeDeterminantResponse">
 <xs:sequence>
 <xs:element name="return" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="removeWorker">
+<xs:sequence>
+<xs:element name="remoteAddress" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="removeWorkerResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:boolean"/>
 </xs:sequence>
 </xs:complexType>
 </xs:schema>

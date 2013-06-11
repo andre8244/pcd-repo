@@ -46,7 +46,7 @@ public class Worker extends UntypedActor {
 		final int rowNumber = oneRow.getRowNumber();
 
 		double factor = -row[0] / firstRow[0];
-		l.l(me, "factor: " + factor);
+		//l.l(me, "factor: " + factor);
 
 		for (int i = 0; i < firstRow.length; i++) {
 			row[i] = row[i] + factor * firstRow[i];
