@@ -60,12 +60,17 @@ public class Master extends UntypedActor {
 		int order = compute.getOrder();
 		URL fileValue = compute.getFileValues();
 
-		//String path = System.getProperty("user.home") + System.getProperty("file.separator");
-		//String fileName = path + "matrix.txt";
-		//MatrixUtil.genAndWriteToFile(10000, 20, fileName);
-                //MatrixUtil.fromFileToList(10000,fileName);
-		//MatrixUtil.fromFileToArrayList(fileName);
+		String path = System.getProperty("user.home") + System.getProperty("file.separator");
+		String fileName = path + "matrix.txt";
+
+		MatrixUtil.genAndWriteToFile(order, 20, fileName);
+
+        //MatrixUtil.fromFileToArrayList(fileName);
 		//MatrixUtil.fromFileToHashMap(fileName);
+		//double[][] matrix = MatrixUtil.fromFileToList(10000, path + "matrix10000.txt");
+
+		double[][] matrix = MatrixUtil.fromFileToList(order, fileName);
+
 
 		String reqId = compute.getReqId();
 		rand = new Random();
@@ -76,14 +81,23 @@ public class Master extends UntypedActor {
 			l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
 		}
 
+		if (workers.size() > order){
+			l.l(me, "\nWORKERS.SIZE() > ORDER !!!!\n");
+			return;
+		}
+
 		for (int i = 0; i < workers.size(); i++) {
-			final ArrayList<Double> jobList = new ArrayList<Double>(order);
+			/*final ArrayList<Double> jobList = new ArrayList<Double>(order);
 
 			for (int j = 0; j < order; j++) {
 				Double val = new Double(rand.nextInt(1000) + rand.nextDouble());
 				jobList.add(val);
 			}
-			workers.get(i).getActorRef().tell(new Job(jobList, reqId), getSelf());
+			workers.get(i).getActorRef().tell(new Job(jobList, reqId), getSelf());*/
+
+			double[] row = matrix[i];
+			workers.get(i).getActorRef().tell(new Job(row, reqId), getSelf());
+			l.l(me, "sent message to worker" + i);
 		}
 	}
 
