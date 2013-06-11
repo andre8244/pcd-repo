@@ -70,6 +70,7 @@ public class Master extends UntypedActor {
                 
                 l.l(me, "Matrix length: "+matrix.get(reqId).length);
                 
+                // calcolo media per verifica 
                 double media = 0;
                 for (int i=0; i<matrix.get(reqId).length; i++){
                     for (int j=0; j<(matrix.get(reqId))[i].length; j++){
