@@ -80,12 +80,12 @@ public class MatrixUtil {
 				for (int j = 0; j < order; j++) {
 					matrix[i][j]=readDouble(reader);
 				}
-                                
+
                                 if (i % 500 == 0){
-					l.l(me, "wrote " + i + " lines in list");                                  
+					l.l(me, "wrote " + i + " lines in list");
                                 }
 			}*/
-                        
+
 			BufferedReader reader = new BufferedReader(new FileReader(fileName));
 			String line = reader.readLine();
                         String[] tokens;
@@ -93,7 +93,7 @@ public class MatrixUtil {
 
 			while (line != null) {
                                 if (i % 500 == 0){
-					l.l(me, "wrote " + i + " lines in list");                                  
+					l.l(me, "wrote " + i + " lines in list");
                                 }
 				tokens = line.split(" ");
 				for (int j=0; j<tokens.length; j++){
@@ -113,8 +113,8 @@ public class MatrixUtil {
 		l.l(me, "finished reading list " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
 		//printMatrix(matrix);
                 return matrix;
-	}     
-        
+	}
+
 	private static double readDouble(Reader reader){
 		StringBuffer buf = new StringBuffer();
 		boolean endOfElem = false;
@@ -134,13 +134,13 @@ public class MatrixUtil {
 			e.printStackTrace();
 		}
 		return Double.parseDouble(buf.toString());
-	}        
-        
-	public static ArrayList<ArrayList<Double>> fromFileToArrayList(String fileName) {
+	}
+
+	public static ArrayList<ArrayList<Double>> fromFileToArrayList(int order, String fileName) {
 		l.l(me, "writing arraylist");
 		long startTime = System.currentTimeMillis();
 
-		ArrayList<ArrayList<Double>> matrix = new ArrayList<ArrayList<Double>>();
+		ArrayList<ArrayList<Double>> matrix = new ArrayList<ArrayList<Double>>(order);
 
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(fileName));
@@ -151,7 +151,7 @@ public class MatrixUtil {
 
 			while (line != null) {
 				tokenizer = new StringTokenizer(line, " ");
-				row = new ArrayList<Double>();
+				row = new ArrayList<Double>(order);
 				lineNumber++;
 
 				if (lineNumber % 500 == 0){
@@ -217,7 +217,7 @@ public class MatrixUtil {
 		l.l(me, "finished reading hashmap " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
 		return matrix;
 	}
-        
+
 	public static void printMatrix(double[][] matrix) {
 		for (int i=0; i<matrix.length; i++) {
 			for (int j=0; j<matrix[i].length; j++) {
@@ -225,7 +225,7 @@ public class MatrixUtil {
 			}
 			System.out.print("\n");
 		}
-	}        
+	}
 
 	public static void printMatrix(ArrayList<ArrayList<Double>> matrix) {
 		for (ArrayList<Double> row : matrix) {
@@ -235,7 +235,7 @@ public class MatrixUtil {
 			System.out.print("\n");
 		}
 	}
-        
+
 	private static void testReadMatrix(double[][] matrix) {
 		long dummy = 0;
 
@@ -244,7 +244,7 @@ public class MatrixUtil {
 				dummy++;
 			}
 		}
-	}        
+	}
 
 	private static void testReadMatrix(ArrayList<ArrayList<Double>> matrix) {
 		long dummy = 0;
