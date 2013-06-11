@@ -31,7 +31,7 @@ public class UserApp {
 		//		new fortibuoni_WS_client.DeterminantCalculatorService_Service();
 		//servicePort = service.getDeterminantCalculatorServicePort();
 
-		String reqId = servicePort.computeDeterminant(20000, null);
+		/*String reqId = servicePort.computeDeterminant(10000, null);
 		int percentage = servicePort.getPercentageDone(reqId);
 		l.l(me, reqId + " percentage: " + percentage + " %");
 		int lastPercentage = percentage;
@@ -51,7 +51,15 @@ public class UserApp {
 		}
 
 		System.out.println("Result for " + reqId + ": " + servicePort.getResult(reqId));
-
+                */
+                
+                String path = System.getProperty("user.home") + System.getProperty("file.separator");
+		String fileName = path + "matrix.txt";
+		MatrixUtil.genAndWriteToFile(10000, 20, fileName);
+                MatrixUtil.fromFileToList(10000,fileName);
+		//MatrixUtil.fromFileToArrayList(fileName);
+		//MatrixUtil.fromFileToHashMap(fileName);
+                
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException ex) {
