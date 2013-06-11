@@ -63,6 +63,7 @@ public class Master extends UntypedActor {
 		//String path = System.getProperty("user.home") + System.getProperty("file.separator");
 		//String fileName = path + "matrix.txt";
 		//MatrixUtil.genAndWriteToFile(10000, 20, fileName);
+                //MatrixUtil.fromFileToList(10000,fileName);
 		//MatrixUtil.fromFileToArrayList(fileName);
 		//MatrixUtil.fromFileToHashMap(fileName);
 
