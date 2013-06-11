@@ -31,7 +31,7 @@ public class DeterminantCalculatorManager {
 	private DeterminantCalculatorManager() {
 		reqNumber = 0;
 		ActorSystem system = ActorSystem.create("masterSystem", ConfigFactory.load().getConfig("masterSystem"));
-		master = system.actorOf(new Props(Master.class), "untyped-master");
+		master = system.actorOf(new Props(Master.class), "master");
 		results = new HashMap<String, Double>();
 		done = new HashMap<String, Integer>();
 	}

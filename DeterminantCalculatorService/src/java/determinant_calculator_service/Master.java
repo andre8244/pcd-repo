@@ -2,7 +2,6 @@ package determinant_calculator_service;
 
 import log.l;
 import java.util.ArrayList;
-import java.util.Random;
 
 import akka.actor.UntypedActor;
 import java.net.URL;
@@ -15,13 +14,13 @@ import messages.Messages.RemoveWorker;
 
 public class Master extends UntypedActor {
 
-	private Random rand;
 	private ArrayList<RemoteWorker> workers;
 	private HashMap<String, Integer> done;
 	private HashMap<String, Double> results;
 	private long startTime;
 	private DeterminantCalculatorManager manager;
 	private String me;
+        private HashMap<String, double[][]> matrix;
 
 	public Master() {
 		// TODO è meglio che i workers stiano dentro al manager?
@@ -29,6 +28,7 @@ public class Master extends UntypedActor {
 		done = new HashMap<String, Integer>();
 		results = new HashMap<String, Double>();
 		me = getSelf().path().name();
+                matrix = new HashMap<String, double[][]>();
 	}
 
 	@Override
@@ -59,26 +59,32 @@ public class Master extends UntypedActor {
 		// utilizzo per ora order come dimensione della lista
 		int order = compute.getOrder();
 		URL fileValue = compute.getFileValues();
+                String reqId = compute.getReqId();
 
 		String path = System.getProperty("user.home") + System.getProperty("file.separator");
 		String fileName = path + "matrix.txt";
 
 		MatrixUtil.genAndWriteToFile(order, 20, fileName);
 
-        //MatrixUtil.fromFileToArrayList(fileName);
-		//MatrixUtil.fromFileToHashMap(fileName);
-		//double[][] matrix = MatrixUtil.fromFileToList(10000, path + "matrix10000.txt");
+                matrix.put(reqId,MatrixUtil.fromFileToList(order, fileName));
+                
+                l.l(me, "Matrix length: "+matrix.get(reqId).length);
+                
+                double media = 0;
+                for (int i=0; i<matrix.get(reqId).length; i++){
+                    for (int j=0; j<(matrix.get(reqId))[i].length; j++){
+                        media = media + (matrix.get(reqId))[i][j];
+                    }
+                }
+                media = media /(matrix.get(reqId).length*matrix.get(reqId).length);
+                l.l(me, "Matrix media: "+media);
 
-		double[][] matrix = MatrixUtil.fromFileToList(order, fileName);
-
-
-		String reqId = compute.getReqId();
-		rand = new Random();
-		done.put(reqId, 0);
+                done.put(reqId, 0);
 		results.put(reqId, 0.0);
 
-		if (workers.size() == 0){
+		if (workers.isEmpty()){
 			l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
+                        return;
 		}
 
 		if (workers.size() > order){
@@ -86,18 +92,12 @@ public class Master extends UntypedActor {
 			return;
 		}
 
-		for (int i = 0; i < workers.size(); i++) {
-			/*final ArrayList<Double> jobList = new ArrayList<Double>(order);
-
-			for (int j = 0; j < order; j++) {
-				Double val = new Double(rand.nextInt(1000) + rand.nextDouble());
-				jobList.add(val);
-			}
-			workers.get(i).getActorRef().tell(new Job(jobList, reqId), getSelf());*/
-
-			double[] row = matrix[i];
-			workers.get(i).getActorRef().tell(new Job(row, reqId), getSelf());
-			l.l(me, "sent message to worker" + i);
+		for (int i = 0; i < matrix.get(reqId).length; i++) {
+			double[] row = matrix.get(reqId)[i];
+			workers.get((i%workers.size())).getActorRef().tell(new Job(row, reqId), getSelf());
+			if (i % 500 == 0) { 
+                                l.l(me, "sent row " + i + " to worker" + (i%workers.size()));
+                        }
 		}
 	}
 
@@ -105,20 +105,22 @@ public class Master extends UntypedActor {
 		double result = jr.getResult();
 		String reqId = jr.getReqId();
 		//log("received jobresult from [" + getSender().path().name() + "]: " + result);
-		int nWorkersDone = done.get(reqId);
-		nWorkersDone++;
-		done.put(reqId, nWorkersDone);
+		int nRowsDone = done.get(reqId);
+		nRowsDone++;
+		done.put(reqId, nRowsDone);
+                
+                if (nRowsDone % 500 == 0) {
+                        l.l(me, "nRowsDone: " + nRowsDone);
+		}
 
-		l.l(me, "nWorkersDone: " + nWorkersDone);
-
-		int percentageDone = nWorkersDone * 100 / workers.size();
+		int percentageDone = nRowsDone * 100 / matrix.get(reqId).length;
 		manager.setPercentageDone(reqId, percentageDone);
 		double precRes = results.get(reqId);
 		results.put(reqId, precRes + result);
 
-		if (nWorkersDone == workers.size()) {
+		if (nRowsDone == matrix.get(reqId).length) {
 			l.l(me, "Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
-			manager.setResult(reqId, results.get(reqId) / workers.size());
+			manager.setResult(reqId, results.get(reqId) / matrix.get(reqId).length);
 		}
 	}
 
