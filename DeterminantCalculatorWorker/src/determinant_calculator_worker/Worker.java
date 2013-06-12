@@ -28,7 +28,7 @@ public class Worker extends UntypedActor {
 			l.l(me, "worker registered");
 		}
 	}
-
+    
 	@Override
 	public void onReceive(Object msg) throws Exception {
 		if (msg instanceof Messages.OneRow) {
