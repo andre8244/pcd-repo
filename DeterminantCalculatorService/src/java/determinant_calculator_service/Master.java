@@ -9,11 +9,11 @@ import messages.Messages;
 
 public class Master extends UntypedActor {
 
-    private HashMap<String, MatrixInfo> matricesInfo;
+	private HashMap<String, MatrixInfo> matricesInfo;
 	private ArrayList<RemoteWorker> workers;
 	private DeterminantCalculatorManager manager;
 	private String me;
-	
+
 	public Master() {
 		// TODO è meglio che i workers stiano dentro al manager?
 		workers = new ArrayList<RemoteWorker>();
@@ -39,7 +39,7 @@ public class Master extends UntypedActor {
 			Messages.RemoveWorker rw = (Messages.RemoveWorker) msg;
 			handleRemoveWorker(rw);
 		} else {
-            unhandled(msg);
+			unhandled(msg);
 		}
 	}
 
@@ -47,58 +47,59 @@ public class Master extends UntypedActor {
 		if (manager == null) {
 			manager = compute.getManager();
 		}
-				
-        int order = compute.getOrder();
+
+		int order = compute.getOrder();
 		String fileValues = compute.getFileValues();
 		String reqId = compute.getReqId();
-        
-        l.l(me, "handleCompute, reqId: " + reqId + ", order: " + order + ", workers.size():" + workers.size());
+
+		l.l(me, "handleCompute, reqId: " + reqId + ", order: " + order + ", workers.size():" + workers.size());
 
 		matricesInfo.put(reqId, new MatrixInfo(MatrixUtil.fromFileToList(order, fileValues)));
-        
-        if (workers.isEmpty()) {
+
+		if (workers.isEmpty()) {
 			l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
-            manager.setPercentageDone(reqId, 100); // TODO comunico al client di aver finito anche se non ho calcolato niente
+			manager.setPercentageDone(reqId, 100); // TODO comunico al client di aver finito anche se non ho calcolato niente
 			return;
 		}
 
-        gauss(reqId);
+		gauss(reqId);
 	}
 
 	private void handleOneRowResult(Messages.OneRowResult orr) {
 		String reqId = orr.getReqId();
 		double[] row = orr.getRow();
 		int rowNumber = orr.getRowNumber();
-		
-        MatrixInfo matrixInfo = matricesInfo.get(reqId);
-        
-        int nRowsDone = matrixInfo.getRowsDone();
+
+		MatrixInfo matrixInfo = matricesInfo.get(reqId);
+
+		int nRowsDone = matrixInfo.getRowsDone();
 		nRowsDone++;
 		matrixInfo.setRowsDone(nRowsDone);
 
 		/*if (nRowsDone % 500 == 0) {
-			l.l(me, "nRowsDone: " + nRowsDone);
-		}*/
+		 l.l(me, "nRowsDone: " + nRowsDone);
+		 }*/
 
 		double[][] matrix = matrixInfo.getMatrix();
 		matrix[rowNumber] = row;
 		matrixInfo.setMatrix(matrix);
 
 		if (nRowsDone == matrix.length - 1) {
-            if (matrix.length % 500 == 0){
-                l.l(me, "Received all rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
-            }
-                
-			if (matrix.length > 2){
+			//if (matrix.length % 100 == 0){
+			l.l(me, "Received all rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
+			//}
+			boolean zeroColumn = false;
+
+			if (matrix.length > 2) {
 				matrixInfo.setRowsDone(0);
-                matrixInfo.setMatrix(subMatrix(reqId, matrix));
-				gauss(reqId);
+				matrixInfo.setMatrix(subMatrix(reqId, matrix));
+				zeroColumn = gauss(reqId);
 			} else {
-                l.l(me, "Received all rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
+				l.l(me, "Received ALL rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
 				double oldDeterminant = matrixInfo.getDeterminant();
 				double determinant = oldDeterminant * matrix[1][1];
 
-				if (!matrixInfo.getChangeSign()){
+				if (!matrixInfo.getChangeSign()) {
 					matrixInfo.setDeterminant(determinant);
 					manager.setResult(reqId, determinant); // TODO
 				} else {
@@ -106,48 +107,51 @@ public class Master extends UntypedActor {
 					manager.setResult(reqId, -determinant); // TODO
 				}
 			}
-            manager.setPercentageDone(reqId, (matrixInfo.getMatrixLength()-matrixInfo.getMatrix().length)*100/(matrixInfo.getMatrixLength()-2));
+			if (!zeroColumn) {
+				manager.setPercentageDone(reqId, (matrixInfo.getMatrixLength() - matrixInfo.getMatrix().length) * 100 / (matrixInfo.getMatrixLength() - 2));
+			}
 		}
 	}
-    
+
 	private void handleManyRowsResult(Messages.ManyRowsResult mrr) {
 		String reqId = mrr.getReqId();
 		double[][] rows = mrr.getRows();
 		int rowNumber = mrr.getRowNumber();
-		
-        MatrixInfo matrixInfo = matricesInfo.get(reqId);
-        
-        int nRowsDone = matrixInfo.getRowsDone();
+
+		MatrixInfo matrixInfo = matricesInfo.get(reqId);
+
+		int nRowsDone = matrixInfo.getRowsDone();
 		nRowsDone = nRowsDone + rows.length;
 		matrixInfo.setRowsDone(nRowsDone);
 
 		/*if (nRowsDone % 500 == 0) {
-			l.l(me, "nRowsDone: " + nRowsDone);
-		}*/
+		 l.l(me, "nRowsDone: " + nRowsDone);
+		 }*/
 
 		double[][] matrix = matrixInfo.getMatrix();
 		System.arraycopy(rows, 0, matrix, rowNumber, rows.length);
-        /*for (int i=0; i < rows.length; i++){
-            matrix[i+rowNumber] = rows[i];
-        }*/
+		/*for (int i=0; i < rows.length; i++){
+		 matrix[i+rowNumber] = rows[i];
+		 }*/
 
-        matrixInfo.setMatrix(matrix);
+		matrixInfo.setMatrix(matrix);
 
 		if (nRowsDone == matrix.length - 1) {
-            if (matrix.length % 500 == 0){
-                l.l(me, "Received all rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
-            }
-                
-			if (matrix.length > 2){
+			//if (matrix.length % 500 == 0){
+				l.l(me, "Received all rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
+			//}
+			boolean zeroColumn = false;
+
+			if (matrix.length > 2) {
 				matrixInfo.setRowsDone(0);
-                matrixInfo.setMatrix(subMatrix(reqId, matrix));
-				gauss(reqId);
+				matrixInfo.setMatrix(subMatrix(reqId, matrix));
+				zeroColumn = gauss(reqId);
 			} else {
-                l.l(me, "Received all rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
+				l.l(me, "Received ALL rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
 				double oldDeterminant = matrixInfo.getDeterminant();
 				double determinant = oldDeterminant * matrix[1][1];
 
-				if (!matrixInfo.getChangeSign()){
+				if (!matrixInfo.getChangeSign()) {
 					matrixInfo.setDeterminant(determinant);
 					manager.setResult(reqId, determinant); // TODO
 				} else {
@@ -155,11 +159,13 @@ public class Master extends UntypedActor {
 					manager.setResult(reqId, -determinant); // TODO
 				}
 			}
-            //l.l(me, "matrix " + matrix.length + ", percentage done " + reqId + ": " + (matrixInfo.getMatrixLength()-matrix.length)*100/(matrixInfo.getMatrixLength()-2));
-            manager.setPercentageDone(reqId, (matrixInfo.getMatrixLength()-matrixInfo.getMatrix().length)*100/(matrixInfo.getMatrixLength()-2));
+			//l.l(me, "matrix " + matrix.length + ", percentage done " + reqId + ": " + (matrixInfo.getMatrixLength()-matrix.length)*100/(matrixInfo.getMatrixLength()-2));
+			if (!zeroColumn) {
+				manager.setPercentageDone(reqId, (matrixInfo.getMatrixLength() - matrixInfo.getMatrix().length) * 100 / (matrixInfo.getMatrixLength() - 2));
+			}
 		}
-	}  
-    
+	}
+
 	private void handleRegisterWorker(Messages.RegisterWorker rw) {
 		String remoteAddress = rw.getRemoteAddress();
 		RemoteWorker worker = new RemoteWorker(remoteAddress, getContext().actorFor(remoteAddress));
@@ -197,40 +203,40 @@ public class Master extends UntypedActor {
 		for (int i = 1; i < matrix.length; i++) {
 			double[] row = matrix[i];
 			workers.get(((i - 1) % workers.size())).getActorRef().tell(new Messages.OneRow(reqId, firstRow, row, i), getSelf());
-			/*if (i % 500 == 0) {
-				l.l(me, "sent row " + i + " to worker" + ((i - 1) % workers.size()));
-			}*/
+			//if (i % 500 == 0) {
+			l.l(me, "sent row " + i + " to worker" + ((i - 1) % workers.size()));
+			//}
 		}
 	}
-    
-    private void sendManyRowsPerMsg(String reqId, double[][] matrix) {
+
+	private void sendManyRowsPerMsg(String reqId, double[][] matrix) {
 		double[] firstRow = matrix[0];
 
-        // TODO provare a migliorare il bilanciamento del lavoro
-        int nRowsPerMsg = (matrix.length-1) / workers.size();
-                
-        if (nRowsPerMsg>0){
-            for (int i = 0; i < (workers.size()-1); i++) {
-                double[][] rows = new double[nRowsPerMsg][matrix.length];
-                for (int j = 0; j < rows.length; j++){
-                    rows[j]=matrix[i*nRowsPerMsg+j+1];
-                }
-                workers.get(i).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, i*nRowsPerMsg+1), getSelf());
-                //l.l(me, "sent rows " + nRowsPerMsg + " to worker" + i);
-            }
-        }
-        double[][] rows = new double[matrix.length-1-nRowsPerMsg*(workers.size()-1)][matrix.length];
-        for (int j = 0; j < rows.length; j++){
-            rows[j]=matrix[(workers.size()-1)*nRowsPerMsg+j+1];
-        }
-        workers.get(workers.size()-1).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, (workers.size()-1)*nRowsPerMsg+1), getSelf());
-		//l.l(me, "sent rows " + rows.length + " to worker" + (workers.size()-1));    
-        
+		// TODO provare a migliorare il bilanciamento del lavoro
+		int nRowsPerMsg = (matrix.length - 1) / workers.size();
+
+		if (nRowsPerMsg > 0) {
+			for (int i = 0; i < (workers.size() - 1); i++) {
+				double[][] rows = new double[nRowsPerMsg][matrix.length];
+				for (int j = 0; j < rows.length; j++) {
+					rows[j] = matrix[i * nRowsPerMsg + j + 1];
+				}
+				workers.get(i).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, i * nRowsPerMsg + 1), getSelf());
+				//l.l(me, "sent rows " + nRowsPerMsg + " to worker" + i);
+			}
+		}
+		double[][] rows = new double[matrix.length - 1 - nRowsPerMsg * (workers.size() - 1)][matrix.length];
+		for (int j = 0; j < rows.length; j++) {
+			rows[j] = matrix[(workers.size() - 1) * nRowsPerMsg + j + 1];
+		}
+		workers.get(workers.size() - 1).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, (workers.size() - 1) * nRowsPerMsg + 1), getSelf());
+		//l.l(me, "sent rows " + rows.length + " to worker" + (workers.size()-1));
+
 	}
 
-	private void gauss(String reqId){
+	private boolean gauss(String reqId) {
 		MatrixInfo matrixInfo = matricesInfo.get(reqId);
-        double[][] matrix = matrixInfo.getMatrix();
+		double[][] matrix = matrixInfo.getMatrix();
 		boolean swapped = false;
 
 		if (matrix[0][0] == 0) {
@@ -238,25 +244,26 @@ public class Master extends UntypedActor {
 
 			if (!swapped) {
 				manager.setResult(reqId, 0.0);
-                manager.setPercentageDone(reqId, 100);
-				return;
+				manager.setPercentageDone(reqId, 100);
+				return true;
 			}
 		}
 
-		if (swapped){
+		if (swapped) {
 			matrixInfo.setChangeSign();
 		}
 		double oldDeterminant = matrixInfo.getDeterminant();
 		matrixInfo.setDeterminant(oldDeterminant * matrix[0][0]);
-		//sendOneRowPerMsg(reqId, matrix); // TODO provare a passare solo reqId
-        sendManyRowsPerMsg(reqId,matrix);
+		sendOneRowPerMsg(reqId, matrix); // TODO provare a passare solo reqId
+		//sendManyRowsPerMsg(reqId,matrix);
+		return false;
 	}
 
-	private double[][] subMatrix(String reqId, double[][] matrix){
-		double[][] subMatrix = new double[matrix.length-1][matrix.length-1];
+	private double[][] subMatrix(String reqId, double[][] matrix) {
+		double[][] subMatrix = new double[matrix.length - 1][matrix.length - 1];
 
-		for (int i = 0; i < subMatrix.length; i++){
-			for (int j = 0; j < subMatrix.length; j++){
+		for (int i = 0; i < subMatrix.length; i++) {
+			for (int j = 0; j < subMatrix.length; j++) {
 				subMatrix[i][j] = matrix[i + 1][j + 1];
 			}
 		}
