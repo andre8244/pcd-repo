@@ -14,11 +14,11 @@ public class UserApp {
 		servicePort = service.getDeterminantCalculatorServicePort();
 
         String path = System.getProperty("user.home") + System.getProperty("file.separator");
-        String fileName = path + "matrix.txt";
+        String fileValues = path + "matrix.txt";
         int order = 100;
-		MatrixUtil.genAndWriteToFile(order, 20, fileName);
+		//MatrixUtil.genAndWriteToFile(order, 20, fileValues);
                         
-        String reqId1 = servicePort.computeDeterminant(order, null);
+        String reqId1 = servicePort.computeDeterminant(order, fileValues);
 		int percentage1 = servicePort.getPercentageDone(reqId1);
 		l.l(me, reqId1 + " percentage: " + percentage1 + " %");
 		int lastPercentage1 = percentage1;
@@ -46,7 +46,9 @@ public class UserApp {
 			percentage1 = servicePort.getPercentageDone(reqId1);
             //percentage2 = servicePort.getPercentageDone(reqId2);
 		}
-
+        l.l(me, reqId1 + " percentage: " + percentage1 + " %");
+        //l.l(me, reqId2 + " percentage: " + percentage2 + " %");
+        
 		System.out.println("Result for " + reqId1 + ": " + servicePort.getResult(reqId1));
         //System.out.println("Result for " + reqId2 + ": " + servicePort.getResult(reqId2));
             
