@@ -11,7 +11,6 @@ public class Master extends UntypedActor {
 
     private HashMap<String, MatrixInfo> matricesInfo;
 	private ArrayList<RemoteWorker> workers;
-	private long startTime;
 	private DeterminantCalculatorManager manager;
 	private String me;
 	
@@ -48,8 +47,7 @@ public class Master extends UntypedActor {
 		if (manager == null) {
 			manager = compute.getManager();
 		}
-		startTime = System.currentTimeMillis();
-		
+				
         int order = compute.getOrder();
 		String fileValues = compute.getFileValues();
 		String reqId = compute.getReqId();
@@ -88,7 +86,7 @@ public class Master extends UntypedActor {
 
 		if (nRowsDone == matrix.length - 1) {
             if (matrix.length % 500 == 0){
-                l.l(me, "Received all rows for submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
+                l.l(me, "Received all rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
             }
                 
 			if (matrix.length > 2){
@@ -96,7 +94,7 @@ public class Master extends UntypedActor {
                 matrixInfo.setMatrix(subMatrix(reqId, matrix));
 				gauss(reqId);
 			} else {
-                l.l(me, "Received all rows for submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
+                l.l(me, "Received all rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
 				double oldDeterminant = matrixInfo.getDeterminant();
 				double determinant = oldDeterminant * matrix[1][1];
 
@@ -137,7 +135,7 @@ public class Master extends UntypedActor {
 
 		if (nRowsDone == matrix.length - 1) {
             if (matrix.length % 500 == 0){
-                l.l(me, "Received all rows for submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
+                l.l(me, "Received all rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
             }
                 
 			if (matrix.length > 2){
@@ -145,7 +143,7 @@ public class Master extends UntypedActor {
                 matrixInfo.setMatrix(subMatrix(reqId, matrix));
 				gauss(reqId);
 			} else {
-                l.l(me, "Received all rows for submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
+                l.l(me, "Received all rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
 				double oldDeterminant = matrixInfo.getDeterminant();
 				double determinant = oldDeterminant * matrix[1][1];
 
@@ -210,20 +208,22 @@ public class Master extends UntypedActor {
         // TODO provare a migliorare il bilanciamento del lavoro
         int nRowsPerMsg = (matrix.length-1) / workers.size();
                 
-		for (int i = 0; i < (workers.size()-1); i++) {
-			double[][] rows = new double[nRowsPerMsg][matrix.length];
-            for (int j = 0; j < rows.length; j++){
-                rows[j]=matrix[i*nRowsPerMsg+j+1];
+        if (nRowsPerMsg>0){
+            for (int i = 0; i < (workers.size()-1); i++) {
+                double[][] rows = new double[nRowsPerMsg][matrix.length];
+                for (int j = 0; j < rows.length; j++){
+                    rows[j]=matrix[i*nRowsPerMsg+j+1];
+                }
+                workers.get(i).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, i*nRowsPerMsg+1), getSelf());
+                //l.l(me, "sent rows " + nRowsPerMsg + " to worker" + i);
             }
-			workers.get(i).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, i*nRowsPerMsg+1), getSelf());
-			l.l(me, "sent rows " + nRowsPerMsg + " to worker" + i);
-		}
+        }
         double[][] rows = new double[matrix.length-1-nRowsPerMsg*(workers.size()-1)][matrix.length];
         for (int j = 0; j < rows.length; j++){
             rows[j]=matrix[(workers.size()-1)*nRowsPerMsg+j+1];
         }
         workers.get(workers.size()-1).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, (workers.size()-1)*nRowsPerMsg+1), getSelf());
-		l.l(me, "sent rows " + rows.length + " to worker" + (workers.size()-1));    
+		//l.l(me, "sent rows " + rows.length + " to worker" + (workers.size()-1));    
         
 	}
 

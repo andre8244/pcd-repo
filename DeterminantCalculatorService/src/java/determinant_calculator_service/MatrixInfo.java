@@ -7,6 +7,7 @@ public class MatrixInfo {
 	private int nRowsDone;
     private double determinant;
 	private boolean changeSign;
+    private long startTime;
     
     public MatrixInfo(double[][] matrix){
         this.matrix = matrix;
@@ -14,6 +15,7 @@ public class MatrixInfo {
         nRowsDone = 0;
         determinant = 1;
         changeSign = false;
+        startTime = System.currentTimeMillis();
     }
     
     public double[][] getMatrix(){
@@ -35,6 +37,10 @@ public class MatrixInfo {
     public boolean getChangeSign(){
         return changeSign;
     }
+    
+    public long getStartTime(){
+        return startTime;
+    }    
     
     public void setMatrix(double[][] matrix){
         this.matrix = matrix;
