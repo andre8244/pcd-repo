@@ -42,13 +42,11 @@ public class Master extends UntypedActor {
 			RemoveWorker rw = (RemoveWorker) msg;
 			handleRemoveWorker(rw);
 		} else {
-			unhandled(msg);
+            unhandled(msg);
 		}
 	}
 
 	private void handleCompute(Compute compute) {
-		l.l(me, "handleCompute, workers.size():" + workers.size());
-
 		if (manager == null) {
 			manager = compute.getManager();
 		}
@@ -57,17 +55,17 @@ public class Master extends UntypedActor {
         int order = compute.getOrder();
 		URL fileValue = compute.getFileValues();
 		String reqId = compute.getReqId();
+        
+        l.l(me, "handleCompute, reqId: " + reqId + ", order: " + order + ", workers.size():" + workers.size());
 
 		String path = System.getProperty("user.home") + System.getProperty("file.separator");
 		String fileName = path + "matrix.txt";
 
 		matricesInfo.put(reqId, new MatrixInfo(MatrixUtil.fromFileToList(order, fileName)));
         
-        int length = matricesInfo.get(reqId).getMatrixLength();
-        l.l(me, "Matrix length: " + length);
-
         if (workers.isEmpty()) {
 			l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
+            manager.setPercentageDone(reqId, 100); // comunico al client di aver finito anche se non ho calcolato niente
 			return;
 		}
 
@@ -161,6 +159,20 @@ public class Master extends UntypedActor {
 			}*/
 		}
 	}
+    
+    private void sendManyRowsPerMsg(String reqId, double[][] matrix) {
+		double[] firstRow = matrix[0];
+
+        // TODO
+		for (int i = 1; i < matrix.length; i++) {
+			double[] row = matrix[i];
+			workers.get(((i - 1) % workers.size())).getActorRef().tell(new OneRow(reqId, firstRow, row, i), getSelf());
+			/*if (i % 500 == 0) {
+				l.l(me, "sent row " + i + " to worker" + ((i - 1) % workers.size()));
+			}*/
+		}
+        
+	}
 
 	private void gauss(String reqId){
 		MatrixInfo matrixInfo = matricesInfo.get(reqId);
@@ -172,6 +184,7 @@ public class Master extends UntypedActor {
 
 			if (!swapped) {
 				manager.setResult(reqId, 0.0);
+                manager.setPercentageDone(reqId, 100);
 				return;
 			}
 		}
@@ -182,6 +195,7 @@ public class Master extends UntypedActor {
 		double oldDeterminant = matrixInfo.getDeterminant();
 		matrixInfo.setDeterminant(oldDeterminant * matrix[0][0]);
 		sendOneRowPerMsg(reqId, matrix); // TODO provare a passare solo reqId
+        sendManyRowsPerMsg(reqId,matrix);
 	}
 
 	private double[][] subMatrix(String reqId, double[][] matrix){
