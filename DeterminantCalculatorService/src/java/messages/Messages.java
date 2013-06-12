@@ -2,18 +2,17 @@ package messages;
 
 import determinant_calculator_service.DeterminantCalculatorManager;
 import java.io.Serializable;
-import java.net.URL;
 
 public class Messages {
 
 	public static class Compute implements Serializable {
 
 		private final int order;
-		private final URL fileValues;
+		private final String fileValues;
 		private final String reqId;
 		private DeterminantCalculatorManager manager;
 
-		public Compute(int order, URL fileValues, String reqId, DeterminantCalculatorManager manager) {
+		public Compute(int order, String fileValues, String reqId, DeterminantCalculatorManager manager) {
 			this.order = order;
 			this.fileValues = fileValues;
 			this.reqId = reqId;
@@ -24,7 +23,7 @@ public class Messages {
 			return order;
 		}
 
-		public URL getFileValues() {
+		public String getFileValues() {
 			return fileValues;
 		}
 

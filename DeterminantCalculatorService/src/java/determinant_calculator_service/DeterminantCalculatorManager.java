@@ -5,15 +5,12 @@
 package determinant_calculator_service;
 
 import log.l;
-import messages.Messages.Compute;
+import messages.Messages;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import com.typesafe.config.ConfigFactory;
-import java.net.URL;
 import java.util.HashMap;
-import messages.Messages.RegisterWorker;
-import messages.Messages.RemoveWorker;
 
 /**
  *
@@ -43,11 +40,11 @@ public class DeterminantCalculatorManager {
 		return instance;
 	}
 
-	public synchronized String computeDeterminant(int order, URL fileValues) {
+	public synchronized String computeDeterminant(int order, String fileValues) {
 		String reqId = "req" + reqNumber;
 		reqNumber = reqNumber + 1;
 		done.put(reqId, 0);
-		master.tell(new Compute(order, fileValues, reqId, this));
+		master.tell(new Messages.Compute(order, fileValues, reqId, this));
 		return reqId;
 	}
 
@@ -69,13 +66,13 @@ public class DeterminantCalculatorManager {
 	}
 
 	public synchronized boolean registerWorker(String remoteAddress) {
-		master.tell(new RegisterWorker(remoteAddress));
+		master.tell(new Messages.RegisterWorker(remoteAddress));
 		// TODO ha senso che restituisca sempre true?
 		return true;
 	}
 
 	public synchronized boolean removeWorker(String remoteAddress) {
-		master.tell(new RemoveWorker(remoteAddress));
+		master.tell(new Messages.RemoveWorker(remoteAddress));
 		return true;
 	}
 

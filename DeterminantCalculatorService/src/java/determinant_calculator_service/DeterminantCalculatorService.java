@@ -19,7 +19,7 @@ public class DeterminantCalculatorService {
 	 * Operazione per calcolare il determinante
 	 */
 	@WebMethod(operationName = "computeDeterminant")
-	public String computeDeterminant(@WebParam(name = "order") int order, @WebParam(name = "fileValues") java.net.URL fileValues) {
+	public String computeDeterminant(@WebParam(name = "order") int order, @WebParam(name = "fileValues") String fileValues) {
 		return DeterminantCalculatorManager.getInstance().computeDeterminant(order, fileValues);
 	}
 
