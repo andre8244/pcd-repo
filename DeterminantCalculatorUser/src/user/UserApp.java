@@ -15,14 +15,14 @@ public class UserApp {
 
         String path = System.getProperty("user.home") + System.getProperty("file.separator");
         String fileValues = path + "matrix.txt";
-        int order = 1000;
-		//MatrixUtil.genAndWriteToFile(order, 20, fileValues);
-                        
+        int order = 4;
+		MatrixUtil.genAndWriteToFile(order, 1, 1, fileValues);
+
         String reqId1 = servicePort.computeDeterminant(order, fileValues);
 		int percentage1 = servicePort.getPercentageDone(reqId1);
 		l.l(me, reqId1 + " percentage: " + percentage1 + " %");
 		int lastPercentage1 = percentage1;
-        
+
         /*String reqId2 = servicePort.computeDeterminant(order, null);
 		int percentage2 = servicePort.getPercentageDone(reqId2);
 		l.l(me, reqId2 + " percentage: " + percentage2 + " %");
@@ -48,10 +48,10 @@ public class UserApp {
 		}
         l.l(me, reqId1 + " percentage: " + percentage1 + " %");
         //l.l(me, reqId2 + " percentage: " + percentage2 + " %");
-        
+
 		System.out.println("Result for " + reqId1 + ": " + servicePort.getResult(reqId1));
         //System.out.println("Result for " + reqId2 + ": " + servicePort.getResult(reqId2));
-            
+
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException ex) {
