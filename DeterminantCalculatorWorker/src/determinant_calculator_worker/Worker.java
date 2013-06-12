@@ -28,7 +28,7 @@ public class Worker extends UntypedActor {
 			l.l(me, "worker registered");
 		}
 	}
-    
+
 	@Override
 	public void onReceive(Object msg) throws Exception {
 		if (msg instanceof Messages.OneRow) {
@@ -57,16 +57,16 @@ public class Worker extends UntypedActor {
 
 		final Messages.OneRowResult oneRowResult = new Messages.OneRowResult(reqId, row, rowNumber);
 		getSender().tell(oneRowResult, getSelf());
+		l.l(me, "sent row " + rowNumber + " to master");
 	}
-    
+
 	private void handleManyRows(Messages.ManyRows manyRows) {
 		final String reqId = manyRows.getReqId();
 		final double[] firstRow = manyRows.getFirstRow();
 		final double[][] rows = manyRows.getRows();
 		final int rowNumber = manyRows.getRowNumber();
-
         double factor;
-        
+
         for (int i= 0; i < rows.length; i++){
             factor = -rows[i][0] / firstRow[0];
             //l.l(me, "factor: " + factor);
@@ -75,8 +75,7 @@ public class Worker extends UntypedActor {
                 rows[i][j] = rows[i][j] + factor * firstRow[j];
             }
         }
-
 		final Messages.ManyRowsResult manyRowsResult = new Messages.ManyRowsResult(reqId, rows, rowNumber);
 		getSender().tell(manyRowsResult, getSelf());
-	}    
+	}
 }
