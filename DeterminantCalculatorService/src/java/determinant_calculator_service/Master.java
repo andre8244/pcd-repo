@@ -155,7 +155,7 @@ public class Master extends UntypedActor {
 					manager.setResult(reqId, -determinant); // TODO
 				}
 			}
-            l.l(me, "matrix " + matrix.length + ", percentage done " + reqId + ": " + (matrixInfo.getMatrixLength()-matrix.length)*100/(matrixInfo.getMatrixLength()-2));
+            //l.l(me, "matrix " + matrix.length + ", percentage done " + reqId + ": " + (matrixInfo.getMatrixLength()-matrix.length)*100/(matrixInfo.getMatrixLength()-2));
             manager.setPercentageDone(reqId, (matrixInfo.getMatrixLength()-matrixInfo.getMatrix().length)*100/(matrixInfo.getMatrixLength()-2));
 		}
 	}  
