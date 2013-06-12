@@ -39,7 +39,7 @@ public class UserApp {
 			}*/
 
 			try {
-				Thread.sleep(50);
+				Thread.sleep(1000);
 			} catch (InterruptedException ex) {
 				ex.printStackTrace();
 			}
@@ -56,7 +56,7 @@ public class UserApp {
 			Thread.sleep(3000);
 		} catch (InterruptedException ex) {
 			ex.printStackTrace();
-		}
+        }
 		System.exit(0);
 	}
 
