@@ -34,7 +34,10 @@ public class Worker extends UntypedActor {
 		if (msg instanceof Messages.OneRow) {
 			Messages.OneRow oneRow = (Messages.OneRow) msg;
 			handleOneRow(oneRow);
-		} else {
+		} else if (msg instanceof Messages.ManyRows) {
+			Messages.ManyRows manyRows = (Messages.ManyRows) msg;
+			handleManyRows(manyRows);
+        } else {
 			unhandled(msg);
 		}
 	}
@@ -55,4 +58,25 @@ public class Worker extends UntypedActor {
 		final Messages.OneRowResult oneRowResult = new Messages.OneRowResult(reqId, row, rowNumber);
 		getSender().tell(oneRowResult, getSelf());
 	}
+    
+	private void handleManyRows(Messages.ManyRows manyRows) {
+		final String reqId = manyRows.getReqId();
+		final double[] firstRow = manyRows.getFirstRow();
+		final double[][] rows = manyRows.getRows();
+		final int rowNumber = manyRows.getRowNumber();
+
+        double factor;
+        
+        for (int i= 0; i < rows.length; i++){
+            factor = -rows[i][0] / firstRow[0];
+            //l.l(me, "factor: " + factor);
+
+            for (int j = 0; j < firstRow.length; j++) {
+                rows[i][j] = rows[i][j] + factor * firstRow[j];
+            }
+        }
+
+		final Messages.ManyRowsResult manyRowsResult = new Messages.ManyRowsResult(reqId, rows, rowNumber);
+		getSender().tell(manyRowsResult, getSelf());
+	}    
 }
