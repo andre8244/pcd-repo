@@ -6,11 +6,7 @@ import java.util.ArrayList;
 import akka.actor.UntypedActor;
 import java.net.URL;
 import java.util.HashMap;
-import messages.Messages.Compute;
-import messages.Messages.OneRow;
-import messages.Messages.OneRowResult;
-import messages.Messages.RegisterWorker;
-import messages.Messages.RemoveWorker;
+import messages.Messages;
 
 public class Master extends UntypedActor {
 
@@ -29,24 +25,24 @@ public class Master extends UntypedActor {
 
 	@Override
 	public void onReceive(Object msg) throws Exception {
-		if (msg instanceof Compute) {
-			Compute c = (Compute) msg;
+		if (msg instanceof Messages.Compute) {
+			Messages.Compute c = (Messages.Compute) msg;
 			handleCompute(c);
-		} else if (msg instanceof OneRowResult) {
-			OneRowResult orr = (OneRowResult) msg;
+		} else if (msg instanceof Messages.OneRowResult) {
+			Messages.OneRowResult orr = (Messages.OneRowResult) msg;
 			handleOneRowResult(orr);
-		} else if (msg instanceof RegisterWorker) {
-			RegisterWorker rw = (RegisterWorker) msg;
+		} else if (msg instanceof Messages.RegisterWorker) {
+			Messages.RegisterWorker rw = (Messages.RegisterWorker) msg;
 			handleRegisterWorker(rw);
-		} else if (msg instanceof RemoveWorker) {
-			RemoveWorker rw = (RemoveWorker) msg;
+		} else if (msg instanceof Messages.RemoveWorker) {
+			Messages.RemoveWorker rw = (Messages.RemoveWorker) msg;
 			handleRemoveWorker(rw);
 		} else {
             unhandled(msg);
 		}
 	}
 
-	private void handleCompute(Compute compute) {
+	private void handleCompute(Messages.Compute compute) {
 		if (manager == null) {
 			manager = compute.getManager();
 		}
@@ -72,7 +68,7 @@ public class Master extends UntypedActor {
         gauss(reqId);
 	}
 
-	private void handleOneRowResult(OneRowResult orr) {
+	private void handleOneRowResult(Messages.OneRowResult orr) {
 		String reqId = orr.getReqId();
 		double[] row = orr.getRow();
 		int rowNumber = orr.getRowNumber();
@@ -117,14 +113,14 @@ public class Master extends UntypedActor {
 		}
 	}
 
-	private void handleRegisterWorker(RegisterWorker rw) {
+	private void handleRegisterWorker(Messages.RegisterWorker rw) {
 		String remoteAddress = rw.getRemoteAddress();
 		RemoteWorker worker = new RemoteWorker(remoteAddress, getContext().actorFor(remoteAddress));
 		workers.add(worker);
 		l.l(me, "worker added, workers size: " + workers.size());
 	}
 
-	private void handleRemoveWorker(RemoveWorker rw) {
+	private void handleRemoveWorker(Messages.RemoveWorker rw) {
 		String remoteAddress = rw.getRemoteAddress();
 
 		// TODO si potrebbe usare una hashmap per rendere la ricerca più performante
@@ -153,7 +149,7 @@ public class Master extends UntypedActor {
 
 		for (int i = 1; i < matrix.length; i++) {
 			double[] row = matrix[i];
-			workers.get(((i - 1) % workers.size())).getActorRef().tell(new OneRow(reqId, firstRow, row, i), getSelf());
+			workers.get(((i - 1) % workers.size())).getActorRef().tell(new Messages.OneRow(reqId, firstRow, row, i), getSelf());
 			/*if (i % 500 == 0) {
 				l.l(me, "sent row " + i + " to worker" + ((i - 1) % workers.size()));
 			}*/
@@ -166,7 +162,7 @@ public class Master extends UntypedActor {
         // TODO
 		for (int i = 1; i < matrix.length; i++) {
 			double[] row = matrix[i];
-			workers.get(((i - 1) % workers.size())).getActorRef().tell(new OneRow(reqId, firstRow, row, i), getSelf());
+			workers.get(((i - 1) % workers.size())).getActorRef().tell(new Messages.OneRow(reqId, firstRow, row, i), getSelf());
 			/*if (i % 500 == 0) {
 				l.l(me, "sent row " + i + " to worker" + ((i - 1) % workers.size()));
 			}*/
