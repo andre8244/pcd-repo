@@ -14,7 +14,7 @@ public class UserApp {
 		servicePort = service.getDeterminantCalculatorServicePort();
 
         String path = System.getProperty("user.home") + System.getProperty("file.separator");
-        int order = 1000;
+        int order = 100;
         String fileValues = path + "matrix"+order+".txt";
 		MatrixUtil.genAndWriteToFile(order, 1, 20, fileValues);
 
