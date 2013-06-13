@@ -38,7 +38,7 @@ public class Worker extends UntypedActor {
 		} else if (msg instanceof Messages.ManyRows) {
 			Messages.ManyRows manyRows = (Messages.ManyRows) msg;
 			handleManyRows(manyRows);
-        } else if (msg instanceof Messages.ManyRows) {
+        } else if (msg instanceof Messages.Remove) {
 			handleRemove();
 		} else {
 			unhandled(msg);

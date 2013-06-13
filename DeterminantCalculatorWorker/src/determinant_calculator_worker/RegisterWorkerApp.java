@@ -38,6 +38,6 @@ public class RegisterWorkerApp {
 			ex.printStackTrace();
 		}
 		//workers.add(system.actorOf(new Props(Worker.class), "worker"+nWorkersToDeploy));
-		workers.get(2).tell(new Messages.Remove());
+		//workers.get(2).tell(new Messages.Remove());
 	}
 }
