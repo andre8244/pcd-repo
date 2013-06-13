@@ -170,19 +170,23 @@ public class Master extends UntypedActor {
 		String remoteAddress = rw.getRemoteAddress();
 		RemoteWorker worker = new RemoteWorker(remoteAddress, getContext().actorFor(remoteAddress));
 		workers.add(worker);
-		l.l(me, remoteAddress + " added, workers size: " + workers.size());
+		l.l(me, worker.getName() + " added, workers size: " + workers.size());
 	}
 
 	private void handleRemoveWorker(Messages.RemoveWorker rw) {
 		String remoteAddress = rw.getRemoteAddress();
+		String workerName = null;
 
 		// TODO si potrebbe usare una hashmap per rendere la ricerca più performante
 		for (int i = 0; i < workers.size(); i++) {
 			if (workers.get(i).getRemoteAddress().equals(remoteAddress)) {
+				workerName = workers.get(i).getName();
 				workers.remove(i);
 			}
 		}
-        l.l(me, remoteAddress + " removed, workers size: " + workers.size());
+		if (workerName!=null){
+			l.l(me, workerName + " removed, workers size: " + workers.size());
+		}
 	}
 
 	private boolean swapFirtsRow(double[][] matrix) {
@@ -204,7 +208,7 @@ public class Master extends UntypedActor {
 			double[] row = matrix[i];
 			workers.get(((i - 1) % workers.size())).getActorRef().tell(new Messages.OneRow(reqId, firstRow, row, i), getSelf());
 			//if (i % 500 == 0) {
-			//l.l(me, "sent row " + i + " to worker " + workers.get(((i - 1) % workers.size())).getRemoteAddress());
+			l.l(me, "sent row " + i + " to worker " + workers.get(((i - 1) % workers.size())).getName());
 			//}
 		}
 	}
@@ -222,7 +226,7 @@ public class Master extends UntypedActor {
 					rows[j] = matrix[i * nRowsPerMsg + j + 1];
 				}
 				workers.get(i).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, i * nRowsPerMsg + 1), getSelf());
-                //l.l(me, "sent rows from " + (i*nRowsPerMsg+1) + " to " + (i*nRowsPerMsg+nRowsPerMsg) + " to worker " + workers.get(i).getRemoteAddress());
+                l.l(me, "sent rows from " + (i*nRowsPerMsg+1) + " to " + (i*nRowsPerMsg+nRowsPerMsg) + " to worker " + workers.get(i).getName());
 			}
 		}
 		double[][] rows = new double[matrix.length - 1 - nRowsPerMsg * (workers.size() - 1)][matrix.length];
@@ -230,7 +234,7 @@ public class Master extends UntypedActor {
 			rows[j] = matrix[(workers.size() - 1) * nRowsPerMsg + j + 1];
 		}
 		workers.get(workers.size() - 1).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, (workers.size() - 1) * nRowsPerMsg + 1), getSelf());
-		//l.l(me, "sent rows from " + ((workers.size()-1)*nRowsPerMsg+1) + " to " + (matrix.length-1) + " to worker " + workers.get(workers.size()-1).getRemoteAddress());
+		l.l(me, "sent rows from " + ((workers.size()-1)*nRowsPerMsg+1) + " to " + (matrix.length-1) + " to worker " + workers.get(workers.size()-1).getName());
 	}
 
 	private boolean gauss(String reqId) {
