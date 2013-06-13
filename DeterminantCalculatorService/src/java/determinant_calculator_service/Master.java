@@ -77,7 +77,7 @@ public class Master extends UntypedActor {
 		matrixInfo.setRowsDone(nRowsDone);
 
 		/*if (nRowsDone % 500 == 0) {
-		 l.l(me, "nRowsDone: " + nRowsDone);
+            l.l(me, "nRowsDone: " + nRowsDone);
 		 }*/
 
 		double[][] matrix = matrixInfo.getMatrix();
@@ -85,9 +85,9 @@ public class Master extends UntypedActor {
 		matrixInfo.setMatrix(matrix);
 
 		if (nRowsDone == matrix.length - 1) {
-			//if (matrix.length % 100 == 0){
-			l.l(me, "Received all rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
-			//}
+			if (matrix.length % 500 == 0){
+                l.l(me, "Received all rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
+			}
 			boolean zeroColumn = false;
 
 			if (matrix.length > 2) {
@@ -125,7 +125,7 @@ public class Master extends UntypedActor {
 		matrixInfo.setRowsDone(nRowsDone);
 
 		/*if (nRowsDone % 500 == 0) {
-		 l.l(me, "nRowsDone: " + nRowsDone);
+            l.l(me, "nRowsDone: " + nRowsDone);
 		 }*/
 
 		double[][] matrix = matrixInfo.getMatrix();
@@ -137,9 +137,9 @@ public class Master extends UntypedActor {
 		matrixInfo.setMatrix(matrix);
 
 		if (nRowsDone == matrix.length - 1) {
-			//if (matrix.length % 500 == 0){
+			if (matrix.length % 500 == 0){
 				l.l(me, "Received all rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
-			//}
+			}
 			boolean zeroColumn = false;
 
 			if (matrix.length > 2) {
