@@ -4,7 +4,6 @@ import log.l;
 import java.util.ArrayList;
 
 import akka.actor.UntypedActor;
-import akka.remote.RemoteClientError;
 import akka.remote.RemoteClientShutdown;
 import akka.remote.RemoteLifeCycleEvent;
 import java.util.HashMap;
@@ -47,14 +46,11 @@ public class Master extends UntypedActor {
 		} else if (msg instanceof Messages.RemoveWorker) {
 			Messages.RemoveWorker rw = (Messages.RemoveWorker) msg;
 			handleRemoveWorker(rw);
-		} else if (msg instanceof RemoteClientError) {
-			l.l(me, "Remote Client Error!");
-			RemoteClientError rce = (RemoteClientError) msg;
-			l.l(me, "address: " + rce.getRemoteAddress().toString());
 		} else if (msg instanceof RemoteClientShutdown) {
 			l.l(me, "Remote Client Shutdown!");
 			RemoteClientShutdown rcs = (RemoteClientShutdown) msg;
 			l.l(me, "address: " + rcs.getRemoteAddress().toString());
+			handleRemoveWorkerSystem(rcs.getRemoteAddress().toString());
 		} else {
 			unhandled(msg);
 		}
@@ -110,6 +106,13 @@ public class Master extends UntypedActor {
 			if (matrix.length > 2) {
 				matrixInfo.setRowsDone(0);
 				matrixInfo.setMatrix(subMatrix(reqId, matrix));
+				
+				if (workers.isEmpty()) {
+					l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
+					manager.setPercentageDone(reqId, 100);
+					return;
+				}
+				
 				zeroColumn = gauss(reqId);
 			} else {
 				l.l(me, "Received ALL rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
@@ -162,6 +165,13 @@ public class Master extends UntypedActor {
 			if (matrix.length > 2) {
 				matrixInfo.setRowsDone(0);
 				matrixInfo.setMatrix(subMatrix(reqId, matrix));
+				
+				if (workers.isEmpty()) {
+					l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
+					manager.setPercentageDone(reqId, 100);
+					return;
+				}
+								
 				zeroColumn = gauss(reqId);
 			} else {
 				l.l(me, "Received ALL rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
@@ -192,17 +202,14 @@ public class Master extends UntypedActor {
 
 	private void handleRemoveWorker(Messages.RemoveWorker rw) {
 		String remoteAddress = rw.getRemoteAddress();
-		String workerName = null;
 
 		// TODO si potrebbe usare una hashmap per rendere la ricerca più performante
 		for (int i = 0; i < workers.size(); i++) {
 			if (workers.get(i).getRemoteAddress().equals(remoteAddress)) {
-				workerName = workers.get(i).getName();
+				l.l(me, workers.get(i).getName() + " removed, workers size: " + (workers.size()-1));
 				workers.remove(i);
+				i--;
 			}
-		}
-		if (workerName!=null){
-			l.l(me, workerName + " removed, workers size: " + workers.size());
 		}
 	}
 
@@ -289,5 +296,19 @@ public class Master extends UntypedActor {
 			}
 		}
 		return subMatrix;
+	}
+
+	private void handleRemoveWorkerSystem(String workerSystem) {
+		String[] tokens;
+		
+		for (int i = 0; i < workers.size(); i++) {
+			tokens = workers.get(i).getRemoteAddress().split("/user");
+			//l.l(me, "worker system "+tokens[0]);
+			if (tokens[0].equals(workerSystem)) {
+				l.l(me, workers.get(i).getName() + " removed, workers size: " + (workers.size()-1));
+				workers.remove(i);
+				i--;				
+			}
+		}
 	}
 }
