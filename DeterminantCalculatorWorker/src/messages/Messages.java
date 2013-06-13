@@ -115,4 +115,11 @@ public class Messages {
 			return rows;
 		}
 	}   
+	
+	public static class Remove implements Serializable {
+
+		public Remove() {
+			
+		}
+	}	
 }

@@ -10,6 +10,7 @@ public class Worker extends UntypedActor {
 
 	private String me;
 	private determinant_ws_client.DeterminantCalculatorService servicePort;
+	private String remoteAddress;
 
 	@Override
 	public void preStart() {
@@ -21,7 +22,7 @@ public class Worker extends UntypedActor {
 		servicePort = service.getDeterminantCalculatorServicePort();
 
 		Address systemRemoteAddress = ((RemoteActorRefProvider) context().provider()).transport().address();
-		String remoteAddress = getSelf().path().toStringWithAddress(systemRemoteAddress);
+		remoteAddress = getSelf().path().toStringWithAddress(systemRemoteAddress);
 		boolean result = servicePort.registerWorker(remoteAddress);
 
 		if (result) {
@@ -37,7 +38,9 @@ public class Worker extends UntypedActor {
 		} else if (msg instanceof Messages.ManyRows) {
 			Messages.ManyRows manyRows = (Messages.ManyRows) msg;
 			handleManyRows(manyRows);
-        } else {
+        } else if (msg instanceof Messages.ManyRows) {
+			handleRemove();
+		} else {
 			unhandled(msg);
 		}
 	}
@@ -77,6 +80,14 @@ public class Worker extends UntypedActor {
         }
 		final Messages.ManyRowsResult manyRowsResult = new Messages.ManyRowsResult(reqId, rows, rowNumber);
 		getSender().tell(manyRowsResult, getSelf());
-        //l.l(me, "sent rows from " + rowNumber + " to " + (rowNumber+rows.length-1) + " to master");
+        l.l(me, "sent rows from " + rowNumber + " to " + (rowNumber+rows.length-1) + " to master");
+	}
+
+	private void handleRemove() {
+		boolean result = servicePort.removeWorker(remoteAddress);
+
+		if (result) {
+			l.l(me, "worker removed");
+		}
 	}
 }
