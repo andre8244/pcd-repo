@@ -4,6 +4,9 @@ import log.l;
 import java.util.ArrayList;
 
 import akka.actor.UntypedActor;
+import akka.remote.RemoteClientError;
+import akka.remote.RemoteClientShutdown;
+import akka.remote.RemoteLifeCycleEvent;
 import java.util.HashMap;
 import messages.Messages;
 
@@ -22,6 +25,12 @@ public class Master extends UntypedActor {
 	}
 
 	@Override
+	public void preStart() {
+		super.preStart();
+		context().system().eventStream().subscribe(getSelf(), RemoteLifeCycleEvent.class);
+	}
+	
+	@Override
 	public void onReceive(Object msg) throws Exception {
 		if (msg instanceof Messages.Compute) {
 			Messages.Compute c = (Messages.Compute) msg;
@@ -38,6 +47,14 @@ public class Master extends UntypedActor {
 		} else if (msg instanceof Messages.RemoveWorker) {
 			Messages.RemoveWorker rw = (Messages.RemoveWorker) msg;
 			handleRemoveWorker(rw);
+		} else if (msg instanceof RemoteClientError) {
+			l.l(me, "Remote Client Error!");
+			RemoteClientError rce = (RemoteClientError) msg;
+			l.l(me, "address: " + rce.getRemoteAddress().toString());
+		} else if (msg instanceof RemoteClientShutdown) {
+			l.l(me, "Remote Client Shutdown!");
+			RemoteClientShutdown rcs = (RemoteClientShutdown) msg;
+			l.l(me, "address: " + rcs.getRemoteAddress().toString());
 		} else {
 			unhandled(msg);
 		}
