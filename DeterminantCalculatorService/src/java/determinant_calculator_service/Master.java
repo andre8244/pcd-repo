@@ -242,7 +242,7 @@ public class Master extends UntypedActor {
 			swapped = swapFirtsRow(matrix);
 
 			if (!swapped) {
-                l.l(me, "zero column! determinant = 0!");
+                l.l(me, "zero column! determinant = 0. Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
 				manager.setResult(reqId, 0.0);
 				manager.setPercentageDone(reqId, 100);
 				return true;
