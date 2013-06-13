@@ -197,7 +197,7 @@ public class Master extends UntypedActor {
 		String remoteAddress = rw.getRemoteAddress();
 		RemoteWorker worker = new RemoteWorker(remoteAddress, getContext().actorFor(remoteAddress));
 		workers.add(worker);
-		l.l(me, worker.getName() + " added, workers size: " + workers.size());
+		l.l(me, worker.getRemoteAddress() + " added, workers size: " + workers.size());
 	}
 
 	private void handleRemoveWorker(Messages.RemoveWorker rw) {
@@ -206,7 +206,7 @@ public class Master extends UntypedActor {
 		// TODO si potrebbe usare una hashmap per rendere la ricerca più performante
 		for (int i = 0; i < workers.size(); i++) {
 			if (workers.get(i).getRemoteAddress().equals(remoteAddress)) {
-				l.l(me, workers.get(i).getName() + " removed, workers size: " + (workers.size()-1));
+				l.l(me, workers.get(i).getRemoteAddress() + " removed, workers size: " + (workers.size()-1));
 				workers.remove(i);
 				i--;
 			}
@@ -232,7 +232,7 @@ public class Master extends UntypedActor {
 			double[] row = matrix[i];
 			workers.get(((i - 1) % workers.size())).getActorRef().tell(new Messages.OneRow(reqId, firstRow, row, i), getSelf());
 			//if (i % 500 == 0) {
-			//l.l(me, "sent row " + i + " to " + workers.get(((i - 1) % workers.size())).getName());
+			//l.l(me, "sent row " + i + " to " + workers.get(((i - 1) % workers.size())).getRemoteAddress());
 			//}
 		}
 	}
@@ -250,7 +250,7 @@ public class Master extends UntypedActor {
 					rows[j] = matrix[i * nRowsPerMsg + j + 1];
 				}
 				workers.get(i).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, i * nRowsPerMsg + 1), getSelf());
-                //l.l(me, "sent rows from " + (i*nRowsPerMsg+1) + " to " + (i*nRowsPerMsg+nRowsPerMsg) + " to " + workers.get(i).getName());
+                //l.l(me, "sent rows from " + (i*nRowsPerMsg+1) + " to " + (i*nRowsPerMsg+nRowsPerMsg) + " to " + workers.get(i).getRemoteAddress());
 			}
 		}
 		double[][] rows = new double[matrix.length - 1 - nRowsPerMsg * (workers.size() - 1)][matrix.length];
@@ -258,7 +258,7 @@ public class Master extends UntypedActor {
 			rows[j] = matrix[(workers.size() - 1) * nRowsPerMsg + j + 1];
 		}
 		workers.get(workers.size() - 1).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, (workers.size() - 1) * nRowsPerMsg + 1), getSelf());
-		//l.l(me, "sent rows from " + ((workers.size()-1)*nRowsPerMsg+1) + " to " + (matrix.length-1) + " to " + workers.get(workers.size()-1).getName());
+		//l.l(me, "sent rows from " + ((workers.size()-1)*nRowsPerMsg+1) + " to " + (matrix.length-1) + " to " + workers.get(workers.size()-1).getRemoteAddress());
 	}
 
 	private boolean gauss(String reqId) {
@@ -305,7 +305,7 @@ public class Master extends UntypedActor {
 			tokens = workers.get(i).getRemoteAddress().split("/user");
 			//l.l(me, "worker system "+tokens[0]);
 			if (tokens[0].equals(workerSystem)) {
-				l.l(me, workers.get(i).getName() + " removed, workers size: " + (workers.size()-1));
+				l.l(me, workers.get(i).getRemoteAddress() + " removed, workers size: " + (workers.size()-1));
 				workers.remove(i);
 				i--;				
 			}
