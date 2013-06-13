@@ -170,7 +170,7 @@ public class Master extends UntypedActor {
 		String remoteAddress = rw.getRemoteAddress();
 		RemoteWorker worker = new RemoteWorker(remoteAddress, getContext().actorFor(remoteAddress));
 		workers.add(worker);
-		l.l(me, "worker added, workers size: " + workers.size());
+		l.l(me, remoteAddress + " added, workers size: " + workers.size());
 	}
 
 	private void handleRemoveWorker(Messages.RemoveWorker rw) {
@@ -182,7 +182,7 @@ public class Master extends UntypedActor {
 				workers.remove(i);
 			}
 		}
-		l.l(me, "worker removed, workers size: " + workers.size());
+        l.l(me, remoteAddress + " removed, workers size: " + workers.size());
 	}
 
 	private boolean swapFirtsRow(double[][] matrix) {
@@ -204,7 +204,7 @@ public class Master extends UntypedActor {
 			double[] row = matrix[i];
 			workers.get(((i - 1) % workers.size())).getActorRef().tell(new Messages.OneRow(reqId, firstRow, row, i), getSelf());
 			//if (i % 500 == 0) {
-			l.l(me, "sent row " + i + " to worker" + ((i - 1) % workers.size()));
+			//l.l(me, "sent row " + i + " to worker " + workers.get(((i - 1) % workers.size())).getRemoteAddress());
 			//}
 		}
 	}
@@ -222,7 +222,7 @@ public class Master extends UntypedActor {
 					rows[j] = matrix[i * nRowsPerMsg + j + 1];
 				}
 				workers.get(i).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, i * nRowsPerMsg + 1), getSelf());
-				//l.l(me, "sent rows " + nRowsPerMsg + " to worker" + i);
+                //l.l(me, "sent rows from " + (i*nRowsPerMsg+1) + " to " + (i*nRowsPerMsg+nRowsPerMsg) + " to worker " + workers.get(i).getRemoteAddress());
 			}
 		}
 		double[][] rows = new double[matrix.length - 1 - nRowsPerMsg * (workers.size() - 1)][matrix.length];
@@ -230,8 +230,7 @@ public class Master extends UntypedActor {
 			rows[j] = matrix[(workers.size() - 1) * nRowsPerMsg + j + 1];
 		}
 		workers.get(workers.size() - 1).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, (workers.size() - 1) * nRowsPerMsg + 1), getSelf());
-		//l.l(me, "sent rows " + rows.length + " to worker" + (workers.size()-1));
-
+		//l.l(me, "sent rows from " + ((workers.size()-1)*nRowsPerMsg+1) + " to " + (matrix.length-1) + " to worker " + workers.get(workers.size()-1).getRemoteAddress());
 	}
 
 	private boolean gauss(String reqId) {
@@ -243,6 +242,7 @@ public class Master extends UntypedActor {
 			swapped = swapFirtsRow(matrix);
 
 			if (!swapped) {
+                l.l(me, "zero column! determinant = 0!");
 				manager.setResult(reqId, 0.0);
 				manager.setPercentageDone(reqId, 100);
 				return true;
@@ -254,8 +254,8 @@ public class Master extends UntypedActor {
 		}
 		double oldDeterminant = matrixInfo.getDeterminant();
 		matrixInfo.setDeterminant(oldDeterminant * matrix[0][0]);
-		sendOneRowPerMsg(reqId, matrix); // TODO provare a passare solo reqId
-		//sendManyRowsPerMsg(reqId,matrix);
+		//sendOneRowPerMsg(reqId, matrix); // TODO provare a passare solo reqId
+		sendManyRowsPerMsg(reqId,matrix);
 		return false;
 	}
 
