@@ -57,7 +57,7 @@ public class Worker extends UntypedActor {
 
 		final Messages.OneRowResult oneRowResult = new Messages.OneRowResult(reqId, row, rowNumber);
 		getSender().tell(oneRowResult, getSelf());
-		l.l(me, "sent row " + rowNumber + " to master");
+		//l.l(me, "sent row " + rowNumber + " to master");
 	}
 
 	private void handleManyRows(Messages.ManyRows manyRows) {
@@ -77,5 +77,6 @@ public class Worker extends UntypedActor {
         }
 		final Messages.ManyRowsResult manyRowsResult = new Messages.ManyRowsResult(reqId, rows, rowNumber);
 		getSender().tell(manyRowsResult, getSelf());
+        //l.l(me, "sent rows from " + rowNumber + " to " + (rowNumber+rows.length-1) + " to master");
 	}
 }
