@@ -208,7 +208,7 @@ public class Master extends UntypedActor {
 			double[] row = matrix[i];
 			workers.get(((i - 1) % workers.size())).getActorRef().tell(new Messages.OneRow(reqId, firstRow, row, i), getSelf());
 			//if (i % 500 == 0) {
-			l.l(me, "sent row " + i + " to " + workers.get(((i - 1) % workers.size())).getName());
+			//l.l(me, "sent row " + i + " to " + workers.get(((i - 1) % workers.size())).getName());
 			//}
 		}
 	}
