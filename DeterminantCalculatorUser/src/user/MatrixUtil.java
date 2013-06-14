@@ -1,28 +1,17 @@
 package user;
 
 import log.l;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
-import java.util.StringTokenizer;
 
 public class MatrixUtil {
 
 	private static BufferedWriter writer;
 	private static Random rand;
 	private static String me = "matrixUtil";
-
-	private static void log(String msg) {
-		System.out.println("" + msg);
-	}
 
 	public static void genAndWriteToFile(int order, double minAbs, double maxAbs, String fileName) {
 		long startTime = System.currentTimeMillis();
@@ -34,7 +23,7 @@ public class MatrixUtil {
 		try {
 			writer = new BufferedWriter(new FileWriter(fileName));
 			double val;
-			log("Writing matrix to file...");
+			l.l(me, "Writing matrix to file...");
 
 			for (int row = 0; row < order; row++) {
 				for (int col = 0; col < order; col++) {
@@ -51,10 +40,10 @@ public class MatrixUtil {
 				}
 
 				if (row % 500 == 0) {
-					log((int) ((double) row / order * 100) + " %");
+					l.l(me, (int) ((double) row / order * 100) + " %");
 				}
 			}
-			log("matrix wrote to file, duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
+			l.l(me, "matrix wrote to file, duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -68,24 +57,13 @@ public class MatrixUtil {
 		}
 	}
 
-	public static double[][] fromFileToList(int order, String fileName) {
+	/*public static double[][] fromFileToList(int order, String fileName) {
 		l.l(me, "reading matrix from file, generating array...");
 		long startTime = System.currentTimeMillis();
 
 		double[][] matrix = new double[order][order];
 
 		try {
-			/*Reader reader = new FileReader(fileName);
-			 for (int i = 0; i < order; i++) {
-			 for (int j = 0; j < order; j++) {
-			 matrix[i][j]=readDouble(reader);
-			 }
-
-			 if (i % 500 == 0){
-			 l.l(me, "wrote " + i + " lines in list");
-			 }
-			 }*/
-
 			BufferedReader reader = new BufferedReader(new FileReader(fileName));
 			String line = reader.readLine();
 			String[] tokens;
@@ -96,6 +74,7 @@ public class MatrixUtil {
 					l.l(me, "wrote " + i + " rows in the array");
 				}
 				tokens = line.split(" ");
+
 				for (int j = 0; j < tokens.length; j++) {
 					matrix[i][j] = Double.parseDouble(tokens[j]);
 				}
@@ -113,30 +92,9 @@ public class MatrixUtil {
 		//l.l(me, "finished reading list " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
 		//printMatrix(matrix);
 		return matrix;
-	}
+	}*/
 
-	private static double readDouble(Reader reader) {
-		StringBuffer buf = new StringBuffer();
-		boolean endOfElem = false;
-
-		try {
-			while (reader.ready() && !endOfElem) {
-				char ch = (char) reader.read();
-
-				endOfElem = ((ch == ' ') || (ch == '\n'));
-
-				if (!endOfElem) {
-					//l.l(me, "read " + ch);
-					buf.append(ch);
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return Double.parseDouble(buf.toString());
-	}
-
-	public static ArrayList<ArrayList<Double>> fromFileToArrayList(int order, String fileName) {
+	/*public static ArrayList<ArrayList<Double>> fromFileToArrayList(int order, String fileName) {
 		l.l(me, "writing arraylist");
 		long startTime = System.currentTimeMillis();
 
@@ -174,9 +132,9 @@ public class MatrixUtil {
 		testReadMatrix(matrix);
 		l.l(me, "finished reading arraylist " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
 		return matrix;
-	}
+	}*/
 
-	public static HashMap<Integer, HashMap<Integer, Double>> fromFileToHashMap(String fileName) {
+	/*public static HashMap<Integer, HashMap<Integer, Double>> fromFileToHashMap(String fileName) {
 		l.l(me, "writing hashmap");
 		long startTime = System.currentTimeMillis();
 
@@ -216,27 +174,27 @@ public class MatrixUtil {
 		testReadMatrix(matrix);
 		l.l(me, "finished reading hashmap " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
 		return matrix;
-	}
+	}*/
 
-	public static void printMatrix(double[][] matrix) {
+	/*public static void printMatrix(double[][] matrix) {
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[i].length; j++) {
 				System.out.print(matrix[i][j] + " ");
 			}
 			System.out.print("\n");
 		}
-	}
+	}*/
 
-	public static void printMatrix(ArrayList<ArrayList<Double>> matrix) {
+	/*public static void printMatrix(ArrayList<ArrayList<Double>> matrix) {
 		for (ArrayList<Double> row : matrix) {
 			for (Double elem : row) {
 				System.out.print(elem + " ");
 			}
 			System.out.print("\n");
 		}
-	}
+	}*/
 
-	private static void testReadMatrix(double[][] matrix) {
+	/*private static void testReadMatrix(double[][] matrix) {
 		long dummy = 0;
 
 		for (int i = 0; i < matrix.length; i++) {
@@ -244,9 +202,9 @@ public class MatrixUtil {
 				dummy++;
 			}
 		}
-	}
+	}*/
 
-	private static void testReadMatrix(ArrayList<ArrayList<Double>> matrix) {
+	/*private static void testReadMatrix(ArrayList<ArrayList<Double>> matrix) {
 		long dummy = 0;
 
 		for (int i = 0; i < matrix.size(); i++) {
@@ -254,9 +212,9 @@ public class MatrixUtil {
 				dummy++;
 			}
 		}
-	}
+	}*/
 
-	private static void testReadMatrix(HashMap<Integer, HashMap<Integer, Double>> matrix) {
+	/*private static void testReadMatrix(HashMap<Integer, HashMap<Integer, Double>> matrix) {
 		long dummy = 0;
 
 		for (int i = 0; i < matrix.size(); i++) {
@@ -264,5 +222,5 @@ public class MatrixUtil {
 				dummy++;
 			}
 		}
-	}
+	}*/
 }
