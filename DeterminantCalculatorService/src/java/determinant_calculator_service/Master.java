@@ -48,16 +48,16 @@ public class Master extends UntypedActor {
 		} else if (msg instanceof Messages.RemoveWorker) {
 			Messages.RemoveWorker rw = (Messages.RemoveWorker) msg;
 			handleRemoveWorker(rw);
-		} else if (msg instanceof RemoteClientShutdown) {
-			l.l(me, "Remote Client Shutdown!");
-			RemoteClientShutdown rcs = (RemoteClientShutdown) msg;
-			l.l(me, "address: " + rcs.getRemoteAddress().toString());
-			handleRemoveWorkerSystem(rcs.getRemoteAddress().toString());
 		} else if (msg instanceof RemoteClientWriteFailed) {
 			l.l(me, "Remote Client Write Failed!");
 			RemoteClientWriteFailed rcwf = (RemoteClientWriteFailed) msg;
 			l.l(me, "address: " + rcwf.getRemoteAddress().toString());
-			handleWriteFailed(rcwf.getRemoteAddress().toString());
+			handleWorkerFailure(rcwf.getRemoteAddress().toString());
+		} else if (msg instanceof RemoteClientShutdown) {
+			l.l(me, "Remote Client Shutdown!");
+			RemoteClientShutdown rcs = (RemoteClientShutdown) msg;
+			l.l(me, "address: " + rcs.getRemoteAddress().toString());
+			handleWorkerFailure(rcs.getRemoteAddress().toString());
 		} else {
 			unhandled(msg);
 		}
@@ -180,13 +180,7 @@ public class Master extends UntypedActor {
 				
 				if (workers.isEmpty()) {
 					l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
-					manager.setPercentageDone(reqId, 100);
-					
-					for (int i = 0; i < workers.size(); i++){
-						workers.get(i).removeReqId(reqId);
-						l.l(me, workers.get(i).getRemoteAddress() + " remove " + reqId);
-					}
-					
+					manager.setPercentageDone(reqId, 100);												
 					return;
 				}
 								
@@ -198,10 +192,15 @@ public class Master extends UntypedActor {
 
 				if (!matrixInfo.getChangeSign()) {
 					matrixInfo.setDeterminant(determinant);
-					manager.setResult(reqId, determinant); // TODO
+					manager.setResult(reqId, determinant);
 				} else {
-					matrixInfo.setDeterminant(-determinant);
-					manager.setResult(reqId, -determinant); // TODO
+					if (determinant==0){
+						matrixInfo.setDeterminant(0);
+						manager.setResult(reqId, 0);
+					} else {
+						matrixInfo.setDeterminant(-determinant);
+						manager.setResult(reqId, -determinant);
+					}
 				}				
 			}
 			//l.l(me, "matrix " + matrix.length + ", percentage done " + reqId + ": " + (matrixInfo.getMatrixLength()-matrix.length)*100/(matrixInfo.getMatrixLength()-2));
@@ -270,7 +269,7 @@ public class Master extends UntypedActor {
 				for (int j = 0; j < rows.length; j++) {
 					rows[j] = matrix[i * nRowsPerMsg + j + 1];
 				}
-				workers.get(i).setReqId(reqId);
+				workers.get(i).addReqId(reqId);
 				workers.get(i).setRows(reqId, rows);
 				workers.get(i).setRowNumber(reqId, i * nRowsPerMsg + 1);
 				workers.get(i).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, i * nRowsPerMsg + 1), getSelf());
@@ -281,7 +280,7 @@ public class Master extends UntypedActor {
 		for (int j = 0; j < rows.length; j++) {
 			rows[j] = matrix[(workers.size() - 1) * nRowsPerMsg + j + 1];
 		}
-		workers.get(workers.size() - 1).setReqId(reqId);
+		workers.get(workers.size() - 1).addReqId(reqId);
 		workers.get(workers.size() - 1).setRows(reqId, rows);
 		workers.get(workers.size() - 1).setRowNumber(reqId, (workers.size() - 1) * nRowsPerMsg + 1);
 		workers.get(workers.size() - 1).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, (workers.size() - 1) * nRowsPerMsg + 1), getSelf());
@@ -325,31 +324,19 @@ public class Master extends UntypedActor {
 		return subMatrix;
 	}
 
-	private void handleRemoveWorkerSystem(String workerSystem) {
+	private void handleWorkerFailure(String workerSystem) {
 		String[] tokens;
-		
-		for (int i = 0; i < workers.size(); i++) {
-			tokens = workers.get(i).getRemoteAddress().split("/user");
-			//l.l(me, "worker system "+tokens[0]);
-			if (tokens[0].equals(workerSystem)) {
-				RemoteWorker worker = workers.remove(i);
-				l.l(me, worker.getRemoteAddress() + " removed, workers size: " + workers.size());
-				i--;				
-			}
-		}
-	}
-
-	private void handleWriteFailed(String workerSystem) {
-		String[] tokens;
-		l.l(me, "handle write failed");
+		l.l(me, "handle failed");
 		for (int i = 0; i < workers.size(); i++) {
 			tokens = workers.get(i).getRemoteAddress().split("/user");
 			//l.l(me, "worker system "+tokens[0]);
 			if (tokens[0].equals(workerSystem)) {
 				RemoteWorker worker = workers.get(i);
 				l.l(me, worker.getRemoteAddress() + " pending request: "+worker.getReqIds().size());
+				// nel caso di shutdown -> pending request = 0 !
 				for (int j = 0; j < worker.getReqIds().size(); j++){
 					String reqId = worker.getReqIds().get(j);
+					// caso particolare: non abbiamo altri worker a disposizione
 					if (workers.size()<2){
 						l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
 						manager.setPercentageDone(reqId, 100);
@@ -358,7 +345,11 @@ public class Master extends UntypedActor {
 					double[] firstRow = matricesInfo.get(reqId).getMatrix()[0];
 					workers.get((i+j+1)%workers.size()).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, worker.getRows(reqId), worker.getRowNumber(reqId)), getSelf());
 					l.l(me, "call " + workers.get((i+j+1)%workers.size()).getRemoteAddress() + " to do the job of the dead worker " +worker.getRemoteAddress());
-				}				
+				}
+				// shutdown
+				workers.remove(i);
+				l.l(me, worker.getRemoteAddress() + " removed, workers size: " + workers.size());
+				i--;
 			}
 		}
 	}

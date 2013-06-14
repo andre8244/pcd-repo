@@ -47,7 +47,7 @@ public class RemoteWorker {
 		return rowNumbers.get(reqId);
 	}
 
-	public void setReqId(String reqId) {
+	public void addReqId(String reqId) {
 		reqIds.add(reqId);
 	}
 	
