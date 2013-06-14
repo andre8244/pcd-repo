@@ -365,8 +365,8 @@ public class Master extends UntypedActor {
 		}
 		double oldDeterminant = matrixInfo.getDeterminant();
 		matrixInfo.setDeterminant(oldDeterminant * matrix[0][0]);
-		//sendOneRowPerMsg(reqId, matrix); // TODO provare a passare solo reqId
-		oldSendManyRowsPerMsg(reqId,matrix);
+		sendOneRowPerMsg(reqId, matrix); // TODO provare a passare solo reqId
+		//oldSendManyRowsPerMsg(reqId,matrix);
 		return false;
 	}
 
