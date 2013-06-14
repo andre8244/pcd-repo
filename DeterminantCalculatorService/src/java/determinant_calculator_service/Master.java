@@ -30,7 +30,7 @@ public class Master extends UntypedActor {
 		super.preStart();
 		context().system().eventStream().subscribe(getSelf(), RemoteLifeCycleEvent.class);
 	}
-	
+
 	@Override
 	public void onReceive(Object msg) throws Exception {
 		if (msg instanceof Messages.Compute) {
@@ -113,13 +113,13 @@ public class Master extends UntypedActor {
 			if (matrix.length > 2) {
 				matrixInfo.setRowsDone(0);
 				matrixInfo.setMatrix(subMatrix(reqId, matrix));
-				
+
 				if (workers.isEmpty()) {
 					l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
 					manager.setPercentageDone(reqId, 100);
 					return;
 				}
-				
+
 				zeroColumn = gauss(reqId);
 			} else {
 				l.l(me, "Received ALL rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
@@ -167,23 +167,23 @@ public class Master extends UntypedActor {
 			if (matrix.length % 500 == 0){
 				l.l(me, "Received all rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
 			}
-			
+
 			for (int i = 0; i < workers.size(); i++){
 				workers.get(i).removeReqId(reqId);
 			}
-			
+
 			boolean zeroColumn = false;
 
 			if (matrix.length > 2) {
 				matrixInfo.setRowsDone(0);
 				matrixInfo.setMatrix(subMatrix(reqId, matrix));
-				
+
 				if (workers.isEmpty()) {
 					l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
-					manager.setPercentageDone(reqId, 100);												
+					manager.setPercentageDone(reqId, 100);
 					return;
 				}
-								
+
 				zeroColumn = gauss(reqId);
 			} else {
 				l.l(me, "Received ALL rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
@@ -201,11 +201,31 @@ public class Master extends UntypedActor {
 						matrixInfo.setDeterminant(-determinant);
 						manager.setResult(reqId, -determinant);
 					}
-				}				
+				}
 			}
 			//l.l(me, "matrix " + matrix.length + ", percentage done " + reqId + ": " + (matrixInfo.getMatrixLength()-matrix.length)*100/(matrixInfo.getMatrixLength()-2));
 			if (!zeroColumn) {
-				manager.setPercentageDone(reqId, (matrixInfo.getMatrixLength() - matrixInfo.getMatrix().length) * 100 / (matrixInfo.getMatrixLength() - 2));
+				//manager.setPercentageDone(reqId, (matrixInfo.getMatrixLength() - matrixInfo.getMatrix().length) * 100 / (matrixInfo.getMatrixLength() - 2));
+				long startTime = System.currentTimeMillis();
+
+				// se il calcolo è poco efficiente, calcoliamo il denominatore (999*1000)+(998*999)+... una sola volta, salvando semmai dentro a matrixinfo
+
+				int totalWorkToDo = 0;
+
+				for (int i = (matrixInfo.getMatrixLength() - 1); i > 0; i--){
+					totalWorkToDo += i * (i + 1);
+				}
+				l.l(me, "totalWorkToDo: " + totalWorkToDo);
+				int workToDo = 0;
+
+				for (int i = matrixInfo.getMatrix().length - 1 ; i > 0; i--){
+					workToDo += i * (i + 1);
+				}
+				int workDone = totalWorkToDo - workToDo;
+				int percentage = (int) Math.round((((double) workDone / totalWorkToDo) * 100));
+				l.l(me, "percentage: " + percentage);
+				l.l(me, "percentage computation duration: " + (System.currentTimeMillis() - startTime) + " ms");
+				manager.setPercentageDone(reqId, percentage);
 			}
 		}
 	}
@@ -257,7 +277,7 @@ public class Master extends UntypedActor {
 		}
 	}
 
-	private void sendManyRowsPerMsg(String reqId, double[][] matrix) {
+	private void oldSendManyRowsPerMsg(String reqId, double[][] matrix) {
 		double[] firstRow = matrix[0];
 
 		// TODO provare a migliorare il bilanciamento del lavoro
@@ -266,6 +286,7 @@ public class Master extends UntypedActor {
 		if (nRowsPerMsg > 0) {
 			for (int i = 0; i < (workers.size() - 1); i++) {
 				double[][] rows = new double[nRowsPerMsg][matrix.length];
+
 				for (int j = 0; j < rows.length; j++) {
 					rows[j] = matrix[i * nRowsPerMsg + j + 1];
 				}
@@ -277,6 +298,7 @@ public class Master extends UntypedActor {
 			}
 		}
 		double[][] rows = new double[matrix.length - 1 - nRowsPerMsg * (workers.size() - 1)][matrix.length];
+
 		for (int j = 0; j < rows.length; j++) {
 			rows[j] = matrix[(workers.size() - 1) * nRowsPerMsg + j + 1];
 		}
@@ -285,6 +307,41 @@ public class Master extends UntypedActor {
 		workers.get(workers.size() - 1).setRowNumber(reqId, (workers.size() - 1) * nRowsPerMsg + 1);
 		workers.get(workers.size() - 1).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, (workers.size() - 1) * nRowsPerMsg + 1), getSelf());
 		//l.l(me, "sent rows from " + ((workers.size()-1)*nRowsPerMsg+1) + " to " + (matrix.length-1) + " to " + workers.get(workers.size()-1).getRemoteAddress());
+	}
+
+	private void sendManyRowsPerMsg(String reqId, double[][] matrix) {
+		double[] firstRow = matrix[0];
+
+		double nRowsPerWorker = (double)(matrix.length - 1) / workers.size();
+		//l.l(me, "nRowsPerWorker: " + nRowsPerWorker);
+		int nRowsSent = 0;
+		int nRowsToSend;
+
+		for (int i = 0; i < (workers.size()); i++) {
+			// number of rows to send to worker i:
+			nRowsToSend = (int) (Math.round((i+1)*nRowsPerWorker) - nRowsSent);
+
+			if (nRowsToSend > 0){
+				double[][] rows = new double[nRowsToSend][matrix.length];
+
+			for (int j = 0; j < rows.length; j++) {
+				rows[j] = matrix[nRowsSent + j + 1];
+			}
+			workers.get(i).addReqId(reqId);
+			workers.get(i).setRows(reqId, rows);
+			workers.get(i).setRowNumber(reqId, nRowsSent + 1);
+			workers.get(i).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, nRowsSent + 1), getSelf());
+			//l.l(me, "sent rows from " + (nRowsSent+1) + " to " + (nRowsSent+1+nRowsToSend) + "(" + nRowsToSend + " rows) to " + workers.get(i).getRemoteAddress());
+			nRowsSent += nRowsToSend;
+			}
+		}
+		/*// number of rows to send to the last worker:
+		nRowsToSend = (matrix.length - 1) - nRowsSent;
+		double[][] rows = new double[nRowsToSend][matrix.length];
+
+		for (int j = 0; j < rows.length; j++) {
+			rows[j] = matrix[(workers.size() - 1) * nRowsPerMsg + j + 1];
+		}*/
 	}
 
 	private boolean gauss(String reqId) {
@@ -309,7 +366,7 @@ public class Master extends UntypedActor {
 		double oldDeterminant = matrixInfo.getDeterminant();
 		matrixInfo.setDeterminant(oldDeterminant * matrix[0][0]);
 		//sendOneRowPerMsg(reqId, matrix); // TODO provare a passare solo reqId
-		sendManyRowsPerMsg(reqId,matrix);
+		oldSendManyRowsPerMsg(reqId,matrix);
 		return false;
 	}
 
