@@ -15,8 +15,9 @@ public class UserApp {
 
         String path = System.getProperty("user.home") + System.getProperty("file.separator");
         int order = 500;
-        String fileValues = path + "matrix"+order+".txt";
-		MatrixUtil.genAndWriteToFile(order, 0, 1, fileValues);
+//        String fileValues = path + "matrix"+order+".txt";
+		String fileValues = path + "matrix.txt";
+		MatrixUtil.genAndWriteToFile(order, 0.01, 0.02, fileValues);
 
         String reqId1 = servicePort.computeDeterminant(order, fileValues);
 		int percentage1 = servicePort.getPercentageDone(reqId1);
@@ -29,17 +30,17 @@ public class UserApp {
 		int lastPercentage2 = percentage2;*/
 
 		while (percentage1 != 100 /*|| percentage2 != 100*/) {
-			if (percentage1 != lastPercentage1){
+			//if (percentage1 != lastPercentage1){
 				l.l(me, reqId1 + " percentage: " + percentage1 + " %");
 				lastPercentage1 = percentage1;
-			}
+			//}
             /*if (percentage2 != lastPercentage2){
 				l.l(me, reqId2 + " percentage: " + percentage2 + " %");
 				lastPercentage2 = percentage2;
 			}*/
 
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(500);
 			} catch (InterruptedException ex) {
 				ex.printStackTrace();
 			}
