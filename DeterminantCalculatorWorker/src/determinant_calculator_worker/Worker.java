@@ -23,11 +23,7 @@ public class Worker extends UntypedActor {
 
 		Address systemRemoteAddress = ((RemoteActorRefProvider) context().provider()).transport().address();
 		remoteAddress = getSelf().path().toStringWithAddress(systemRemoteAddress);
-		boolean result = servicePort.registerWorker(remoteAddress);
-
-		if (result) {
-			l.l(me, "worker registered");
-		}
+		servicePort.registerWorker(remoteAddress);
 	}
 
 	@Override
@@ -40,6 +36,10 @@ public class Worker extends UntypedActor {
 			handleManyRows(manyRows);
         } else if (msg instanceof Messages.Remove) {
 			handleRemove();
+		} else if (msg instanceof Messages.RegAck) {
+			handleRegAck();
+		} else if (msg instanceof Messages.RemAck) {
+			handleRemAck();
 		} else {
 			unhandled(msg);
 		}
@@ -84,10 +84,14 @@ public class Worker extends UntypedActor {
 	}
 
 	private void handleRemove() {
-		boolean result = servicePort.removeWorker(remoteAddress);
-
-		if (result) {
-			l.l(me, "worker removed");
-		}
+		servicePort.removeWorker(remoteAddress);
 	}
+
+	private void handleRegAck() {
+		l.l(me, "worker registered");
+	}
+	
+	private void handleRemAck() {
+		l.l(me, "worker removed");
+	}	
 }
