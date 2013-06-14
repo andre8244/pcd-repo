@@ -210,18 +210,17 @@ public class Master extends UntypedActor {
 
 				// se il calcolo è poco efficiente, calcoliamo il denominatore (999*1000)+(998*999)+... una sola volta, salvando semmai dentro a matrixinfo
 
-				int totalWorkToDo = 0;
-
-				for (int i = (matrixInfo.getMatrixLength() - 1); i > 0; i--){
-					totalWorkToDo += i * (i + 1);
-				}
-				l.l(me, "totalWorkToDo: " + totalWorkToDo);
+				int totalWorkToDo = MatrixUtil.getTotalWorkToDo(matrixInfo.getMatrixLength()-1);
+				//l.l(me, "totalWorkToDo: " + totalWorkToDo);
+				
 				int workToDo = 0;
 
 				for (int i = matrixInfo.getMatrix().length - 1 ; i > 0; i--){
 					workToDo += i * (i + 1);
 				}
+				//l.l(me, "WorkToDo: " + workToDo);				
 				int workDone = totalWorkToDo - workToDo;
+				//l.l(me, "WorkDone: " + workDone);
 				int percentage = (int) Math.round((((double) workDone / totalWorkToDo) * 100));
 				l.l(me, "percentage: " + percentage);
 				l.l(me, "percentage computation duration: " + (System.currentTimeMillis() - startTime) + " ms");
@@ -365,7 +364,7 @@ public class Master extends UntypedActor {
 		}
 		double oldDeterminant = matrixInfo.getDeterminant();
 		matrixInfo.setDeterminant(oldDeterminant * matrix[0][0]);
-		sendOneRowPerMsg(reqId, matrix); // TODO provare a passare solo reqId
+		sendManyRowsPerMsg(reqId, matrix); // TODO provare a passare solo reqId
 		//oldSendManyRowsPerMsg(reqId,matrix);
 		return false;
 	}

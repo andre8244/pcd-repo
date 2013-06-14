@@ -13,6 +13,7 @@ public class MatrixUtil {
 	private static BufferedWriter writer;
 	private static Random rand;
 	private static String me = "matrixUtil";
+	private static int totalWorkToDo;
 
 	public static double[][] fromFileToList(int order, String fileName) {
 		l.l(me, "writing list");
@@ -72,49 +73,13 @@ public class MatrixUtil {
 		}
 	}
 	
-	/*public static void genAndWriteToFile(int order, int maxAbs, String fileName) {
-	 long startTime = System.currentTimeMillis();
-	 rand = new Random();
-
-	 File file = new File(fileName);
-	 l.l("MATRIXUTIL", file.getAbsolutePath());
-
-	 try {
-	 writer = new BufferedWriter(new FileWriter(fileName));
-	 double val;
-	 log("Writing matrix...");
-
-	 for (int row = 0; row < order; row++) {
-	 for (int col = 0; col < order; col++) {
-	 val = rand.nextDouble() * maxAbs;
-
-	 if (rand.nextBoolean()) {
-	 val = -val;
-	 }
-	 if (col==order-1){
-	 writer.write(val + "\n");
-	 } else {
-	 writer.write(val + " ");
-	 }
-	 }
-
-	 if (row % 500 == 0) {
-	 log((int) ((double) row / order * 100) + " %");
-	 }
-	 }
-	 log("Matrix wrote to file, duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
-	 } catch (IOException e) {
-	 e.printStackTrace();
-	 } finally {
-	 if (writer != null) {
-	 try {
-	 writer.close();
-	 } catch (IOException e) {
-	 e.printStackTrace();
-	 }
-	 }
-	 }
-	 }*/
+	public static int getTotalWorkToDo(int matrixLength){
+		totalWorkToDo = 0;
+		for (int i = matrixLength; i > 0; i--){
+			totalWorkToDo += i * (i + 1);
+		}
+		return totalWorkToDo;
+	}
 
 	/*public static ArrayList<ArrayList<Double>> fromFileToArrayList(String fileName) {
 	 l.l(me, "writing arraylist");
