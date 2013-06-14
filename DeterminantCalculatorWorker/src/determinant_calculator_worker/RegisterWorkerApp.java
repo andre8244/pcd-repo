@@ -15,7 +15,7 @@ import log.l;
 public class RegisterWorkerApp {
 
 	// TODO in futuro forse sarà meglio poter installare un solo worker su ogni nodo di rete per valutare le performance
-	private static final int nWorkersToDeploy = 1;
+	private static final int nWorkersToDeploy = 6;
 	private static ActorSystem system;
 	private static ArrayList<ActorRef> workers;
 
@@ -40,6 +40,6 @@ public class RegisterWorkerApp {
 		//workers.add(system.actorOf(new Props(Worker.class), "worker"+nWorkersToDeploy));
 		/*for (int i = 0; i < nWorkersToDeploy; i++) {
 			workers.get(i).tell(new Messages.Remove());
-		}*/	
+		}*/
 	}
 }
