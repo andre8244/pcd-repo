@@ -53,6 +53,8 @@ public class RemoteWorker {
 	
 	public void removeReqId(String reqId) {
 		reqIds.remove(reqId);
+		rows.remove(reqId);
+		rowNumbers.remove(reqId);
 	}
 	
 	public void setRows(String reqId, double[][] r) {
