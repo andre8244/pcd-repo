@@ -24,7 +24,7 @@ public class MatrixUtil {
 		System.out.println("" + msg);
 	}
 
-	public static void genAndWriteToFile(int order, int minAbs, int maxAbs, String fileName) {
+	public static void genAndWriteToFile(int order, double minAbs, double maxAbs, String fileName) {
 		long startTime = System.currentTimeMillis();
 		rand = new Random();
 
@@ -40,9 +40,9 @@ public class MatrixUtil {
 				for (int col = 0; col < order; col++) {
 					val = minAbs + rand.nextDouble() * (maxAbs - minAbs);
 
-//					if (rand.nextBoolean()) {
-//						val = -val;
-//					}
+					if (rand.nextBoolean()) {
+						val = -val;
+					}
 					if (col == order - 1) {
 						writer.write(val + "\n");
 					} else {
