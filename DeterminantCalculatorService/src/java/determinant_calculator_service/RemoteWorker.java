@@ -46,5 +46,21 @@ public class RemoteWorker {
 	public int getRowNumber(String reqId) {
 		return rowNumbers.get(reqId);
 	}
+
+	public void setReqId(String reqId) {
+		reqIds.add(reqId);
+	}
+	
+	public void removeReqId(String reqId) {
+		reqIds.remove(reqId);
+	}
+	
+	public void setRows(String reqId, double[][] r) {
+		rows.put(reqId, r);
+	}
+	
+	public void setRowNumber(String reqId, int rowNumber) {
+		rowNumbers.put(reqId, rowNumber);
+	}
 	
 }

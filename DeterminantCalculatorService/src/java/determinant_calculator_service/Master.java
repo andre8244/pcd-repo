@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import akka.actor.UntypedActor;
 import akka.remote.RemoteClientShutdown;
+import akka.remote.RemoteClientWriteFailed;
 import akka.remote.RemoteLifeCycleEvent;
 import java.util.HashMap;
 import messages.Messages;
@@ -52,6 +53,11 @@ public class Master extends UntypedActor {
 			RemoteClientShutdown rcs = (RemoteClientShutdown) msg;
 			l.l(me, "address: " + rcs.getRemoteAddress().toString());
 			handleRemoveWorkerSystem(rcs.getRemoteAddress().toString());
+		} else if (msg instanceof RemoteClientWriteFailed) {
+			l.l(me, "Remote Client Write Failed!");
+			RemoteClientWriteFailed rcwf = (RemoteClientWriteFailed) msg;
+			l.l(me, "address: " + rcwf.getRemoteAddress().toString());
+			handleWriteFailed(rcwf.getRemoteAddress().toString());
 		} else {
 			unhandled(msg);
 		}
@@ -75,6 +81,13 @@ public class Master extends UntypedActor {
 			manager.setPercentageDone(reqId, 100); // TODO comunico al client di aver finito anche se non ho calcolato niente
 			return;
 		}
+		
+		// metto la richiesta nell'arraylist di richieste dei worker all'inizio del lavoro e la rimuovo alla fine
+		for (int i = 0; i < workers.size(); i++){
+			workers.get(i).setReqId(reqId);
+			l.l(me, workers.get(i).getRemoteAddress() + " set " + reqId);
+		}
+		
 
 		gauss(reqId);
 	}
@@ -170,6 +183,12 @@ public class Master extends UntypedActor {
 				if (workers.isEmpty()) {
 					l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
 					manager.setPercentageDone(reqId, 100);
+					
+					for (int i = 0; i < workers.size(); i++){
+						workers.get(i).removeReqId(reqId);
+						l.l(me, workers.get(i).getRemoteAddress() + " remove " + reqId);
+					}
+					
 					return;
 				}
 								
@@ -186,6 +205,12 @@ public class Master extends UntypedActor {
 					matrixInfo.setDeterminant(-determinant);
 					manager.setResult(reqId, -determinant); // TODO
 				}
+				
+				for (int i = 0; i < workers.size(); i++){
+					workers.get(i).removeReqId(reqId);
+					l.l(me, workers.get(i).getRemoteAddress() + " remove " + reqId);
+				}
+				
 			}
 			//l.l(me, "matrix " + matrix.length + ", percentage done " + reqId + ": " + (matrixInfo.getMatrixLength()-matrix.length)*100/(matrixInfo.getMatrixLength()-2));
 			if (!zeroColumn) {
@@ -253,6 +278,8 @@ public class Master extends UntypedActor {
 				for (int j = 0; j < rows.length; j++) {
 					rows[j] = matrix[i * nRowsPerMsg + j + 1];
 				}
+				workers.get(i).setRows(reqId, rows);
+				workers.get(i).setRowNumber(reqId, i * nRowsPerMsg + 1);
 				workers.get(i).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, i * nRowsPerMsg + 1), getSelf());
                 //l.l(me, "sent rows from " + (i*nRowsPerMsg+1) + " to " + (i*nRowsPerMsg+nRowsPerMsg) + " to " + workers.get(i).getRemoteAddress());
 			}
@@ -261,6 +288,8 @@ public class Master extends UntypedActor {
 		for (int j = 0; j < rows.length; j++) {
 			rows[j] = matrix[(workers.size() - 1) * nRowsPerMsg + j + 1];
 		}
+		workers.get(workers.size() - 1).setRows(reqId, rows);
+		workers.get(workers.size() - 1).setRowNumber(reqId, (workers.size() - 1) * nRowsPerMsg + 1);
 		workers.get(workers.size() - 1).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, (workers.size() - 1) * nRowsPerMsg + 1), getSelf());
 		//l.l(me, "sent rows from " + ((workers.size()-1)*nRowsPerMsg+1) + " to " + (matrix.length-1) + " to " + workers.get(workers.size()-1).getRemoteAddress());
 	}
@@ -309,9 +338,27 @@ public class Master extends UntypedActor {
 			tokens = workers.get(i).getRemoteAddress().split("/user");
 			//l.l(me, "worker system "+tokens[0]);
 			if (tokens[0].equals(workerSystem)) {
-				l.l(me, workers.get(i).getRemoteAddress() + " removed, workers size: " + (workers.size()-1));
-				workers.remove(i);
+				RemoteWorker worker = workers.remove(i);
+				l.l(me, worker.getRemoteAddress() + " removed, workers size: " + workers.size());
 				i--;				
+			}
+		}
+	}
+
+	private void handleWriteFailed(String workerSystem) {
+		String[] tokens;
+		l.l(me, "handle write failed");
+		for (int i = 0; i < workers.size(); i++) {
+			tokens = workers.get(i).getRemoteAddress().split("/user");
+			//l.l(me, "worker system "+tokens[0]);
+			if (tokens[0].equals(workerSystem)) {
+				RemoteWorker worker = workers.get(i);
+				for (int j = 0; j < worker.getReqIds().size(); j++){
+					String reqId = worker.getReqIds().get(j);
+					double[] firstRow = matricesInfo.get(reqId).getMatrix()[0];
+					workers.get((i+j+1)%workers.size()).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, worker.getRows(reqId), worker.getRowNumber(reqId)), getSelf());
+					l.l(me, "call " + workers.get((i+j+1)%workers.size()).getRemoteAddress() + " to do the job of the dead worker " +worker.getRemoteAddress());
+				}				
 			}
 		}
 	}
