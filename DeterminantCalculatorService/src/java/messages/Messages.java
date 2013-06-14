@@ -173,4 +173,18 @@ public class Messages {
 			return remoteAddress;
 		}
 	}
+	
+	public static class RegAck implements Serializable {
+
+		public RegAck() {
+			
+		}
+	}
+	
+	public static class RemAck implements Serializable {
+
+		public RemAck() {
+			
+		}
+	}			
 }

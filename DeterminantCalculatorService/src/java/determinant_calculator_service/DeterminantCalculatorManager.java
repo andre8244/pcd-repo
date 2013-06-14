@@ -22,7 +22,7 @@ public class DeterminantCalculatorManager {
 	private int reqNumber;
 	private ActorRef master;
 	private HashMap<String, Double> results;
-	private HashMap<String, Integer> done;
+	private HashMap<String, Integer> percentageDones;
 	private String me = "manager";
 
 	private DeterminantCalculatorManager() {
@@ -30,7 +30,7 @@ public class DeterminantCalculatorManager {
 		ActorSystem system = ActorSystem.create("masterSystem", ConfigFactory.load().getConfig("masterSystem"));
 		master = system.actorOf(new Props(Master.class), "master");
 		results = new HashMap<String, Double>();
-		done = new HashMap<String, Integer>();
+		percentageDones = new HashMap<String, Integer>();
 	}
 
 	public synchronized static DeterminantCalculatorManager getInstance() {
@@ -43,15 +43,16 @@ public class DeterminantCalculatorManager {
 	public synchronized String computeDeterminant(int order, String fileValues) {
 		String reqId = "req" + reqNumber;
 		reqNumber = reqNumber + 1;
-		done.put(reqId, 0);
+		percentageDones.put(reqId, 0);
 		master.tell(new Messages.Compute(order, fileValues, reqId, this));
 		return reqId;
 	}
 
 	public synchronized int getPercentageDone(String reqId) {
-		if (done.get(reqId) != null) {
-			return done.get(reqId);
+		if (percentageDones.get(reqId) != null) {
+			return percentageDones.get(reqId);
 		} else {
+			l.l(me, reqId + ", percentageDone not yet calculated");
 			return -1;
 		}
 	}
@@ -61,6 +62,7 @@ public class DeterminantCalculatorManager {
 			return results.get(reqId);
 		} else {
 			// TODO questa operazione potrebbe essere sospensiva, oppure restituire un Future
+			l.l(me, reqId + ", result not yet calculated");
 			return -1;
 		}
 	}
@@ -77,7 +79,7 @@ public class DeterminantCalculatorManager {
 	}
 
 	public void setPercentageDone(String reqId, int percentageDone) {
-		done.put(reqId, percentageDone);
+		percentageDones.put(reqId, percentageDone);
 	}
 
 	public void setResult(String reqId, double result) {

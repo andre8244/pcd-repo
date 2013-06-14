@@ -1,5 +1,6 @@
 package determinant_calculator_service;
 
+import akka.actor.ActorRef;
 import log.l;
 import java.util.ArrayList;
 
@@ -195,8 +196,10 @@ public class Master extends UntypedActor {
 
 	private void handleRegisterWorker(Messages.RegisterWorker rw) {
 		String remoteAddress = rw.getRemoteAddress();
-		RemoteWorker worker = new RemoteWorker(remoteAddress, getContext().actorFor(remoteAddress));
+		ActorRef actorRef  = getContext().actorFor(remoteAddress);
+		RemoteWorker worker = new RemoteWorker(remoteAddress, actorRef);
 		workers.add(worker);
+		actorRef.tell(new Messages.RegAck(), getSelf());
 		l.l(me, worker.getRemoteAddress() + " added, workers size: " + workers.size());
 	}
 
@@ -206,9 +209,10 @@ public class Master extends UntypedActor {
 		// TODO si potrebbe usare una hashmap per rendere la ricerca più performante
 		for (int i = 0; i < workers.size(); i++) {
 			if (workers.get(i).getRemoteAddress().equals(remoteAddress)) {
-				l.l(me, workers.get(i).getRemoteAddress() + " removed, workers size: " + (workers.size()-1));
-				workers.remove(i);
-				i--;
+				RemoteWorker worker = workers.remove(i);
+				worker.getActorRef().tell(new Messages.RemAck(), getSelf());
+				l.l(me, worker.getRemoteAddress() + " removed, workers size: " + workers.size());
+				return;
 			}
 		}
 	}
