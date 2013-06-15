@@ -185,6 +185,29 @@ public class Master extends UntypedActor {
 				}
 
 				zeroColumn = gauss(reqId);
+				
+				if (!zeroColumn) {
+					
+					long startTime = System.currentTimeMillis();
+
+					// se il calcolo è poco efficiente, calcoliamo il denominatore (999*1000)+(998*999)+... una sola volta, salvando semmai dentro a matrixinfo
+
+					int totalWorkToDo = MatrixUtil.getTotalWorkToDo(matrixInfo.getMatrixLength()-1);
+					//l.l(me, "totalWorkToDo: " + totalWorkToDo);
+
+					int workToDo = 0;
+
+					for (int i = matrixInfo.getMatrix().length - 1 ; i > 0; i--){
+						workToDo += i * (i + 1);
+					}
+					//l.l(me, "WorkToDo: " + workToDo);				
+					int workDone = totalWorkToDo - workToDo;
+					//l.l(me, "WorkDone: " + workDone);
+					int percentage = (int) (((double) workDone / totalWorkToDo) * 100);
+					//l.l(me, "percentage: " + percentage);
+					//l.l(me, "percentage computation duration: " + (System.currentTimeMillis() - startTime) + " ms");
+					manager.setPercentageDone(reqId, percentage);
+				}
 			} else {
 				l.l(me, "Received ALL rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - matrixInfo.getStartTime()) / (double) 1000) + " sec");
 				double oldDeterminant = matrixInfo.getDeterminant();
@@ -202,29 +225,8 @@ public class Master extends UntypedActor {
 						manager.setResult(reqId, -determinant);
 					}
 				}
-			}
-			//l.l(me, "matrix " + matrix.length + ", percentage done " + reqId + ": " + (matrixInfo.getMatrixLength()-matrix.length)*100/(matrixInfo.getMatrixLength()-2));
-			if (!zeroColumn) {
-				//manager.setPercentageDone(reqId, (matrixInfo.getMatrixLength() - matrixInfo.getMatrix().length) * 100 / (matrixInfo.getMatrixLength() - 2));
-				long startTime = System.currentTimeMillis();
-
-				// se il calcolo è poco efficiente, calcoliamo il denominatore (999*1000)+(998*999)+... una sola volta, salvando semmai dentro a matrixinfo
-
-				int totalWorkToDo = MatrixUtil.getTotalWorkToDo(matrixInfo.getMatrixLength()-1);
-				//l.l(me, "totalWorkToDo: " + totalWorkToDo);
-				
-				int workToDo = 0;
-
-				for (int i = matrixInfo.getMatrix().length - 1 ; i > 0; i--){
-					workToDo += i * (i + 1);
-				}
-				//l.l(me, "WorkToDo: " + workToDo);				
-				int workDone = totalWorkToDo - workToDo;
-				//l.l(me, "WorkDone: " + workDone);
-				int percentage = (int) Math.round((((double) workDone / totalWorkToDo) * 100));
-				l.l(me, "percentage: " + percentage);
-				l.l(me, "percentage computation duration: " + (System.currentTimeMillis() - startTime) + " ms");
-				manager.setPercentageDone(reqId, percentage);
+				manager.setPercentageDone(reqId, 100);
+				//l.l(me, "percentage: 100");
 			}
 		}
 	}
@@ -396,11 +398,17 @@ public class Master extends UntypedActor {
 					if (workers.size()<2){
 						l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
 						manager.setPercentageDone(reqId, 100);
-						return;
+						break;
 					}
 					double[] firstRow = matricesInfo.get(reqId).getMatrix()[0];
-					workers.get((i+j+1)%workers.size()).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, worker.getRows(reqId), worker.getRowNumber(reqId)), getSelf());
-					l.l(me, "call " + workers.get((i+j+1)%workers.size()).getRemoteAddress() + " to do the job of the dead worker " +worker.getRemoteAddress());
+					for (int k = 0; k < (workers.size()-1); k++) {
+						tokens = workers.get((i+j+k+1)%workers.size()).getRemoteAddress().split("/user");
+						if (!tokens[0].equals(workerSystem)) {
+							workers.get((i+j+k+1)%workers.size()).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, worker.getRows(reqId), worker.getRowNumber(reqId)), getSelf());
+							l.l(me, "call " + workers.get((i+j+k+1)%workers.size()).getRemoteAddress() + " to do the job of the dead worker " +worker.getRemoteAddress());
+							break;
+						}
+					}
 				}
 				// shutdown
 				workers.remove(i);

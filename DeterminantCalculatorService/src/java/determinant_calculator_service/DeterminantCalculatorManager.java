@@ -63,7 +63,7 @@ public class DeterminantCalculatorManager {
 		} else {
 			// TODO questa operazione potrebbe essere sospensiva, oppure restituire un Future
 			l.l(me, reqId + ", result not yet calculated");
-			return -0;
+			return -0.0;
 		}
 	}
 
