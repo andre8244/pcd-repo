@@ -17,7 +17,7 @@ public class UserApp {
         int order = 500;
 //        String fileValues = path + "matrix"+order+".txt";
 		String fileValues = path + "matrix.txt";
-		MatrixUtil.genAndWriteToFile(order, 0.01, 0.02, fileValues);
+		MatrixUtil.genAndWriteToFile(order, 0.1, 0.2, fileValues);
 
         String reqId1 = servicePort.computeDeterminant(order, fileValues);
 		int percentage1 = servicePort.getPercentageDone(reqId1);
