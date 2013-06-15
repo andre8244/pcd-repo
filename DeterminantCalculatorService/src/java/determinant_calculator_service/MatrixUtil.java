@@ -2,16 +2,12 @@ package determinant_calculator_service;
 
 import log.l;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Random;
 
 public class MatrixUtil {
 
-	private static BufferedWriter writer;
-	private static Random rand;
 	private static String me = "matrixUtil";
 	private static int totalWorkToDo;
 
