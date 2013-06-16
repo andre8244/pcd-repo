@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package determinant_calculator_service;
 
 import javax.jws.WebService;
@@ -10,7 +6,7 @@ import javax.jws.WebParam;
 
 /**
  *
- * @author Marco
+ *
  */
 @WebService(serviceName = "DeterminantCalculatorService")
 public class DeterminantCalculatorService {
@@ -42,16 +38,16 @@ public class DeterminantCalculatorService {
 	/**
 	 * Registrazione di un worker al servizio
 	 */
-	@WebMethod(operationName = "registerWorker")
-	public boolean registerWorker(@WebParam(name = "remoteAddress") String remoteAddress) {
-		return DeterminantCalculatorManager.getInstance().registerWorker(remoteAddress);
+	@WebMethod(operationName = "addWorkerNode")
+	public boolean addWorkerNode(@WebParam(name = "remoteAddress") String remoteAddress) {
+		return DeterminantCalculatorManager.getInstance().addWorkerNode(remoteAddress);
 	}
 
 	/**
 	 * Rimozione di un worker dal servizio
 	 */
-	@WebMethod(operationName = "removeWorker")
-	public boolean removeWorker(@WebParam(name = "remoteAddress") String remoteAddress) {
-		return DeterminantCalculatorManager.getInstance().removeWorker(remoteAddress);
+	@WebMethod(operationName = "removeWorkerNode")
+	public boolean removeWorkerNode(@WebParam(name = "remoteAddress") String remoteAddress) {
+		return DeterminantCalculatorManager.getInstance().removeWorkerNode(remoteAddress);
 	}
 }

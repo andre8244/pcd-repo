@@ -91,14 +91,14 @@ public class Messages {
 			return row;
 		}
 	}
-    
+
     public static class ManyRows implements Serializable {
 
 		private final double[] firstRow;
 		private final double[][] rows;
 		private final String reqId;
 		private final int rowNumber;
-    
+
 		public ManyRows(String reqId, double[] firstRow, double[][] rows, int rowNumber) {
 			this.firstRow = firstRow;
 			this.rows = rows;
@@ -121,14 +121,14 @@ public class Messages {
 		public double[][] getRows() {
 			return rows;
 		}
-	}    
+	}
 
     public static class ManyRowsResult implements Serializable {
 
 		private final double[][] rows;
 		private final String reqId;
 		private final int rowNumber;
-    
+
 		public ManyRowsResult(String reqId, double[][] rows, int rowNumber) {
 			this.rows = rows;
 			this.reqId = reqId;
@@ -148,11 +148,11 @@ public class Messages {
 		}
 	}
 
-	public static class RegisterWorker implements Serializable {
+	public static class AddWorkerNode implements Serializable {
 
 		private final String remoteAddress;
 
-		public RegisterWorker(String remoteAddress) {
+		public AddWorkerNode(String remoteAddress) {
 			this.remoteAddress = remoteAddress;
 		}
 
@@ -161,11 +161,11 @@ public class Messages {
 		}
 	}
 
-	public static class RemoveWorker implements Serializable {
+	public static class RemoveWorkerNode implements Serializable {
 
 		private final String remoteAddress;
 
-		public RemoveWorker(String remoteAddress) {
+		public RemoveWorkerNode(String remoteAddress) {
 			this.remoteAddress = remoteAddress;
 		}
 
@@ -173,18 +173,16 @@ public class Messages {
 			return remoteAddress;
 		}
 	}
-	
-	public static class RegAck implements Serializable {
 
-		public RegAck() {
-			
+	public static class AddWorkerNodeAck implements Serializable {
+
+		public AddWorkerNodeAck() {
 		}
 	}
-	
-	public static class RemAck implements Serializable {
 
-		public RemAck() {
-			
+	public static class RemoveWorkerNodeAck implements Serializable {
+
+		public RemoveWorkerNodeAck() {
 		}
-	}			
+	}
 }

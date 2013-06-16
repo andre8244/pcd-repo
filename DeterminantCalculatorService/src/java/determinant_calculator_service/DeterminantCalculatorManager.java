@@ -14,23 +14,21 @@ import java.util.HashMap;
 
 /**
  *
- * @author Marco
  */
 public class DeterminantCalculatorManager {
 
 	private static DeterminantCalculatorManager instance;
 	private int reqNumber;
 	private ActorRef master;
-	private HashMap<String, Double> results;
-	private HashMap<String, Integer> percentageDones;
+	private HashMap<String, RequestInfo> requestsInfo;
+//	private HashMap<String, Integer> percentagesDone; // TODO spostare dentro reqInfo
 	private String me = "manager";
 
 	private DeterminantCalculatorManager() {
 		reqNumber = 0;
 		ActorSystem system = ActorSystem.create("masterSystem", ConfigFactory.load().getConfig("masterSystem"));
 		master = system.actorOf(new Props(Master.class), "master");
-		results = new HashMap<String, Double>();
-		percentageDones = new HashMap<String, Integer>();
+		requestsInfo = new HashMap<String, RequestInfo>();
 	}
 
 	public synchronized static DeterminantCalculatorManager getInstance() {
@@ -43,47 +41,52 @@ public class DeterminantCalculatorManager {
 	public synchronized String computeDeterminant(int order, String fileValues) {
 		String reqId = "req" + reqNumber;
 		reqNumber = reqNumber + 1;
-		percentageDones.put(reqId, 0);
+		requestsInfo.put(reqId, new RequestInfo());
 		master.tell(new Messages.Compute(order, fileValues, reqId, this));
 		return reqId;
 	}
 
 	public synchronized int getPercentageDone(String reqId) {
-		if (percentageDones.get(reqId) != null) {
-			return percentageDones.get(reqId);
+		RequestInfo requestInfo = requestsInfo.get(reqId);
+
+		if (requestInfo != null){
+			return requestInfo.getPercentageDone();
 		} else {
-			l.l(me, reqId + ", percentageDone not yet calculated");
+			l.l(me, reqId + ": invalid requestId");
 			return -1;
 		}
 	}
 
 	public synchronized double getResult(String reqId) {
-		if (results.get(reqId) != null) {
-			return results.get(reqId);
+		// TODO assicurarsi che il "synchronized" non impedisca ad altri client di usare il metodo getResult()
+		RequestInfo requestInfo = requestsInfo.get(reqId);
+
+		if (requestInfo != null){
+			 // blocking operation:
+			return requestInfo.getFinalDeterminant();
 		} else {
-			// TODO questa operazione potrebbe essere sospensiva, oppure restituire un Future
-			l.l(me, reqId + ", result not yet calculated");
+			l.l(me, reqId + ": invalid requestId");
 			return -0.0;
 		}
 	}
 
-	public synchronized boolean registerWorker(String remoteAddress) {
-		master.tell(new Messages.RegisterWorker(remoteAddress));
+	public synchronized boolean addWorkerNode(String remoteAddress) {
+		master.tell(new Messages.AddWorkerNode(remoteAddress));
 		// TODO ha senso che restituisca sempre true?
 		return true;
 	}
 
-	public synchronized boolean removeWorker(String remoteAddress) {
-		master.tell(new Messages.RemoveWorker(remoteAddress));
+	public synchronized boolean removeWorkerNode(String remoteAddress) {
+		master.tell(new Messages.RemoveWorkerNode(remoteAddress));
 		return true;
 	}
 
-	public void setPercentageDone(String reqId, int percentageDone) {
-		percentageDones.put(reqId, percentageDone);
+	public void putRequestInfo(String reqId, RequestInfo requestInfo){
+		requestsInfo.put(reqId, requestInfo);
 	}
 
-	public void setResult(String reqId, double result) {
-		results.put(reqId, result);
+	public RequestInfo getRequestInfo(String reqId){
+		return requestsInfo.get(reqId);
 	}
 
 }

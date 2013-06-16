@@ -14,7 +14,6 @@ public class MatrixUtil {
 	public static double[][] fromFileToList(int order, String fileName) {
 		l.l(me, "writing list");
 		long startTime = System.currentTimeMillis();
-
 		double[][] matrix = new double[order][order];
 
 		try {
@@ -42,7 +41,7 @@ public class MatrixUtil {
 		}
 		l.l(me, "finished writing list " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
 		startTime = System.currentTimeMillis();
-		testReadMatrix(matrix);
+		//testReadMatrix(matrix);
 		l.l(me, "finished reading list " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
 		//printMatrix(matrix);
 		return matrix;
@@ -67,14 +66,6 @@ public class MatrixUtil {
 			}
 			System.out.print("\n");
 		}
-	}
-	
-	public static int getTotalWorkToDo(int matrixLength){
-		totalWorkToDo = 0;
-		for (int i = matrixLength; i > 0; i--){
-			totalWorkToDo += i * (i + 1);
-		}
-		return totalWorkToDo;
 	}
 
 	/*public static ArrayList<ArrayList<Double>> fromFileToArrayList(String fileName) {
