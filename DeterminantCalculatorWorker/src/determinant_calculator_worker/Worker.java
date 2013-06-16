@@ -23,23 +23,23 @@ public class Worker extends UntypedActor {
 
 		Address systemRemoteAddress = ((RemoteActorRefProvider) context().provider()).transport().address();
 		remoteAddress = getSelf().path().toStringWithAddress(systemRemoteAddress);
-		servicePort.registerWorker(remoteAddress);
+		servicePort.addWorkerNode(remoteAddress); // TODO non ignorare il valore booleano di ritorno
 	}
 
 	@Override
 	public void onReceive(Object msg) throws Exception {
-		if (msg instanceof Messages.OneRow) {
+		if (msg instanceof Messages.OneRow) { // TODO eliminare OneRow
 			Messages.OneRow oneRow = (Messages.OneRow) msg;
 			handleOneRow(oneRow);
 		} else if (msg instanceof Messages.ManyRows) {
 			Messages.ManyRows manyRows = (Messages.ManyRows) msg;
 			handleManyRows(manyRows);
-        } else if (msg instanceof Messages.Remove) {
+        } else if (msg instanceof Messages.Remove) { // TODO da eliminare?
 			handleRemove();
-		} else if (msg instanceof Messages.RegAck) {
-			handleRegAck();
-		} else if (msg instanceof Messages.RemAck) {
-			handleRemAck();
+		} else if (msg instanceof Messages.AddWorkerNodeAck) {
+			handleAddWorkerNodeAck();
+		} else if (msg instanceof Messages.RemoveWorkerNodeAck) {
+			handleRemoveWorkerNodeAck();
 		} else {
 			unhandled(msg);
 		}
@@ -84,14 +84,14 @@ public class Worker extends UntypedActor {
 	}
 
 	private void handleRemove() {
-		servicePort.removeWorker(remoteAddress);
+		servicePort.removeWorkerNode(remoteAddress);
 	}
 
-	private void handleRegAck() {
+	private void handleAddWorkerNodeAck() {
 		l.l(me, "worker registered");
 	}
-	
-	private void handleRemAck() {
+
+	private void handleRemoveWorkerNodeAck() {
 		l.l(me, "worker removed");
-	}	
+	}
 }

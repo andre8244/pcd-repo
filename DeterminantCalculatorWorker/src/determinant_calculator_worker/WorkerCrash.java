@@ -23,7 +23,7 @@ public class WorkerCrash extends UntypedActor {
 
 		Address systemRemoteAddress = ((RemoteActorRefProvider) context().provider()).transport().address();
 		remoteAddress = getSelf().path().toStringWithAddress(systemRemoteAddress);
-		servicePort.registerWorker(remoteAddress);
+		servicePort.addWorkerNode(remoteAddress);
 	}
 
 	@Override
@@ -36,10 +36,10 @@ public class WorkerCrash extends UntypedActor {
 			handleManyRows(manyRows);
         } else if (msg instanceof Messages.Remove) {
 			handleRemove();
-		} else if (msg instanceof Messages.RegAck) {
-			handleRegAck();
-		} else if (msg instanceof Messages.RemAck) {
-			handleRemAck();
+		} else if (msg instanceof Messages.AddWorkerNodeAck) {
+			handleAddWorkerNodeAck();
+		} else if (msg instanceof Messages.RemoveWorkerNodeAck) {
+			handleRemoveWorkerNodeAck();
 		} else {
 			unhandled(msg);
 		}
@@ -87,15 +87,15 @@ public class WorkerCrash extends UntypedActor {
 	}
 
 	private void handleRemove() {
-		servicePort.removeWorker(remoteAddress);
+		servicePort.removeWorkerNode(remoteAddress);
 	}
 
-	private void handleRegAck() {
+	private void handleAddWorkerNodeAck() {
 		l.l(me, "worker registered");
 	}
-	
-	private void handleRemAck() {
+
+	private void handleRemoveWorkerNodeAck() {
 		l.l(me, "worker removed");
-	}	
+	}
 }
 
