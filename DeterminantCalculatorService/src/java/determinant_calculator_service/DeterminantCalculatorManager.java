@@ -56,7 +56,7 @@ public class DeterminantCalculatorManager {
 		}
 	}
 
-	public /*synchronized*/ double getResult(String reqId) {
+	public synchronized double getResult(String reqId) {
 		// TODO assicurarsi che il "synchronized" non impedisca ad altri client di usare il metodo getResult()
 		RequestInfo requestInfo = requestsInfo.get(reqId);
 
@@ -78,10 +78,6 @@ public class DeterminantCalculatorManager {
 	public synchronized boolean removeWorkerNode(String remoteAddress) {
 		master.tell(new Messages.RemoveWorkerNode(remoteAddress));
 		return true;
-	}
-
-	public void putRequestInfo(String reqId, RequestInfo requestInfo){
-		requestsInfo.put(reqId, requestInfo);
 	}
 
 	public RequestInfo getRequestInfo(String reqId){

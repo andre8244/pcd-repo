@@ -25,7 +25,7 @@ public class RequestInfo {
 		computationEnded = new CountDownLatch(1);
 	}
 
-	public void setMatrix(double[][] matrix) {
+	public void setOriginalMatrix(double[][] matrix) {
 		this.matrix = matrix;
 		matrixLength = matrix.length;
 		totalWorkToDo = 0;
@@ -37,13 +37,14 @@ public class RequestInfo {
 			totalWorkToDo += i * (i + 1);
 		}
 	}
+	
+	public void setMatrix(double[][] matrix) {
+		this.matrix = matrix;
+		
+	}
 
 	public double[][] getMatrix() {
 		return matrix;
-	}
-
-	public int getMatrixLength() {
-		return matrixLength;
 	}
 
 	public int getRowsDone() {
