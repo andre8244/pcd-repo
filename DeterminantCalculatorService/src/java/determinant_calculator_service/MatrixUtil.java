@@ -9,7 +9,6 @@ import java.io.IOException;
 public class MatrixUtil {
 
 	private static String me = "matrixUtil";
-	private static int totalWorkToDo;
 
 	public static double[][] fromFileToList(int order, String fileName) {
 		l.l(me, "writing list");

@@ -44,7 +44,11 @@ public class RemoteWorker {
 	}
 	
 	public int getRowNumber(String reqId) {
-		return rowNumbers.get(reqId);
+		if (rowNumbers.get(reqId)!=null){
+			return rowNumbers.get(reqId);
+		} else {
+			return -1;
+		}
 	}
 
 	public void addReqId(String reqId) {

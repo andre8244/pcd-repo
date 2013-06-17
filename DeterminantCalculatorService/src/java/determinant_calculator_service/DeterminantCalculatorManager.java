@@ -21,7 +21,6 @@ public class DeterminantCalculatorManager {
 	private int reqNumber;
 	private ActorRef master;
 	private HashMap<String, RequestInfo> requestsInfo;
-//	private HashMap<String, Integer> percentagesDone; // TODO spostare dentro reqInfo
 	private String me = "manager";
 
 	private DeterminantCalculatorManager() {

@@ -85,6 +85,13 @@ public class Master extends UntypedActor {
 		String reqId = mrr.getReqId();
 		double[][] rows = mrr.getRows();
 		int rowNumber = mrr.getRowNumber();
+		
+		for (int i = 0; i < workers.size(); i++){
+			if (workers.get(i).getRowNumber(reqId)==rowNumber){
+				workers.get(i).removeReqId(reqId);
+				break;
+			}
+		}		
 
 		RequestInfo requestInfo = manager.getRequestInfo(reqId);
 
@@ -92,16 +99,12 @@ public class Master extends UntypedActor {
 		nRowsDone = nRowsDone + rows.length;
 		requestInfo.setRowsDone(nRowsDone);
 
-		/*if (nRowsDone % 500 == 0) {
-            l.l(me, "nRowsDone: " + nRowsDone);
-		 }*/
+		//l.l(me, reqId + ", receive rows from " + rowNumber + " to " + (rowNumber+rows.length-1) + "(" + rows.length + " rows)");
+		//l.l(me, reqId + ", nRowsDone: " + nRowsDone);
 
 		double[][] matrix = requestInfo.getMatrix();
 		System.arraycopy(rows, 0, matrix, rowNumber, rows.length);
-		/*for (int i=0; i < rows.length; i++){
-		 matrix[i+rowNumber] = rows[i];
-		 }*/
-
+		
 		// TODO serve? oppure è sufficiente il side-effect?
 		requestInfo.setMatrix(matrix);
 
@@ -110,9 +113,6 @@ public class Master extends UntypedActor {
 				l.l(me, "Received all rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
 			}
 
-			for (int i = 0; i < workers.size(); i++){
-				workers.get(i).removeReqId(reqId);
-			}
 			boolean zeroColumn = false;
 
 			if (matrix.length > 2) {
@@ -255,17 +255,10 @@ public class Master extends UntypedActor {
 			workers.get(i).setRows(reqId, rows);
 			workers.get(i).setRowNumber(reqId, nRowsSent + 1);
 			workers.get(i).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, nRowsSent + 1), getSelf());
-			//l.l(me, "sent rows from " + (nRowsSent+1) + " to " + (nRowsSent+1+nRowsToSend) + "(" + nRowsToSend + " rows) to " + workers.get(i).getRemoteAddress());
+			//l.l(me, reqId + ", sent rows from " + (nRowsSent+1) + " to " + (nRowsSent+nRowsToSend) + "(" + nRowsToSend + " rows) to " + workers.get(i).getRemoteAddress());
 			nRowsSent += nRowsToSend;
 			}
 		}
-		/*// number of rows to send to the last worker:
-		nRowsToSend = (matrix.length - 1) - nRowsSent;
-		double[][] rows = new double[nRowsToSend][matrix.length];
-
-		for (int j = 0; j < rows.length; j++) {
-			rows[j] = matrix[(workers.size() - 1) * nRowsPerMsg + j + 1];
-		}*/
 	}
 
 	private boolean gauss(String reqId) {
@@ -308,6 +301,8 @@ public class Master extends UntypedActor {
 	private void handleWorkerFailure(String workerSystem) {
 		String[] tokens;
 		l.l(me, "handle failed");
+		boolean first = true;
+		int index=0;		
 		for (int i = 0; i < workers.size(); i++) {
 			tokens = workers.get(i).getRemoteAddress().split("/user");
 			//l.l(me, "worker system "+tokens[0]);
@@ -316,6 +311,10 @@ public class Master extends UntypedActor {
 				l.l(me, worker.getRemoteAddress() + " pending request: "+worker.getReqIds().size());
 				// nel caso di shutdown -> pending request = 0 !
 				for (int j = 0; j < worker.getReqIds().size(); j++){
+					if (first){
+						index = (i+1)%workers.size();
+						first=false;
+					}			
 					String reqId = worker.getReqIds().get(j);
 					RequestInfo requestInfo = manager.getRequestInfo(reqId);
 					// caso particolare: non abbiamo altri worker a disposizione
@@ -323,16 +322,24 @@ public class Master extends UntypedActor {
 						l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
 						requestInfo.setFinalDeterminant(-0.0);
 						requestInfo.setPercentageDone(100);
-						break;
+						continue;
 					}
 					double[] firstRow = requestInfo.getMatrix()[0];
-					for (int k = 0; k < (workers.size()-1); k++) {
-						tokens = workers.get((i+j+k+1)%workers.size()).getRemoteAddress().split("/user");
+					for (int k = 0; k < workers.size(); k++) {
+						index=index%workers.size();
+						tokens = workers.get(index).getRemoteAddress().split("/user");
 						if (!tokens[0].equals(workerSystem)) {
-							workers.get((i+j+k+1)%workers.size()).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, worker.getRows(reqId), worker.getRowNumber(reqId)), getSelf());
-							l.l(me, "call " + workers.get((i+j+k+1)%workers.size()).getRemoteAddress() + " to do the job of the dead worker " +worker.getRemoteAddress());
+							workers.get(index).addReqId(reqId);
+							workers.get(index).setRows(reqId, worker.getRows(reqId));
+							workers.get(index).setRowNumber(reqId, worker.getRowNumber(reqId));
+							workers.get(index).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, worker.getRows(reqId), worker.getRowNumber(reqId)), getSelf());
+							l.l(me, reqId + ", call " + workers.get(index).getRemoteAddress() + " to do the job of the dead worker " +worker.getRemoteAddress());
+							if (j==worker.getReqIds().size()-1){
+								index=(index+1)%workers.size();
+							}
 							break;
 						}
+						index=(index+1)%workers.size();
 					}
 				}
 				// shutdown
