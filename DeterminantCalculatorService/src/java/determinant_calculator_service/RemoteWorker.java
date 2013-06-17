@@ -2,71 +2,38 @@ package determinant_calculator_service;
 
 import akka.actor.ActorRef;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class RemoteWorker {
 
 	private String remoteAddress;
 	//private String name;
 	private ActorRef actorRef;
-	private ArrayList<String> reqIds;
-	private HashMap<String,double[][]> rows;
-	private HashMap<String,Integer> rowNumbers;
+	private ArrayList<Work> works;
 
 	public RemoteWorker(String remoteAddress, ActorRef actorRef) {
 		this.remoteAddress = remoteAddress;
-		//String[] tokens = remoteAddress.split("/");
-		//this.name = tokens[tokens.length-1];
 		this.actorRef = actorRef;
-		reqIds = new ArrayList<String>();
-		rows = new HashMap<String,double[][]>();
-		rowNumbers = new HashMap<String,Integer>();
+		works = new ArrayList<Work>();
 	}
 
 	public String getRemoteAddress() {
 		return remoteAddress;
 	}
 	
-	/*public String getName() {
-		return name;
-	}*/	
-
 	public ActorRef getActorRef() {
 		return actorRef;
 	}
 	
-	public ArrayList<String> getReqIds() {
-		return reqIds;
-	}
-		
-	public double[][] getRows(String reqId) {
-		return rows.get(reqId);
-	}
-	
-	public int getRowNumber(String reqId) {
-		if (rowNumbers.get(reqId)!=null){
-			return rowNumbers.get(reqId);
-		} else {
-			return -1;
-		}
+	public ArrayList<Work> getWorks() {
+		return works;
 	}
 
-	public void addReqId(String reqId) {
-		reqIds.add(reqId);
+	public void addWork(String reqId, double[][] rows, int rowNumber) {
+		works.add(new Work(reqId,rows,rowNumber));
 	}
 	
-	public void removeReqId(String reqId) {
-		reqIds.remove(reqId);
-		rows.remove(reqId);
-		rowNumbers.remove(reqId);
-	}
-	
-	public void setRows(String reqId, double[][] r) {
-		rows.put(reqId, r);
-	}
-	
-	public void setRowNumber(String reqId, int rowNumber) {
-		rowNumbers.put(reqId, rowNumber);
+	public void removeWork(Work work) {
+		works.remove(work);
 	}
 	
 }
