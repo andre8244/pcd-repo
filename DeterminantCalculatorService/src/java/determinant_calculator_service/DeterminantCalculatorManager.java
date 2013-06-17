@@ -23,7 +23,7 @@ public class DeterminantCalculatorManager {
 	private int reqNumber;
 	private ActorRef master;
 	private HashMap<String, RequestInfo> requestsInfo;
-	private static Lock lock = new ReentrantLock();
+	private static Lock lock = new ReentrantLock(true);
 	private String me = "manager";
 
 	private DeterminantCalculatorManager() {
@@ -81,7 +81,7 @@ public class DeterminantCalculatorManager {
 		lock.lock();
 		RequestInfo requestInfo = requestsInfo.get(reqId);
 		lock.unlock();
-		
+
 		if (requestInfo != null){
 			 // blocking operation:
 			return requestInfo.getFinalDeterminant();

@@ -37,10 +37,10 @@ public class RequestInfo {
 			totalWorkToDo += i * (i + 1);
 		}
 	}
-	
+
 	public void setMatrix(double[][] matrix) {
 		this.matrix = matrix;
-		
+
 	}
 
 	public double[][] getMatrix() {

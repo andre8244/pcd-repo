@@ -40,8 +40,8 @@ public class MatrixUtil {
 		}
 		l.l(me, "finished writing list " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
 		startTime = System.currentTimeMillis();
-		//testReadMatrix(matrix);
-		l.l(me, "finished reading list " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
+		/*testReadMatrix(matrix);
+		l.l(me, "finished reading list " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");*/
 		//printMatrix(matrix);
 		return matrix;
 	}
