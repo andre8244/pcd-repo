@@ -56,7 +56,7 @@ public class UserApp {
 			l.l(me, reqId + " percentage: " + percentage + " % (polling)");
 
 			try {
-				Thread.sleep(100);
+				Thread.sleep(500);
 			} catch (InterruptedException ex) {
 				ex.printStackTrace();
 			}
@@ -92,7 +92,7 @@ public class UserApp {
 //			 }*/
 //
 //			try {
-//				Thread.sleep(100);
+//				Thread.sleep(500);
 //			} catch (InterruptedException ex) {
 //				ex.printStackTrace();
 //			}

@@ -69,7 +69,7 @@ public class Master extends UntypedActor {
 		String reqId = compute.getReqId();
 		l.l(me, "handleCompute, reqId: " + reqId + ", order: " + order + ", workers.size():" + workers.size());
 		RequestInfo requestInfo = manager.getRequestInfo(reqId);
-		requestInfo.setMatrix(MatrixUtil.fromFileToList(order, fileValues));
+		requestInfo.setOriginalMatrix(MatrixUtil.fromFileToList(order, fileValues));
 
 		if (workers.isEmpty()) {
 			l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
@@ -117,8 +117,6 @@ public class Master extends UntypedActor {
 				l.l(me, "Received all rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
 			}
 
-			boolean zeroColumn = false;
-
 			if (matrix.length > 2) {
 				requestInfo.setRowsDone(0);
 				requestInfo.setMatrix(subMatrix(reqId, matrix));
@@ -129,7 +127,7 @@ public class Master extends UntypedActor {
 					requestInfo.setPercentageDone(100);
 					return;
 				}
-				zeroColumn = gauss(reqId);
+				boolean zeroColumn = gauss(reqId);
 
 				if (!zeroColumn) {
 					long startTime = System.currentTimeMillis();
