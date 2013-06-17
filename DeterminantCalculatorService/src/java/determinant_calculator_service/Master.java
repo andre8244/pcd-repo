@@ -87,6 +87,7 @@ public class Master extends UntypedActor {
 		int rowNumber = mrr.getRowNumber();
 		
 		for (int i = 0; i < workers.size(); i++){
+			// works.size è generalmente uno, tranne in casi di failure
 			ArrayList<Work> works = workers.get(i).getWorks();
 			for (int j = 0; j < works.size(); j++){
 				if (works.get(j).getReqId().equals(reqId) && works.get(j).getRowNumber()==rowNumber){
@@ -156,7 +157,7 @@ public class Master extends UntypedActor {
 					//requestInfo.setTempDeterminant(determinant);
 					requestInfo.setFinalDeterminant(determinant);
 				} else {
-					if (determinant == 0){ // TODO questo blocco serve ancora?
+					if (determinant == 0){
 						//requestInfo.setTempDeterminant(0);
 						requestInfo.setFinalDeterminant(0);
 					} else {
@@ -302,8 +303,9 @@ public class Master extends UntypedActor {
 		int index=0;		
 		for (int i = 0; i < workers.size(); i++) {
 			tokens = workers.get(i).getRemoteAddress().split("/user");
+			String workerSystemMain = tokens[0];
 			//l.l(me, "worker system "+tokens[0]);
-			if (tokens[0].equals(workerSystem)) {
+			if (workerSystemMain.equals(workerSystem)) {
 				RemoteWorker worker = workers.get(i);
 				ArrayList<Work> works = worker.getWorks();
 				l.l(me, worker.getRemoteAddress() + " pending request: "+works.size());
