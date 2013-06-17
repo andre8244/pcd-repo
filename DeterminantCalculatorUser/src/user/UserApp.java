@@ -16,7 +16,7 @@ public class UserApp {
 	private static final int CALLBACK = 2;
 	private String path = System.getProperty("user.home") + System.getProperty("file.separator");
 	private String fileValues;
-	private int order = 500;
+	private int order = 1000;
 	// select execution policy:
 	private static final int policy = SYNCHRONOUS;
 
@@ -28,7 +28,7 @@ public class UserApp {
 
 //		fileValues = path + "matrix" + order + ".txt";
 		fileValues = path + "matrix.txt";
-		MatrixUtil.genAndWriteToFile(order, 0.1, 0.2, fileValues);
+		//MatrixUtil.genAndWriteToFile(order, 0.1, 0.2, fileValues);
 		l.l(me, "waiting for web service response...");
 
 		switch (policy) {
@@ -47,7 +47,7 @@ public class UserApp {
 
 	private void pollingRequest() {
 		String reqId = servicePort.computeDeterminant(order, fileValues);
-		Response<GetResultResponse> response = servicePort.getResultAsync(reqId);
+		/*Response<GetResultResponse> response = servicePort.getResultAsync(reqId);
 
 		while (!response.isDone()) {
 			//l.l(me, "dummy print... i could do something more useful while waiting (polling)");
@@ -68,7 +68,7 @@ public class UserApp {
 			ex.printStackTrace();
 		} catch (ExecutionException ex) {
 			ex.printStackTrace();
-		}
+		}*/
 
 		// vecchia implementazione
 //		String reqId1 = servicePort.computeDeterminant(order, fileValues);
@@ -120,7 +120,7 @@ public class UserApp {
 				}
 			}
 		};
-		Future<?> response = servicePort.getResultAsync(reqId, asyncHandler);
+		/*Future<?> response = servicePort.getResultAsync(reqId, asyncHandler);
 
 		while (!response.isDone()) {
 			//l.l(me, "dummy print... i could do something more useful while waiting (callback)");
@@ -133,7 +133,7 @@ public class UserApp {
 			} catch (InterruptedException ex) {
 				ex.printStackTrace();
 			}
-		}
+		}*/
 	}
 
 	public static void main(String[] args) {
