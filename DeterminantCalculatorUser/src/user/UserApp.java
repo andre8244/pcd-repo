@@ -16,9 +16,9 @@ public class UserApp {
 	private static final int CALLBACK = 2;
 	private String path = System.getProperty("user.home") + System.getProperty("file.separator");
 	private String fileValues;
-	private int order = 1500;
+	private int order = 700;
 	// select execution policy:
-	private static final int policy = POLLING;
+	private static final int policy = CALLBACK;
 
 	public UserApp() {
 
@@ -51,7 +51,7 @@ public class UserApp {
 
 		while (!response.isDone()) {
 			//l.l(me, "dummy print... i could do something more useful while waiting (polling)");
-			l.l(me, "getting percentage...");
+//			l.l(me, "getting percentage...");
 			int percentage = servicePort.getPercentageDone(reqId);
 			l.l(me, reqId + " percentage: " + percentage + " % (polling)");
 
@@ -124,12 +124,12 @@ public class UserApp {
 
 		while (!response.isDone()) {
 			//l.l(me, "dummy print... i could do something more useful while waiting (callback)");
-			l.l(me, "getting percentage...");
+//			l.l(me, "getting percentage...");
 			int percentage = servicePort.getPercentageDone(reqId);
 			l.l(me, reqId + " percentage: " + percentage + " % (callback)");
 
 			try {
-				Thread.sleep(100);
+				Thread.sleep(500);
 			} catch (InterruptedException ex) {
 				ex.printStackTrace();
 			}
