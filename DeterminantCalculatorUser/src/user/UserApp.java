@@ -16,7 +16,7 @@ public class UserApp {
 	private static final int CALLBACK = 2;
 	private String path = System.getProperty("user.home") + System.getProperty("file.separator");
 	private String fileValues;
-	private int order = 1000;
+	private int order = 500;
 	// select execution policy:
 	private static final int policy = SYNCHRONOUS;
 
