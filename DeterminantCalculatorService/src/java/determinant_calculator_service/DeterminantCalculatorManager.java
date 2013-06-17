@@ -11,6 +11,8 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import com.typesafe.config.ConfigFactory;
 import java.util.HashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
@@ -21,6 +23,7 @@ public class DeterminantCalculatorManager {
 	private int reqNumber;
 	private ActorRef master;
 	private HashMap<String, RequestInfo> requestsInfo;
+	private static Lock lock = new ReentrantLock();
 	private String me = "manager";
 
 	private DeterminantCalculatorManager() {
@@ -30,36 +33,55 @@ public class DeterminantCalculatorManager {
 		requestsInfo = new HashMap<String, RequestInfo>();
 	}
 
-	public synchronized static DeterminantCalculatorManager getInstance() {
-		if (instance == null) {
-			instance = new DeterminantCalculatorManager();
-		}
-		return instance;
-	}
+	public static DeterminantCalculatorManager getInstance() {
+		lock.lock();
 
-	public synchronized String computeDeterminant(int order, String fileValues) {
-		String reqId = "req" + reqNumber;
-		reqNumber = reqNumber + 1;
-		requestsInfo.put(reqId, new RequestInfo());
-		master.tell(new Messages.Compute(order, fileValues, reqId, this));
-		return reqId;
-	}
-
-	public synchronized int getPercentageDone(String reqId) {
-		RequestInfo requestInfo = requestsInfo.get(reqId);
-
-		if (requestInfo != null){
-			return requestInfo.getPercentageDone();
-		} else {
-			l.l(me, reqId + ": invalid requestId");
-			return -1;
+		try {
+			if (instance == null) {
+				instance = new DeterminantCalculatorManager();
+			}
+			return instance;
+		} finally {
+			lock.unlock();
 		}
 	}
 
-	public /*synchronized*/ double getResult(String reqId) {
-		// TODO assicurarsi che il "synchronized" non impedisca ad altri client di usare il metodo getResult()
-		RequestInfo requestInfo = requestsInfo.get(reqId);
+	public String computeDeterminant(int order, String fileValues) {
+		lock.lock();
 
+		try {
+			String reqId = "req" + reqNumber;
+			reqNumber = reqNumber + 1;
+			requestsInfo.put(reqId, new RequestInfo());
+			master.tell(new Messages.Compute(order, fileValues, reqId, this));
+			return reqId;
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	public int getPercentageDone(String reqId) {
+		lock.lock();
+
+		try {
+			RequestInfo requestInfo = requestsInfo.get(reqId);
+
+			if (requestInfo != null){
+				return requestInfo.getPercentageDone();
+			} else {
+				l.l(me, reqId + ": invalid requestId");
+				return -1;
+			}
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	public double getResult(String reqId) {
+		lock.lock();
+		RequestInfo requestInfo = requestsInfo.get(reqId);
+		lock.unlock();
+		
 		if (requestInfo != null){
 			 // blocking operation:
 			return requestInfo.getFinalDeterminant();
@@ -69,19 +91,27 @@ public class DeterminantCalculatorManager {
 		}
 	}
 
-	public synchronized boolean addWorkerNode(String remoteAddress) {
-		master.tell(new Messages.AddWorkerNode(remoteAddress));
-		// TODO ha senso che restituisca sempre true?
-		return true;
+	public boolean addWorkerNode(String remoteAddress) {
+		lock.lock();
+
+		try {
+			master.tell(new Messages.AddWorkerNode(remoteAddress));
+			// TODO ha senso che restituisca sempre true?
+			return true;
+		} finally {
+			lock.unlock();
+		}
 	}
 
-	public synchronized boolean removeWorkerNode(String remoteAddress) {
-		master.tell(new Messages.RemoveWorkerNode(remoteAddress));
-		return true;
-	}
+	public boolean removeWorkerNode(String remoteAddress) {
+		lock.lock();
 
-	public void putRequestInfo(String reqId, RequestInfo requestInfo){
-		requestsInfo.put(reqId, requestInfo);
+		try {
+			master.tell(new Messages.RemoveWorkerNode(remoteAddress));
+			return true;
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	public RequestInfo getRequestInfo(String reqId){
