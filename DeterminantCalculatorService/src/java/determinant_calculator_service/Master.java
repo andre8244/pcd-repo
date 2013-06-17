@@ -331,10 +331,11 @@ public class Master extends UntypedActor {
 						index=index%workers.size();
 						tokens = workers.get(index).getRemoteAddress().split("/user");
 						if (!tokens[0].equals(workerSystem)) {
+							l.l(me, "index: "+index);
 							workers.get(index).addWork(reqId, rows, rowNumber);
 							workers.get(index).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, rowNumber), getSelf());
 							l.l(me, reqId + ", call " + workers.get(index).getRemoteAddress() + " to do the job of the dead worker " +worker.getRemoteAddress());
-							if (j==works.size()-1){
+							if (j==works.size()-1 && index<i){
 								index=(index+1)%workers.size();
 							}
 							break;

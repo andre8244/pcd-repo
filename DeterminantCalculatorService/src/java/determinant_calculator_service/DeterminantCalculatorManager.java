@@ -56,7 +56,7 @@ public class DeterminantCalculatorManager {
 		}
 	}
 
-	public synchronized double getResult(String reqId) {
+	public /*synchronized*/ double getResult(String reqId) {
 		// TODO assicurarsi che il "synchronized" non impedisca ad altri client di usare il metodo getResult()
 		RequestInfo requestInfo = requestsInfo.get(reqId);
 
