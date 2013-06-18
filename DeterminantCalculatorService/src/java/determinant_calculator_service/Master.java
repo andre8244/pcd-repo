@@ -130,15 +130,15 @@ public class Master extends UntypedActor {
 
 				if (!zeroColumn) {
 					long startTime = System.currentTimeMillis();
-					int totalWorkToDo = requestInfo.getTotalWorkToDo();
-					//l.l(me, "totalWorkToDo: " + totalWorkToDo);
-					int workToDo = 0;
+					long totalWorkToDo = requestInfo.getTotalWorkToDo();
+					long workToDo = 0;
 
-					for (int i = requestInfo.getMatrix().length - 1; i > 0; i--) {
+					for (long i = requestInfo.getMatrix().length - 1; i > 0; i--) {
 						workToDo += i * (i + 1);
 					}
 					//l.l(me, "WorkToDo: " + workToDo);
-					int workDone = totalWorkToDo - workToDo;
+					long workDone = totalWorkToDo - workToDo;
+					//l.l(me, "workDone(" + workDone + ") = totalWorkToDo("+ totalWorkToDo + ") - workToDo(" + workToDo + ")");
 					//l.l(me, "WorkDone: " + workDone);
 					int percentage = (int) (((double) workDone / totalWorkToDo) * 100);
 					//l.l(me, "percentage: " + percentage);

@@ -1,13 +1,15 @@
 package determinant_calculator_service;
 
 import java.util.concurrent.CountDownLatch;
+import log.l;
 
 public class RequestInfo {
 
+	private String me = "requestInfo";
 	private double[][] matrix;
 	private int matrixLength;
 	private int nRowsDone; // TODO forse meglio rinominare
-	private int totalWorkToDo;
+	private long totalWorkToDo;
 	private int percentageDone;
 	private double tempDeterminant;
 	private double finalDeterminant;
@@ -33,9 +35,13 @@ public class RequestInfo {
 		/* sums the elements of all the submatrices to be computed
 		 * example: order = 1000 -> totalWorkToDo = (999 * 1000) + (998 * 999) + ... + (1 * 2)
 		 */
-		for (int i = matrixLength; i > 0; i--) {
+		long startTime = System.currentTimeMillis();
+		for (long i = matrixLength; i > 0; i--) {
+			//l.l(me, "setOriginalMatrix: i("+i+")");
 			totalWorkToDo += i * (i + 1);
+			//l.l(me, "totalWorkToDo += i * (i + 1) = " + totalWorkToDo);
 		}
+		l.l(me, "setOriginalMatrix: computed totalWorkTodo (" + totalWorkToDo + "). Duration: " + (System.currentTimeMillis() - startTime) + " ms");
 	}
 
 	public void setMatrix(double[][] matrix) {
@@ -63,7 +69,7 @@ public class RequestInfo {
 		return startTime;
 	}
 
-	public int getTotalWorkToDo() {
+	public long getTotalWorkToDo() {
 		return totalWorkToDo;
 	}
 
