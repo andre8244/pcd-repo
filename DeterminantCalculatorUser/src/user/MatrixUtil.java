@@ -1,15 +1,19 @@
 package user;
 
+import java.io.BufferedReader;
 import log.l;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MatrixUtil {
 
@@ -62,10 +66,10 @@ public class MatrixUtil {
 	}
 
 	public static URL makeUrlFromFile(String fileName) throws MalformedURLException{
-			//create the URL object, and set the connection so that we can write to it
-			File file = new File(fileName.trim());
-			URL url = file.toURI().toURL();
-			l.l(me, "File URL: " + url);
+		//create the URL object, and set the connection so that we can write to it
+		File file = new File(fileName.trim());
+		URL url = file.toURI().toURL();
+		l.l(me, "File URL: " + url);
 		/*try {
 			HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
 			httpCon.setDoOutput(true);
@@ -79,6 +83,23 @@ public class MatrixUtil {
 		}catch (IOException ex) {
 			ex.printStackTrace();
 		}*/
+		BufferedReader in = null;
+		try {
+			in = new BufferedReader(new InputStreamReader(url.openStream()));
+			String str;
+			while ((str = in.readLine()) != null) {
+				//System.out.println(str);
+			}
+			in.close();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			try {
+				in.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
 		return url;
 	}
 	
