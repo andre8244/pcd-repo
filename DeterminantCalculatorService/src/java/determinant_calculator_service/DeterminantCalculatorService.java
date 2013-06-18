@@ -1,5 +1,6 @@
 package determinant_calculator_service;
 
+import java.net.URL;
 import javax.jws.WebService;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -14,9 +15,9 @@ public class DeterminantCalculatorService {
 	/**
 	 * Operazione per calcolare il determinante
 	 */
-	@WebMethod(operationName = "computeDeterminant")
-	public String computeDeterminant(@WebParam(name = "order") int order, @WebParam(name = "fileValues") String fileValues) {
-		return DeterminantCalculatorManager.getInstance().computeDeterminant(order, fileValues);
+	@WebMethod(operationName = "computeDeterminant") // TODO sistemare il tipo di fileValues
+	public String computeDeterminant(@WebParam(name = "order") int order, @WebParam(name = "fileValues") URL fileValues) {
+		return DeterminantCalculatorManager.getInstance().computeDeterminant(order, fileValues.toString());
 	}
 
 	/**
