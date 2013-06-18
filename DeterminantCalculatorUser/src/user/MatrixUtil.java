@@ -12,8 +12,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class MatrixUtil {
 
@@ -70,6 +68,47 @@ public class MatrixUtil {
 		File file = new File(fileName.trim());
 		URL url = file.toURI().toURL();
 		l.l(me, "File URL: " + url);
+		//FTP
+		/*String server = "www.myserver.com";
+        int port = 21;
+        String user = "user";
+        String pass = "pass";
+ 
+        FTPClient ftpClient = new FTPClient();
+        try {
+ 
+            ftpClient.connect(server, port);
+            ftpClient.login(user, pass);
+            ftpClient.enterLocalPassiveMode();
+ 
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+ 
+            File firstLocalFile = new File(fileName);
+ 
+            String firstRemoteFile = "Matrix.zip";
+            InputStream inputStream = new FileInputStream(firstLocalFile);
+ 
+            System.out.println("Start uploading first file");
+            boolean done = ftpClient.storeFile(firstRemoteFile, inputStream);
+            inputStream.close();
+            if (done) {
+                System.out.println("The file is uploaded successfully.");
+            }
+		} catch (IOException ex) {
+            System.out.println("Error: " + ex.getMessage());
+            ex.printStackTrace();
+        } finally {
+            try {
+                if (ftpClient.isConnected()) {
+                    ftpClient.logout();
+                    ftpClient.disconnect();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+		*/		
+		//HTTP prova
 		/*try {
 			HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
 			httpCon.setDoOutput(true);
@@ -83,6 +122,7 @@ public class MatrixUtil {
 		}catch (IOException ex) {
 			ex.printStackTrace();
 		}*/
+		//Prova per leggere file da URL
 		BufferedReader in = null;
 		try {
 			in = new BufferedReader(new InputStreamReader(url.openStream()));
