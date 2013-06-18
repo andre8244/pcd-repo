@@ -16,9 +16,9 @@ public class UserApp {
 	private static final int CALLBACK = 2;
 	private String path = System.getProperty("user.home") + System.getProperty("file.separator");
 	private String fileValues;
-	private int order = 700;
+	private int order = 3000;
 	// select execution policy:
-	private static final int policy = CALLBACK;
+	private static final int policy = POLLING;
 
 	public UserApp() {
 
@@ -28,7 +28,8 @@ public class UserApp {
 
 		//fileValues = path + "matrix" + order + ".txt";
 		fileValues = path + "matrix.txt";
-		//MatrixUtil.genAndWriteToFile(order, 0.1, 0.2, fileValues);
+		MatrixUtil.genAndWriteToFile(order, 0.02, 0.03, fileValues);
+
 		l.l(me, "waiting for web service response...");
 
 		switch (policy) {
@@ -56,7 +57,7 @@ public class UserApp {
 			l.l(me, reqId + " percentage: " + percentage + " % (polling)");
 
 			try {
-				Thread.sleep(500);
+				Thread.sleep(1000);
 			} catch (InterruptedException ex) {
 				ex.printStackTrace();
 			}
@@ -129,7 +130,7 @@ public class UserApp {
 			l.l(me, reqId + " percentage: " + percentage + " % (callback)");
 
 			try {
-				Thread.sleep(500);
+				Thread.sleep(1000);
 			} catch (InterruptedException ex) {
 				ex.printStackTrace();
 			}
