@@ -1,10 +1,16 @@
 package user;
 
+import java.io.BufferedReader;
 import log.l;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Random;
 
 public class MatrixUtil {
@@ -57,6 +63,86 @@ public class MatrixUtil {
 		}
 	}
 
+	public static URL makeUrlFromFile(String fileName) throws MalformedURLException{
+		//create the URL object, and set the connection so that we can write to it
+		File file = new File(fileName.trim());
+		URL url = file.toURI().toURL();
+		l.l(me, "File URL: " + url);
+		//FTP
+		/*String server = "www.myserver.com";
+        int port = 21;
+        String user = "user";
+        String pass = "pass";
+ 
+        FTPClient ftpClient = new FTPClient();
+        try {
+ 
+            ftpClient.connect(server, port);
+            ftpClient.login(user, pass);
+            ftpClient.enterLocalPassiveMode();
+ 
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+ 
+            File firstLocalFile = new File(fileName);
+ 
+            String firstRemoteFile = "Matrix.zip";
+            InputStream inputStream = new FileInputStream(firstLocalFile);
+ 
+            System.out.println("Start uploading first file");
+            boolean done = ftpClient.storeFile(firstRemoteFile, inputStream);
+            inputStream.close();
+            if (done) {
+                System.out.println("The file is uploaded successfully.");
+            }
+		} catch (IOException ex) {
+            System.out.println("Error: " + ex.getMessage());
+            ex.printStackTrace();
+        } finally {
+            try {
+                if (ftpClient.isConnected()) {
+                    ftpClient.logout();
+                    ftpClient.disconnect();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+		*/		
+		//HTTP prova
+		/*try {
+			HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+			httpCon.setDoOutput(true);
+			httpCon.setRequestMethod("PUT");
+			//create an output stream on the connection and open an OutputStreamWriter on it
+			OutputStreamWriter out = new OutputStreamWriter(httpCon.getOutputStream());
+			//write the required information to the output stream and close it
+			out.write(".....write something....");
+			out.close();
+			httpCon.getInputStream();
+		}catch (IOException ex) {
+			ex.printStackTrace();
+		}*/
+		//Prova per leggere file da URL
+		BufferedReader in = null;
+		try {
+			in = new BufferedReader(new InputStreamReader(url.openStream()));
+			String str;
+			while ((str = in.readLine()) != null) {
+				//System.out.println(str);
+			}
+			in.close();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			try {
+				in.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+		return url;
+	}
+	
 	/*public static double[][] fromFileToList(int order, String fileName) {
 		l.l(me, "reading matrix from file, generating array...");
 		long startTime = System.currentTimeMillis();
