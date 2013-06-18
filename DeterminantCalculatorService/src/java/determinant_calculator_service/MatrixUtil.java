@@ -5,6 +5,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 
 public class MatrixUtil {
 
@@ -16,7 +18,9 @@ public class MatrixUtil {
 		double[][] matrix = new double[order][order];
 
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader(fileName));
+			URL url = new URL(fileName);
+			//BufferedReader reader = new BufferedReader(new FileReader(fileName));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
 			String line = reader.readLine();
 			String[] tokens;
 			int i = 0;
