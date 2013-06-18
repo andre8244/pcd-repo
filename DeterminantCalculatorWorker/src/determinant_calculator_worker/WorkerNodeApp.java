@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * This class deploys one (or more) workers on a network node.
  *
  */
-public class RegisterWorkerApp {
+public class WorkerNodeApp {
 
 	// TODO in futuro forse sarà meglio poter installare un solo worker su ogni nodo di rete per valutare le performance
 	private static final int nWorkersToDeploy = 4;
@@ -18,7 +18,7 @@ public class RegisterWorkerApp {
 	private static ArrayList<ActorRef> workers;
 
 	// TODO in futuro questo metodo dovrebbe essere eliminato, s
-	public static void deploy(int nWorkers) {
+	public static void installWorkerNode(int nWorkers) {
 		long id = System.currentTimeMillis();
 		workers = new ArrayList<>();
 		system = ActorSystem.create("workerSystem_" + id, ConfigFactory.load().getConfig("worker"));
@@ -29,12 +29,12 @@ public class RegisterWorkerApp {
 	}
 
 	public static void main(String args[]) {
-		deploy(nWorkersToDeploy);
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException ex) {
-			ex.printStackTrace();
-		}
+		installWorkerNode(nWorkersToDeploy);
+//		try {
+//			Thread.sleep(10000);
+//		} catch (InterruptedException ex) {
+//			ex.printStackTrace();
+//		}
 		//workers.add(system.actorOf(new Props(Worker.class), "worker"+nWorkersToDeploy));
 		/*for (int i = 0; i < nWorkersToDeploy; i++) {
 			workers.get(i).tell(new Messages.Remove());

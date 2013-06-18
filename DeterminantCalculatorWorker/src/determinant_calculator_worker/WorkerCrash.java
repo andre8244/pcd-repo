@@ -6,7 +6,7 @@ import akka.actor.Address;
 import akka.actor.UntypedActor;
 import akka.remote.RemoteActorRefProvider;
 
-public class WorkerCrash extends UntypedActor {
+public class WorkerCrash extends UntypedActor { // TODO da eliminare?
 
 	private String me;
 	private determinant_ws_client.DeterminantCalculatorService servicePort;
