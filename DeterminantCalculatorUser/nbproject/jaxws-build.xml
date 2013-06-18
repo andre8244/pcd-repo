@@ -19,7 +19,7 @@
     <target name="wsimport-client-DeterminantCalculatorService" depends="wsimport-init">
         <mkdir dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService"/>
         <property name="wsdl-DeterminantCalculatorService" location="xml-resources/web-service-references/DeterminantCalculatorService/wsdl/localhost_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl"/>
-        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService" destdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService" wsdl="${wsdl-DeterminantCalculatorService}" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" wsdlLocation="http://localhost:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl" xendorsed="true" package="determinant_ws_client">
+        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService" destdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService" wsdl="${wsdl-DeterminantCalculatorService}" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" wsdlLocation="http://localhost:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl" xnocompile="true" xendorsed="true" package="determinant_ws_client">
             <depends file="${wsdl-DeterminantCalculatorService}"/>
             <produces dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService"/>
         </wsimport>

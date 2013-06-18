@@ -1,8 +1,12 @@
 package user;
 
 import determinant_ws_client.GetResultResponse;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Response;
 import log.l;
@@ -16,7 +20,8 @@ public class UserApp {
 	private static final int CALLBACK = 2;
 	private String path = System.getProperty("user.home") + System.getProperty("file.separator");
 	private String fileValues;
-	private int order = 3000;
+	private URL fileValuesURL;
+	private int order = 300;
 	// select execution policy:
 	private static final int policy = POLLING;
 
@@ -27,8 +32,15 @@ public class UserApp {
 		servicePort = service.getDeterminantCalculatorServicePort();
 
 		//fileValues = path + "matrix" + order + ".txt";
-		fileValues = path + "matrix.txt";
-		MatrixUtil.genAndWriteToFile(order, 0.02, 0.03, fileValues);
+		//fileValues = path + "matrix.txt";
+
+		try {
+			fileValuesURL = new URL("http://pcddeterminant.altervista.org/matrix300@6.03e60.txt");
+		} catch (MalformedURLException ex) {
+			ex.printStackTrace();
+		}
+
+		// MatrixUtil.genAndWriteToFile(order, 0.02, 0.03, fileValues); // 3000
 
 		l.l(me, "waiting for web service response...");
 
@@ -47,7 +59,7 @@ public class UserApp {
 	}
 
 	private void pollingRequest() {
-		String reqId = servicePort.computeDeterminant(order, fileValues);
+		String reqId = servicePort.computeDeterminant(order, fileValuesURL.toString());
 		Response<GetResultResponse> response = servicePort.getResultAsync(reqId);
 
 		while (!response.isDone()) {
