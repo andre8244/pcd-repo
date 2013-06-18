@@ -1,8 +1,12 @@
 package user;
 
 import determinant_ws_client.GetResultResponse;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Response;
 import log.l;
@@ -29,6 +33,11 @@ public class UserApp {
 		//fileValues = path + "matrix" + order + ".txt";
 		fileValues = path + "matrix.txt";
 		//MatrixUtil.genAndWriteToFile(order, 0.1, 0.2, fileValues);
+		try {
+			MatrixUtil.makeUrlFromFile(fileValues);
+		} catch (MalformedURLException ex) {
+			ex.printStackTrace();
+		}
 		l.l(me, "waiting for web service response...");
 
 		switch (policy) {

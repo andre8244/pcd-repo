@@ -5,6 +5,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Random;
 
 public class MatrixUtil {
@@ -57,6 +61,27 @@ public class MatrixUtil {
 		}
 	}
 
+	public static URL makeUrlFromFile(String fileName) throws MalformedURLException{
+			//create the URL object, and set the connection so that we can write to it
+			File file = new File(fileName.trim());
+			URL url = file.toURI().toURL();
+			l.l(me, "File URL: " + url);
+		/*try {
+			HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+			httpCon.setDoOutput(true);
+			httpCon.setRequestMethod("PUT");
+			//create an output stream on the connection and open an OutputStreamWriter on it
+			OutputStreamWriter out = new OutputStreamWriter(httpCon.getOutputStream());
+			//write the required information to the output stream and close it
+			out.write(".....write something....");
+			out.close();
+			httpCon.getInputStream();
+		}catch (IOException ex) {
+			ex.printStackTrace();
+		}*/
+		return url;
+	}
+	
 	/*public static double[][] fromFileToList(int order, String fileName) {
 		l.l(me, "reading matrix from file, generating array...");
 		long startTime = System.currentTimeMillis();
