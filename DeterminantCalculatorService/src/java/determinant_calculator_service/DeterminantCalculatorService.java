@@ -16,8 +16,8 @@ public class DeterminantCalculatorService {
 	 * Operazione per calcolare il determinante
 	 */
 	@WebMethod(operationName = "computeDeterminant") // TODO sistemare il tipo di fileValues
-	public String computeDeterminant(@WebParam(name = "order") int order, @WebParam(name = "fileValues") URL fileValues) {
-		return DeterminantCalculatorManager.getInstance().computeDeterminant(order, fileValues.toString());
+	public String computeDeterminant(@WebParam(name = "order") int order, @WebParam(name = "fileValues") String fileValues) {
+		return DeterminantCalculatorManager.getInstance().computeDeterminant(order, fileValues);
 	}
 
 	/**

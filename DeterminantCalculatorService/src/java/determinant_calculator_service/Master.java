@@ -115,7 +115,6 @@ public class Master extends UntypedActor {
 			if (matrix.length % 500 == 0) {
 				l.l(me, "Received all rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
 			}
-
 			if (matrix.length > 2) {
 				requestInfo.setRowsDone(0);
 				requestInfo.setMatrix(subMatrix(reqId, matrix));

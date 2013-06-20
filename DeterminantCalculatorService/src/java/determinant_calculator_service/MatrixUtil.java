@@ -3,6 +3,7 @@ package determinant_calculator_service;
 import log.l;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -11,15 +12,19 @@ public class MatrixUtil {
 
 	private static String me = "matrixUtil";
 
-	public static double[][] fromFileToList(int order, String fileName) {
+	public static double[][] fromFileToList(int order, String filePath) {
 		l.l(me, "writing list");
 		long startTime = System.currentTimeMillis();
 		double[][] matrix = new double[order][order];
+		BufferedReader reader;
 
 		try {
-			URL url = new URL(fileName);
-			//BufferedReader reader = new BufferedReader(new FileReader(fileName));
-			BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+			if (filePath.contains("http://")){
+				URL url = new URL(filePath);
+				reader = new BufferedReader(new InputStreamReader(url.openStream()));
+			} else {
+				reader = new BufferedReader(new FileReader(filePath));
+			}
 			String line = reader.readLine();
 			String[] tokens;
 			int i = 0;
@@ -41,8 +46,8 @@ public class MatrixUtil {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
-		l.l(me, "finished writing list " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
-		startTime = System.currentTimeMillis();
+		l.l(me, "finished reading file and writing list: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
+		//startTime = System.currentTimeMillis();
 		/*testReadMatrix(matrix);
 		l.l(me, "finished reading list " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");*/
 		//printMatrix(matrix);
