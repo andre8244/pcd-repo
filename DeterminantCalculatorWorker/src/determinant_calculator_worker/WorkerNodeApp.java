@@ -12,8 +12,7 @@ import java.util.ArrayList;
  */
 public class WorkerNodeApp {
 
-	// TODO in futuro forse sarà meglio poter installare un solo worker su ogni nodo di rete per valutare le performance
-	private static final int nWorkersToDeploy = 4;
+	private static final int nWorkersToDeploy = Runtime.getRuntime().availableProcessors();
 	private static ActorSystem system;
 	private static ArrayList<ActorRef> workers;
 
