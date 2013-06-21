@@ -93,5 +93,6 @@ public class Worker extends UntypedActor {
 
 	private void handleRemoveWorkerNodeAck() {
 		l.l(me, "worker removed");
+		this.getContext().stop(this.getSelf());
 	}
 }

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import log.l;
@@ -24,6 +25,7 @@ public class WorkerNodeAppFrame extends JFrame implements ActionListener{
 	private final JButton initWorkerSystemButton,  addWorkerButton, removeWorkerButton;
 	private final JTextField addWorkerText, removeWorkerText, consoleText;
 	private final JTextArea workersText;
+	private final JScrollPane scrollPane;
 	
 	private static int nWorkersToDeploy;
 	private static ActorSystem system;
@@ -71,13 +73,14 @@ public class WorkerNodeAppFrame extends JFrame implements ActionListener{
 		consolePanel = new JPanel();
 		
 		workersText = new JTextArea("Worker's list: no workers");
-		workersText.setPreferredSize(new Dimension(350, 350));
 		workersText.setEditable(false);
+		scrollPane = new JScrollPane(workersText);
+		scrollPane.setPreferredSize(new Dimension(350, 350));
 		consoleText = new JTextField("console");
 		consoleText.setPreferredSize(new Dimension(350, 30));
 		consoleText.setEditable(false);
 		
-		workersPanel.add(workersText);
+		workersPanel.add(scrollPane);
 		consolePanel.add(consoleText);
 		
 		infoPanel.add(BorderLayout.NORTH, workersPanel);
@@ -91,7 +94,7 @@ public class WorkerNodeAppFrame extends JFrame implements ActionListener{
 		setLocationRelativeTo(null);
 		
 		me = "workerNodeAppPanel";
-		nWorkersToDeploy = Runtime.getRuntime().availableProcessors();
+		nWorkersToDeploy = 30;//Runtime.getRuntime().availableProcessors();
 		workers = new HashMap<String,ActorRef>();
 		system = ActorSystem.create("workerSystem_" + System.currentTimeMillis(), ConfigFactory.load().getConfig("worker"));				
 	}
