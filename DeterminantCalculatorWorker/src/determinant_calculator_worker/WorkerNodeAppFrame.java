@@ -91,7 +91,7 @@ public class WorkerNodeAppFrame extends JFrame implements ActionListener{
 		setSize(600,600);
 		setLocationRelativeTo(null);
 		
-		nWorkersToDeploy = 30;//Runtime.getRuntime().availableProcessors();
+		nWorkersToDeploy = Runtime.getRuntime().availableProcessors();
 		workers = new HashMap<String,ActorRef>();
 		system = ActorSystem.create("workerSystem_" + System.currentTimeMillis(), ConfigFactory.load().getConfig("worker"));				
 	}
