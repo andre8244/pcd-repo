@@ -16,7 +16,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import log.l;
 import messages.Messages;
 
 public class WorkerNodeAppFrame extends JFrame implements ActionListener{
@@ -30,7 +29,6 @@ public class WorkerNodeAppFrame extends JFrame implements ActionListener{
 	private static int nWorkersToDeploy;
 	private static ActorSystem system;
 	private static HashMap<String,ActorRef> workers;
-	private String me;
 	
 	public WorkerNodeAppFrame(){
 		super("WorkerNodeApp");
@@ -93,7 +91,6 @@ public class WorkerNodeAppFrame extends JFrame implements ActionListener{
 		setSize(600,600);
 		setLocationRelativeTo(null);
 		
-		me = "workerNodeAppPanel";
 		nWorkersToDeploy = 30;//Runtime.getRuntime().availableProcessors();
 		workers = new HashMap<String,ActorRef>();
 		system = ActorSystem.create("workerSystem_" + System.currentTimeMillis(), ConfigFactory.load().getConfig("worker"));				
@@ -124,23 +121,27 @@ public class WorkerNodeAppFrame extends JFrame implements ActionListener{
 	}
 
 	private void addWorker(String workerName) {
-        if (!workerName.equals("") && workers.get(workerName)==null){
+        if (workerName.equals("")){
+			consoleText.setText("the field addWorkerText is null");
+		} else if (workers.get(workerName)!=null){
+			consoleText.setText("worker already exists");
+		} else {
 			workers.put(workerName, system.actorOf(new Props(Worker.class), workerName));
 			refreshWorkersList();
 			initWorkerSystemButton.setEnabled(false);
-		} else {
-			l.l(me, "Name is null or Worker already exists");
 		}
 	}
 
 	private void removeWorker(String workerName) {
-		if (!workerName.equals("") && workers.get(workerName)!=null){
+        if (workerName.equals("")){
+			consoleText.setText("the field removeWorkerText is null");
+		} else if (workers.get(workerName)==null){
+			consoleText.setText("worker not exists");
+		} else {
 			workers.get(workerName).tell(new Messages.Remove());
 			workers.remove(workerName);
 			refreshWorkersList();
 			initWorkerSystemButton.setEnabled(false);
-		}  else {
-			l.l(me, "Name is null or Worker not exists");
 		}
 	}
 
