@@ -4,17 +4,17 @@
 <xsd:import namespace="http://determinant_calculator_service/" schemaLocation="http://localhost:8080/DeterminantCalculatorService/DeterminantCalculatorService?xsd=1"/>
 </xsd:schema>
 </types>
-<message name="computeDeterminant">
-<part name="parameters" element="tns:computeDeterminant"/>
+<message name="getResult">
+<part name="parameters" element="tns:getResult"/>
 </message>
-<message name="computeDeterminantResponse">
-<part name="parameters" element="tns:computeDeterminantResponse"/>
+<message name="getResultResponse">
+<part name="parameters" element="tns:getResultResponse"/>
 </message>
-<message name="registerWorker">
-<part name="parameters" element="tns:registerWorker"/>
+<message name="removeWorkerNode">
+<part name="parameters" element="tns:removeWorkerNode"/>
 </message>
-<message name="registerWorkerResponse">
-<part name="parameters" element="tns:registerWorkerResponse"/>
+<message name="removeWorkerNodeResponse">
+<part name="parameters" element="tns:removeWorkerNodeResponse"/>
 </message>
 <message name="getPercentageDone">
 <part name="parameters" element="tns:getPercentageDone"/>
@@ -22,43 +22,43 @@
 <message name="getPercentageDoneResponse">
 <part name="parameters" element="tns:getPercentageDoneResponse"/>
 </message>
-<message name="getResult">
-<part name="parameters" element="tns:getResult"/>
+<message name="addWorkerNode">
+<part name="parameters" element="tns:addWorkerNode"/>
 </message>
-<message name="getResultResponse">
-<part name="parameters" element="tns:getResultResponse"/>
+<message name="addWorkerNodeResponse">
+<part name="parameters" element="tns:addWorkerNodeResponse"/>
 </message>
-<message name="removeWorker">
-<part name="parameters" element="tns:removeWorker"/>
+<message name="computeDeterminant">
+<part name="parameters" element="tns:computeDeterminant"/>
 </message>
-<message name="removeWorkerResponse">
-<part name="parameters" element="tns:removeWorkerResponse"/>
+<message name="computeDeterminantResponse">
+<part name="parameters" element="tns:computeDeterminantResponse"/>
 </message>
 <portType name="DeterminantCalculatorService">
-<operation name="computeDeterminant">
-<input wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/computeDeterminantRequest" message="tns:computeDeterminant"/>
-<output wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/computeDeterminantResponse" message="tns:computeDeterminantResponse"/>
+<operation name="getResult">
+<input wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/getResultRequest" message="tns:getResult"/>
+<output wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/getResultResponse" message="tns:getResultResponse"/>
 </operation>
-<operation name="registerWorker">
-<input wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/registerWorkerRequest" message="tns:registerWorker"/>
-<output wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/registerWorkerResponse" message="tns:registerWorkerResponse"/>
+<operation name="removeWorkerNode">
+<input wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/removeWorkerNodeRequest" message="tns:removeWorkerNode"/>
+<output wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/removeWorkerNodeResponse" message="tns:removeWorkerNodeResponse"/>
 </operation>
 <operation name="getPercentageDone">
 <input wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/getPercentageDoneRequest" message="tns:getPercentageDone"/>
 <output wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/getPercentageDoneResponse" message="tns:getPercentageDoneResponse"/>
 </operation>
-<operation name="getResult">
-<input wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/getResultRequest" message="tns:getResult"/>
-<output wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/getResultResponse" message="tns:getResultResponse"/>
+<operation name="addWorkerNode">
+<input wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/addWorkerNodeRequest" message="tns:addWorkerNode"/>
+<output wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/addWorkerNodeResponse" message="tns:addWorkerNodeResponse"/>
 </operation>
-<operation name="removeWorker">
-<input wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/removeWorkerRequest" message="tns:removeWorker"/>
-<output wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/removeWorkerResponse" message="tns:removeWorkerResponse"/>
+<operation name="computeDeterminant">
+<input wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/computeDeterminantRequest" message="tns:computeDeterminant"/>
+<output wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/computeDeterminantResponse" message="tns:computeDeterminantResponse"/>
 </operation>
 </portType>
 <binding name="DeterminantCalculatorServicePortBinding" type="tns:DeterminantCalculatorService">
 <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-<operation name="computeDeterminant">
+<operation name="getResult">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -67,7 +67,7 @@
 <soap:body use="literal"/>
 </output>
 </operation>
-<operation name="registerWorker">
+<operation name="removeWorkerNode">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -85,7 +85,7 @@
 <soap:body use="literal"/>
 </output>
 </operation>
-<operation name="getResult">
+<operation name="addWorkerNode">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -94,7 +94,7 @@
 <soap:body use="literal"/>
 </output>
 </operation>
-<operation name="removeWorker">
+<operation name="computeDeterminant">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>

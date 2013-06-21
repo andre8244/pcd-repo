@@ -135,13 +135,20 @@ public class UserApp {
 			}
 		};
 		Future<?> response = servicePort.getResultAsync(reqId, asyncHandler);
-
+		int lastPercentage = 0;
+		long startTime = System.currentTimeMillis();
+		
 		while (!response.isDone()) {
 			//l.l(me, "dummy print... i could do something more useful while waiting (callback)");
 //			l.l(me, "getting percentage...");
 			int percentage = servicePort.getPercentageDone(reqId);
-			l.l(me, reqId + " percentage: " + percentage + " % (callback)");
-
+			if (percentage!=lastPercentage){
+				l.l(me, reqId + " percentage: " + percentage + " % (callback). Time elapsed: " + (double)((System.currentTimeMillis()-startTime)/1000) + "sec , duration stimated: "+ (double)((System.currentTimeMillis()-startTime)/(10*percentage))+" sec");
+				lastPercentage = percentage;
+			} else {
+				l.l(me, reqId + " percentage: " + percentage + " % (callback)");
+			}
+			
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException ex) {
