@@ -3,8 +3,8 @@
   <services/>
   <clients>
     <client name="DeterminantCalculatorService">
-      <wsdl-url>http://localhost:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsdl-url>
-      <local-wsdl-file>localhost_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl</local-wsdl-file>
+      <wsdl-url>http://192.168.1.137:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsdl-url>
+      <local-wsdl-file>192.168.1.137_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl</local-wsdl-file>
       <package-name forceReplace="true">determinant_ws_client</package-name>
       <catalog-file>catalog.xml</catalog-file>
       <wsimport-options>
@@ -18,7 +18,7 @@
         </wsimport-option>
         <wsimport-option>
           <wsimport-option-name>wsdlLocation</wsimport-option-name>
-          <wsimport-option-value>http://localhost:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsimport-option-value>
+          <wsimport-option-value>http://192.168.1.137:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsimport-option-value>
         </wsimport-option>
         <wsimport-option>
           <wsimport-option-name>xnocompile</wsimport-option-name>

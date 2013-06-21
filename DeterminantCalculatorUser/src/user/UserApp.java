@@ -18,7 +18,7 @@ public class UserApp {
 	private String path = System.getProperty("user.home") + System.getProperty("file.separator");
 	private String fileValues;
 	private URL fileValuesURL;
-	private int order = 4000;
+	private int order = 2000;
 	// select execution policy:
 	private static final int policy = POLLING;
 
@@ -33,7 +33,7 @@ public class UserApp {
 		//fileValues = path + "matrix2000@1.15e-44.txt";
 		//fileValues = "http://pcddeterminant.altervista.org/matrix300@6.03e60.txt";
 
-		MatrixUtil.genAndWriteToFile(order, 0.01, 0.02, fileValues); // 4000
+		MatrixUtil.genAndWriteToFile(order, 0.1, 0.2, fileValues); // 4000
 
 		l.l(me, "waiting for web service response...");
 
@@ -55,12 +55,19 @@ public class UserApp {
 		//String reqId = servicePort.computeDeterminant(order, fileValuesURL.toString());
 		String reqId = servicePort.computeDeterminant(order, fileValues);
 		Response<GetResultResponse> response = servicePort.getResultAsync(reqId);
+		int lastPercentage = 0;
+		long startTime = System.currentTimeMillis();
 
 		while (!response.isDone()) {
 			//l.l(me, "dummy print... i could do something more useful while waiting (polling)");
 //			l.l(me, "getting percentage...");
 			int percentage = servicePort.getPercentageDone(reqId);
-			l.l(me, reqId + " percentage: " + percentage + " % (polling)");
+			if (percentage!=lastPercentage){
+				l.l(me, reqId + " percentage: " + percentage + " % (polling). Time elapsed: " + (double)((System.currentTimeMillis()-startTime)/1000) + "sec , duration stimated: "+ (double)((System.currentTimeMillis()-startTime)/(10*percentage))+" sec");
+				lastPercentage = percentage;
+			} else {
+				l.l(me, reqId + " percentage: " + percentage + " % (polling)");
+			}
 
 			try {
 				Thread.sleep(1000);
@@ -70,7 +77,7 @@ public class UserApp {
 		}
 
 		try {
-			l.l(me, "Result for " + reqId + ": " + response.get().getReturn());
+			l.l(me, "Result for " + reqId + ": " + response.get().getReturn()+ ". Time elapsed: " + (double)((System.currentTimeMillis()-startTime)/1000)+" sec.");
 		} catch (InterruptedException ex) {
 			ex.printStackTrace();
 		} catch (ExecutionException ex) {
