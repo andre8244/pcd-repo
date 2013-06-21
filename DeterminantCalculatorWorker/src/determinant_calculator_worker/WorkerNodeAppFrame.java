@@ -6,21 +6,24 @@ import akka.actor.Props;
 import com.typesafe.config.ConfigFactory;
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import log.l;
 import messages.Messages;
 
 public class WorkerNodeAppFrame extends JFrame implements ActionListener{
 
-	private final JPanel globalPanel, initPanel, addPanel, removePanel;
+	private final JPanel globalPanel, controlPanel, infoPanel, initPanel, addPanel, removePanel, workersPanel, consolePanel;
 	private final JButton initWorkerSystemButton,  addWorkerButton, removeWorkerButton;
-	private final JTextField addWorkerText, removeWorkerText;
+	private final JTextField addWorkerText, removeWorkerText, consoleText;
+	private final JTextArea workersText;
 	
 	private static int nWorkersToDeploy;
 	private static ActorSystem system;
@@ -33,20 +36,26 @@ public class WorkerNodeAppFrame extends JFrame implements ActionListener{
 		
 		Container cp = getContentPane();
 		globalPanel = new JPanel((new BorderLayout()));
+		controlPanel = new JPanel((new BorderLayout()));
+		infoPanel = new JPanel((new BorderLayout()));
+		
 		initPanel = new JPanel();
 		addPanel = new JPanel();
 		removePanel = new JPanel();
 		
 		initWorkerSystemButton = new JButton("Init WorkerSystem");
+		initWorkerSystemButton.setPreferredSize(new Dimension(200, 30));
 		addWorkerButton = new JButton("Add Worker");
+		addWorkerButton.setPreferredSize(new Dimension(200, 30));
 		removeWorkerButton = new JButton("Remove Worker");
+		removeWorkerButton.setPreferredSize(new Dimension(200, 30));
 		
 		initWorkerSystemButton.addActionListener(this);
 		addWorkerButton.addActionListener(this);
 		removeWorkerButton.addActionListener(this);
 		
-		addWorkerText = new JTextField("", 20);
-		removeWorkerText = new JTextField("", 20);
+		addWorkerText = new JTextField("", 15);
+		removeWorkerText = new JTextField("", 15);
 		
 		initPanel.add(initWorkerSystemButton);
 		addPanel.add(addWorkerText);
@@ -54,10 +63,32 @@ public class WorkerNodeAppFrame extends JFrame implements ActionListener{
 		removePanel.add(removeWorkerText);
 		removePanel.add(removeWorkerButton);
 		
-		globalPanel.add(BorderLayout.NORTH, initPanel);
-		globalPanel.add(BorderLayout.CENTER, addPanel);
-		globalPanel.add(BorderLayout.SOUTH, removePanel);
+		controlPanel.add(BorderLayout.NORTH, initPanel);
+		controlPanel.add(BorderLayout.CENTER, addPanel);
+		controlPanel.add(BorderLayout.SOUTH, removePanel);
+		
+		workersPanel = new JPanel();
+		consolePanel = new JPanel();
+		
+		workersText = new JTextArea("Worker's list: no workers");
+		workersText.setPreferredSize(new Dimension(350, 350));
+		workersText.setEditable(false);
+		consoleText = new JTextField("console");
+		consoleText.setPreferredSize(new Dimension(350, 30));
+		consoleText.setEditable(false);
+		
+		workersPanel.add(workersText);
+		consolePanel.add(consoleText);
+		
+		infoPanel.add(BorderLayout.NORTH, workersPanel);
+		infoPanel.add(BorderLayout.SOUTH, consolePanel);	
+		
+		globalPanel.add(BorderLayout.NORTH, controlPanel);
+		globalPanel.add(BorderLayout.SOUTH, infoPanel);
+		
 		cp.add(globalPanel);
+		setSize(600,600);
+		setLocationRelativeTo(null);
 		
 		me = "workerNodeAppPanel";
 		nWorkersToDeploy = Runtime.getRuntime().availableProcessors();
@@ -68,14 +99,19 @@ public class WorkerNodeAppFrame extends JFrame implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent ev) {
 		String cmd = ev.getActionCommand();
-		
-		if (cmd.equals("Init WorkerSystem")) {
-			initWorkerSystem();
-		} else if (cmd.equals("Add Worker")) {
-			addWorker(addWorkerText.getText());
-		}  else if (cmd.equals("Add Worker")) {
-			removeWorker(removeWorkerText.getText());
-		} 
+		switch (cmd) {
+			case "Init WorkerSystem":
+				initWorkerSystem();
+				refreshWorkersList();
+				initWorkerSystemButton.setEnabled(false);
+				break;
+			case "Add Worker":
+				addWorker(addWorkerText.getText());
+				break;
+			case "Remove Worker": 
+				removeWorker(removeWorkerText.getText());
+				break;
+		}
 	}		
 
 	private void initWorkerSystem() {
@@ -85,18 +121,35 @@ public class WorkerNodeAppFrame extends JFrame implements ActionListener{
 	}
 
 	private void addWorker(String workerName) {
-        if (workerName!=null && workers.get(workerName)==null){
+        if (!workerName.equals("") && workers.get(workerName)==null){
 			workers.put(workerName, system.actorOf(new Props(Worker.class), workerName));
+			refreshWorkersList();
+			initWorkerSystemButton.setEnabled(false);
 		} else {
 			l.l(me, "Name is null or Worker already exists");
 		}
 	}
 
 	private void removeWorker(String workerName) {
-		if (workerName!=null && workers.get(workerName)!=null){
+		if (!workerName.equals("") && workers.get(workerName)!=null){
 			workers.get(workerName).tell(new Messages.Remove());
+			workers.remove(workerName);
+			refreshWorkersList();
+			initWorkerSystemButton.setEnabled(false);
 		}  else {
 			l.l(me, "Name is null or Worker not exists");
 		}
+	}
+
+	private void refreshWorkersList() {
+		String list = "Worker's list: ";
+		if (workers.isEmpty()){
+			list = list + "no workers";
+		} else {
+			for (String worker : workers.keySet()){
+				list = list + "\n" + worker;
+			}
+		}
+		workersText.setText(list);
 	}
 }
