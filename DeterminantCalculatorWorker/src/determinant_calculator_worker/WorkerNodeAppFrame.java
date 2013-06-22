@@ -74,7 +74,7 @@ public class WorkerNodeAppFrame extends JFrame implements ActionListener{
 		workersText.setEditable(false);
 		scrollPane = new JScrollPane(workersText);
 		scrollPane.setPreferredSize(new Dimension(350, 350));
-		consoleText = new JTextField("console");
+		consoleText = new JTextField("");
 		consoleText.setPreferredSize(new Dimension(350, 30));
 		consoleText.setEditable(false);
 		
@@ -102,8 +102,6 @@ public class WorkerNodeAppFrame extends JFrame implements ActionListener{
 		switch (cmd) {
 			case "Init WorkerSystem":
 				initWorkerSystem();
-				refreshWorkersList();
-				initWorkerSystemButton.setEnabled(false);
 				break;
 			case "Add Worker":
 				addWorker(addWorkerText.getText());
@@ -118,30 +116,32 @@ public class WorkerNodeAppFrame extends JFrame implements ActionListener{
         for (int i=0; i<nWorkersToDeploy; i++){
 			workers.put("worker"+i,system.actorOf(new Props(Worker.class), "worker" + i));
 		}
+		refreshWorkersList();
+		consoleText.setText("Init worker system completed");
 	}
 
 	private void addWorker(String workerName) {
         if (workerName.equals("")){
-			consoleText.setText("the field addWorkerText is null");
+			consoleText.setText("Error: empty string!");
 		} else if (workers.get(workerName)!=null){
-			consoleText.setText("worker already exists");
+			consoleText.setText(workerName + " already exists");
 		} else {
 			workers.put(workerName, system.actorOf(new Props(Worker.class), workerName));
 			refreshWorkersList();
-			initWorkerSystemButton.setEnabled(false);
+			consoleText.setText(workerName + " added to worker's list");
 		}
 	}
 
 	private void removeWorker(String workerName) {
         if (workerName.equals("")){
-			consoleText.setText("the field removeWorkerText is null");
+			consoleText.setText("Error: empty string!");
 		} else if (workers.get(workerName)==null){
-			consoleText.setText("worker not exists");
+			consoleText.setText(workerName + " not exists");
 		} else {
 			workers.get(workerName).tell(new Messages.Remove());
 			workers.remove(workerName);
 			refreshWorkersList();
-			initWorkerSystemButton.setEnabled(false);
+			consoleText.setText(workerName + " removed from worker's list");
 		}
 	}
 
@@ -149,9 +149,13 @@ public class WorkerNodeAppFrame extends JFrame implements ActionListener{
 		String list = "Worker's list: ";
 		if (workers.isEmpty()){
 			list = list + "no workers";
+			initWorkerSystemButton.setEnabled(true);
 		} else {
 			for (String worker : workers.keySet()){
 				list = list + "\n" + worker;
+			}
+			if (initWorkerSystemButton.isEnabled()){
+				initWorkerSystemButton.setEnabled(false);
 			}
 		}
 		workersText.setText(list);
