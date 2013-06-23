@@ -3,9 +3,41 @@
   <services/>
   <clients>
     <client name="DeterminantCalculatorService">
+      <wsdl-url>http://192.168.0.7:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsdl-url>
+      <local-wsdl-file>192.168.0.7_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl</local-wsdl-file>
+      <package-name forceReplace="true">kubuntu</package-name>
+      <catalog-file>catalog.xml</catalog-file>
+      <wsimport-options>
+        <wsimport-option>
+          <wsimport-option-name>extension</wsimport-option-name>
+          <wsimport-option-value>true</wsimport-option-value>
+        </wsimport-option>
+        <wsimport-option>
+          <wsimport-option-name>verbose</wsimport-option-name>
+          <wsimport-option-value>true</wsimport-option-value>
+        </wsimport-option>
+        <wsimport-option>
+          <wsimport-option-name>wsdlLocation</wsimport-option-name>
+          <wsimport-option-value>http://192.168.0.7:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsimport-option-value>
+        </wsimport-option>
+        <wsimport-option>
+          <wsimport-option-name>xnocompile</wsimport-option-name>
+          <wsimport-option-value>true</wsimport-option-value>
+        </wsimport-option>
+        <wsimport-option>
+          <wsimport-option-name>xendorsed</wsimport-option-name>
+          <wsimport-option-value>true</wsimport-option-value>
+        </wsimport-option>
+        <wsimport-option>
+          <wsimport-option-name>package</wsimport-option-name>
+          <wsimport-option-value>kubuntu</wsimport-option-value>
+        </wsimport-option>
+      </wsimport-options>
+    </client>
+    <client name="DeterminantCalculatorService_1">
       <wsdl-url>http://localhost:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsdl-url>
       <local-wsdl-file>localhost_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl</local-wsdl-file>
-      <package-name forceReplace="true">determinant_ws_client</package-name>
+      <package-name forceReplace="true">localhost_client</package-name>
       <catalog-file>catalog.xml</catalog-file>
       <wsimport-options>
         <wsimport-option>
@@ -30,7 +62,7 @@
         </wsimport-option>
         <wsimport-option>
           <wsimport-option-name>package</wsimport-option-name>
-          <wsimport-option-value>determinant_ws_client</wsimport-option-value>
+          <wsimport-option-value>localhost_client</wsimport-option-value>
         </wsimport-option>
       </wsimport-options>
     </client>

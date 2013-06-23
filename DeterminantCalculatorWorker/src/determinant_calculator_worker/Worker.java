@@ -5,11 +5,13 @@ import log.l;
 import akka.actor.Address;
 import akka.actor.UntypedActor;
 import akka.remote.RemoteActorRefProvider;
+// IMPORT DEL WEB SERVICE CLIENT:
+import localhost_client.*;
 
 public class Worker extends UntypedActor {
 
 	private String me;
-	private determinant_ws_client.DeterminantCalculatorService servicePort;
+	private DeterminantCalculatorService servicePort;
 	private String remoteAddress;
 
 	@Override
@@ -17,8 +19,8 @@ public class Worker extends UntypedActor {
 		super.preStart();
 		me = getSelf().path().name();
 
-		determinant_ws_client.DeterminantCalculatorService_Service service =
-				new determinant_ws_client.DeterminantCalculatorService_Service();
+		DeterminantCalculatorService_Service service =
+				new DeterminantCalculatorService_Service();
 		servicePort = service.getDeterminantCalculatorServicePort();
 
 		Address systemRemoteAddress = ((RemoteActorRefProvider) context().provider()).transport().address();
