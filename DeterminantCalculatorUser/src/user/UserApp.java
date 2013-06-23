@@ -1,39 +1,40 @@
 package user;
 
-import determinant_ws_client.GetResultResponse;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Response;
 import log.l;
+// IMPORT DEL WEB SERVICE CLIENT:
+import localhost_client.*;
 
 public class UserApp {
 
 	private static final String me = "userApp";
-	private determinant_ws_client.DeterminantCalculatorService servicePort;
+	private DeterminantCalculatorService servicePort;
 	private static final int SYNCHRONOUS = 0;
 	private static final int POLLING = 1;
 	private static final int CALLBACK = 2;
 	private String path = System.getProperty("user.home") + System.getProperty("file.separator");
 	private String fileValues;
 	private URL fileValuesURL;
-	private int order = 2000;
+	private int order = 300;
 	// select execution policy:
 	private static final int policy = POLLING;
 
 	public UserApp() {
 
-		determinant_ws_client.DeterminantCalculatorService_Service service =
-				new determinant_ws_client.DeterminantCalculatorService_Service();
+		DeterminantCalculatorService_Service service =
+				new DeterminantCalculatorService_Service();
 		servicePort = service.getDeterminantCalculatorServicePort();
 
-		fileValues = path + "matrix.txt";
+		//fileValues = path + "matrix.txt";
 		//fileValues = path + "matrix" + order + ".txt";
-		//fileValues = path + "matrix2000@1.15e-44.txt";
+		fileValues = path + "matrix300@6.03e60.txt";
 		//fileValues = "http://pcddeterminant.altervista.org/matrix300@6.03e60.txt";
 
-		MatrixUtil.genAndWriteToFile(order, 0.1, 0.2, fileValues); // 4000
+		//MatrixUtil.genAndWriteToFile(order, 0.1, 0.2, fileValues); // 4000
 
 		l.l(me, "waiting for web service response...");
 
@@ -49,6 +50,13 @@ public class UserApp {
 				callbackRequest();
 				break;
 		}
+
+		// non eliminare per ora: a volte la riga con il risultato non viene stampata
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	private void pollingRequest() {
@@ -63,7 +71,7 @@ public class UserApp {
 //			l.l(me, "getting percentage...");
 			int percentage = servicePort.getPercentageDone(reqId);
 			if (percentage!=lastPercentage){
-				l.l(me, reqId + " percentage: " + percentage + " % (polling). Time elapsed: " + (double)((System.currentTimeMillis()-startTime)/1000) + "sec , duration stimated: "+ (double)((System.currentTimeMillis()-startTime)/(10*percentage))+" sec");
+				l.l(me, reqId + " percentage: " + percentage + " % (polling). Time elapsed: " + (double)((System.currentTimeMillis()-startTime)/1000) + "sec, duration estimated: "+ (double)((System.currentTimeMillis()-startTime)/(10*percentage))+" sec");
 				lastPercentage = percentage;
 			} else {
 				l.l(me, reqId + " percentage: " + percentage + " % (polling)");
@@ -137,7 +145,7 @@ public class UserApp {
 		Future<?> response = servicePort.getResultAsync(reqId, asyncHandler);
 		int lastPercentage = 0;
 		long startTime = System.currentTimeMillis();
-		
+
 		while (!response.isDone()) {
 			//l.l(me, "dummy print... i could do something more useful while waiting (callback)");
 //			l.l(me, "getting percentage...");
@@ -148,7 +156,7 @@ public class UserApp {
 			} else {
 				l.l(me, reqId + " percentage: " + percentage + " % (callback)");
 			}
-			
+
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException ex) {
