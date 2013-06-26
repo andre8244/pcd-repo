@@ -71,7 +71,7 @@ public class Master extends UntypedActor {
 		requestInfo.setOriginalMatrix(MatrixUtil.fromFileToList(order, fileValues));
 
 		if (workers.isEmpty()) {
-			l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
+			l.l(me, reqId + ", WORKERS.SIZE() = 0 !!!");
 			requestInfo.setFinalDeterminant(-0.0);
 			requestInfo.setPercentageDone(100); // TODO comunico al client di aver finito anche se non ho calcolato niente
 			return;
@@ -113,14 +113,14 @@ public class Master extends UntypedActor {
 
 		if (nRowsDone == matrix.length - 1) {
 			if (matrix.length % 500 == 0) {
-				l.l(me, "Received all rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
+				l.l(me, reqId + ", received all rows, submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
 			}
 			if (matrix.length > 2) {
 				requestInfo.setRowsDone(0);
 				requestInfo.setMatrix(subMatrix(reqId, matrix));
 
 				if (workers.isEmpty()) {
-					l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
+					l.l(me, reqId + ", WORKERS.SIZE() = 0 !!!");
 					requestInfo.setFinalDeterminant(-0.0);
 					requestInfo.setPercentageDone(100);
 					return;
@@ -145,20 +145,20 @@ public class Master extends UntypedActor {
 					requestInfo.setPercentageDone(percentage);
 				}
 			} else { // matrix.length = 2
-				l.l(me, "Received ALL rows for " + reqId + ", submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
+				l.l(me, reqId + ", received all rows, submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
 				double oldDeterminant = requestInfo.getTempDeterminant();
 				double determinant = oldDeterminant * matrix[1][1];
 
 				if (determinant == 0) { // needed in case determinant = -0.0
-					l.l(me, "determinant == 0 || determinant == -0, determinant: " + determinant);
+					l.l(me, reqId +", determinant == 0 || determinant == -0, determinant: " + determinant);
 					requestInfo.setFinalDeterminant(0);
 				} else {
 					if (!requestInfo.getChangeSign()) {
-						l.l(me, "NOT CHANGING SIGN: determinant: " + determinant);
+						l.l(me, reqId +", NOT CHANGING SIGN: determinant: " + determinant);
 						//requestInfo.setTempDeterminant(determinant);
 						requestInfo.setFinalDeterminant(determinant);
 					} else {
-						l.l(me, "CHANGING SIGN: determinant: " + determinant);
+						l.l(me, reqId +", CHANGING SIGN: determinant: " + determinant);
 						//requestInfo.setTempDeterminant(-determinant);
 						requestInfo.setFinalDeterminant(-determinant);
 					}
@@ -284,7 +284,7 @@ public class Master extends UntypedActor {
 			swapped = swapFirtsRow(matrix);
 
 			if (!swapped) {
-				l.l(me, "zero column! determinant = 0. Duration: " + ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
+				l.l(me, reqId +", zero column! determinant = 0. Duration: " + ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
 				requestInfo.setFinalDeterminant(0);
 				requestInfo.setPercentageDone(100);
 				return true;
@@ -337,7 +337,7 @@ public class Master extends UntypedActor {
 					RequestInfo requestInfo = manager.getRequestInfo(reqId);
 					// caso particolare: non abbiamo altri worker a disposizione
 					if (workers.size() < 2) {
-						l.l(me, "\nWORKERS.SIZE() = 0 !!!!\n");
+						l.l(me, reqId + ", WORKERS.SIZE() = 0 !!!");
 						requestInfo.setFinalDeterminant(-0.0);
 						requestInfo.setPercentageDone(100);
 						continue;
