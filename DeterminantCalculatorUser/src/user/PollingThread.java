@@ -26,10 +26,10 @@ public class PollingThread extends Thread{
 		while (!response.isDone()) {
 			int percentage = servicePort.getPercentageDone(reqId);
 			if (percentage!=lastPercentage){
-				view.updatingData(percentage,"Time elapsed: " + (double)((System.currentTimeMillis()-startTime)/1000) + "sec","Duration estimated: "+ (double)((System.currentTimeMillis()-startTime)/(10*percentage))+" sec");
+				view.updatingData(percentage,"Time elapsed: " + ((System.currentTimeMillis()-startTime)/(double)1000) + "sec","Duration estimated: "+ ((System.currentTimeMillis()-startTime)/(double)(10*percentage))+" sec");
 				lastPercentage = percentage;
 			} else {
-				view.updatingData(percentage,"Time elapsed: " + (double)((System.currentTimeMillis()-startTime)/1000) + "sec","");
+				view.updatingData(percentage,"Time elapsed: " + ((System.currentTimeMillis()-startTime)/(double) 1000) + "sec","");
 			}
 
 			try {
@@ -39,7 +39,7 @@ public class PollingThread extends Thread{
 			}
 		}
 		int percentage = servicePort.getPercentageDone(reqId);
-		view.updatingData(percentage,"Time elapsed: " + (double)((System.currentTimeMillis()-startTime)/1000) + "sec","Duration estimated: "+ (double)((System.currentTimeMillis()-startTime)/(10*percentage))+" sec");
+		view.updatingData(percentage,"Time elapsed: " + ((System.currentTimeMillis()-startTime)/ (double) 1000) + "sec","Duration estimated: "+ ((System.currentTimeMillis()-startTime)/(double)(10*percentage))+" sec");
 		try {
 			view.updateLabelResult("Result : " + response.get().getReturn());
 		} catch (InterruptedException ex) {
