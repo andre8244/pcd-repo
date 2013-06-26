@@ -29,7 +29,7 @@ public class CallbackThread extends Thread{
 				try {
 					// process of asynchronous response goes here
 					int percentage = servicePort.getPercentageDone(reqId);
-					view.updatingData(percentage,"Time elapsed: " + ((System.currentTimeMillis()-startTime)/(double)1000) + "sec","Duration estimated: "+ ((System.currentTimeMillis()-startTime)/(double)(10*percentage))+" sec");
+					view.updatingData(percentage,"Time elapsed: " + ((System.currentTimeMillis()-startTime)/(double)1000) + " sec","Duration estimated: "+ ((System.currentTimeMillis()-startTime)/(double)(10*percentage))+" sec");
 					view.updateLabelResult("Result: " + response.get().getReturn());
 				} catch (InterruptedException | ExecutionException ex) {
 					ex.printStackTrace();
@@ -45,10 +45,10 @@ public class CallbackThread extends Thread{
 //			l.l(me, "getting percentage...");
 			int percentage = servicePort.getPercentageDone(reqId);
 			if (percentage!=lastPercentage){
-				view.updatingData(percentage,"Time elapsed: " + ((System.currentTimeMillis()-startTime)/(double)1000) + "sec","Duration stimated: "+ ((System.currentTimeMillis()-startTime)/(double)(10*percentage))+" sec");
+				view.updatingData(percentage,"Time elapsed: " + ((System.currentTimeMillis()-startTime)/(double)1000) + " sec","Duration stimated: "+ ((System.currentTimeMillis()-startTime)/(double)(10*percentage))+" sec");
 				lastPercentage = percentage;
 			} else {
-				view.updatingData(percentage,"Time elapsed: " + ((System.currentTimeMillis()-startTime)/(double)1000) + "sec","");
+				view.updatingData(percentage,"Time elapsed: " + ((System.currentTimeMillis()-startTime)/(double)1000) + " sec","");
 			}
 
 			try {

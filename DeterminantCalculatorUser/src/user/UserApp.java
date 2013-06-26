@@ -1,17 +1,27 @@
 package user;
 
+import java.awt.Color;
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Response;
-import log.l;
 // IMPORT DEL WEB SERVICE CLIENT:
 import localhost_client.*;
 
-public class UserApp {
+import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
-	private static final String me = "userApp";
+public class UserApp extends JFrame implements ActionListener {
+
+	private JPanel globalPanel, topPanel, centralPanel, bottomPanel;
+	private JTextField orderText, fileValuesText;
+	private JButton computeButton, synchButton, pollingButton, callbackButton;
+	private JLabel lbInfo;
 	private DeterminantCalculatorService servicePort;
 	private static final int SYNCHRONOUS = 0;
 	private static final int POLLING = 1;
@@ -21,151 +31,122 @@ public class UserApp {
 	private URL fileValuesURL;
 	private int order = 1000;
 	// select execution policy:
-	private static final int policy = POLLING;
+	private int policy = POLLING;
+	private String me = "userApp";
 
 	public UserApp() {
-
+		super("User App");
+		
 		DeterminantCalculatorService_Service service =
 				new DeterminantCalculatorService_Service();
 		servicePort = service.getDeterminantCalculatorServicePort();
-
+		
 		fileValues = path + "matrix.txt";
 		//fileValues = path + "matrix" + order + ".txt";
 		//fileValues = path + "matrix300@6.03e60.txt";
 		//fileValues = "http://pcddeterminant.altervista.org/matrix300@6.03e60.txt";
 
-		MatrixUtil.genAndWriteToFile(order, 0.1, 0.2, fileValues); // 4000
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		Container cp = getContentPane();
+		globalPanel = new JPanel();
+		globalPanel.setLayout(new BoxLayout(globalPanel, BoxLayout.Y_AXIS));
+		topPanel = new JPanel();
+		centralPanel = new JPanel();
+		bottomPanel = new JPanel();
+		bottomPanel.setBackground(Color.LIGHT_GRAY);
+		bottomPanel.setOpaque(true);
+		
+		orderText = new JTextField(""+order);
+		fileValuesText = new JTextField(""+fileValues);
+		computeButton = new JButton("Compute determinant");
+		computeButton.addActionListener(this);
+		topPanel.add(new JLabel("order"));
+		topPanel.add(orderText);
+		topPanel.add(new JLabel("fileValues"));
+		topPanel.add(fileValuesText);
+		topPanel.add(computeButton);
 
-		l.l(me, "waiting for web service response...");
+		synchButton = new JButton("Synchronous");
+		synchButton.addActionListener(this);
+		pollingButton = new JButton("Polling");
+		pollingButton.setEnabled(false);
+		pollingButton.addActionListener(this);
+		callbackButton = new JButton("Callback");
+		callbackButton.addActionListener(this);
+		centralPanel.add(synchButton);
+		centralPanel.add(pollingButton);
+		centralPanel.add(callbackButton);
+		
+		lbInfo = new JLabel("Set POLLING");
+		bottomPanel.add(lbInfo);
 
-		switch (policy) {
-			case SYNCHRONOUS:
-				String reqId = servicePort.computeDeterminant(order, fileValues);
-				l.l(me, "Result for " + reqId + ": " + servicePort.getResult(reqId));
-				break;
-			case POLLING:
-				pollingRequest();
-				break;
-			case CALLBACK:
-				callbackRequest();
-				break;
-		}
-
-		// non eliminare per ora: a volte la riga con il risultato non viene stampata
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException ex) {
-			ex.printStackTrace();
-		}
+		globalPanel.add(Box.createVerticalStrut(25));
+		globalPanel.add(topPanel);
+		globalPanel.add(Box.createVerticalStrut(25));
+		globalPanel.add(centralPanel);
+		globalPanel.add(Box.createVerticalStrut(25));
+		globalPanel.add(bottomPanel);		
+		cp.add(globalPanel);
+		setResizable(false);
+		pack();
+		setLocationRelativeTo(null);
+		setVisible(true);
 	}
 
-	private void pollingRequest() {
-		//String reqId = servicePort.computeDeterminant(order, fileValuesURL.toString());
-		String reqId = servicePort.computeDeterminant(order, fileValues);
-		Response<GetResultResponse> response = servicePort.getResultAsync(reqId);
-		int lastPercentage = 0;
-		long startTime = System.currentTimeMillis();
-
-		while (!response.isDone()) {
-			//l.l(me, "dummy print... i could do something more useful while waiting (polling)");
-//			l.l(me, "getting percentage...");
-			int percentage = servicePort.getPercentageDone(reqId);
-			if (percentage!=lastPercentage){
-				l.l(me, reqId + " percentage: " + percentage + " % (polling). Time elapsed: " + (double)((System.currentTimeMillis()-startTime)/1000) + "sec, duration estimated: "+ (double)((System.currentTimeMillis()-startTime)/(10*percentage))+" sec");
-				lastPercentage = percentage;
-			} else {
-				l.l(me, reqId + " percentage: " + percentage + " % (polling)");
-			}
-
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException ex) {
-				ex.printStackTrace();
-			}
-		}
-
-		try {
-			l.l(me, "Result for " + reqId + ": " + response.get().getReturn()+ ". Time elapsed: " + (double)((System.currentTimeMillis()-startTime)/1000)+" sec.");
-		} catch (InterruptedException ex) {
-			ex.printStackTrace();
-		} catch (ExecutionException ex) {
-			ex.printStackTrace();
-		}
-
-		// vecchia implementazione
-//		String reqId1 = servicePort.computeDeterminant(order, fileValues);
-//		int percentage1 = servicePort.getPercentageDone(reqId1);
-//		l.l(me, reqId1 + " percentage: " + percentage1 + " %");
-//		int lastPercentage1 = percentage1;
-//
-//		/*String reqId2 = servicePort.computeDeterminant(order, null);
-//		 int percentage2 = servicePort.getPercentageDone(reqId2);
-//		 l.l(me, reqId2 + " percentage: " + percentage2 + " %");
-//		 int lastPercentage2 = percentage2;*/
-//
-//		while (percentage1 != 100 /*|| percentage2 != 100*/) {
-//			if (percentage1 != lastPercentage1) {
-//				l.l(me, reqId1 + " percentage: " + percentage1 + " %");
-//				lastPercentage1 = percentage1;
-//			}
-//			/*if (percentage2 != lastPercentage2){
-//			 l.l(me, reqId2 + " percentage: " + percentage2 + " %");
-//			 lastPercentage2 = percentage2;
-//			 }*/
-//
-//			try {
-//				Thread.sleep(500);
-//			} catch (InterruptedException ex) {
-//				ex.printStackTrace();
-//			}
-//			percentage1 = servicePort.getPercentageDone(reqId1);
-//			//percentage2 = servicePort.getPercentageDone(reqId2);
-//		}
-//		l.l(me, reqId1 + " percentage: " + percentage1 + " %");
-//		//l.l(me, reqId2 + " percentage: " + percentage2 + " %");
-//
-//		l.l(me, "Result for " + reqId1 + ": " + servicePort.getResult(reqId1));
-////		l.l(me, "Result for " + reqId2 + ": " + servicePort.getResult(reqId2));
-	}
-
-	private void callbackRequest() {
-		final String reqId = servicePort.computeDeterminant(order, fileValues);
-		// definizione dell'handler
-		AsyncHandler<GetResultResponse> asyncHandler = new AsyncHandler<GetResultResponse>() {
-			@Override
-			public void handleResponse(Response<GetResultResponse> response) {
-				try {
-					// process of asynchronous response goes here
-					l.l(me, "Result for " + reqId + ": " + response.get().getReturn());
-				} catch (InterruptedException | ExecutionException ex) {
-					ex.printStackTrace();
-				}
-			}
-		};
-		Future<?> response = servicePort.getResultAsync(reqId, asyncHandler);
-		int lastPercentage = 0;
-		long startTime = System.currentTimeMillis();
-
-		while (!response.isDone()) {
-			//l.l(me, "dummy print... i could do something more useful while waiting (callback)");
-//			l.l(me, "getting percentage...");
-			int percentage = servicePort.getPercentageDone(reqId);
-			if (percentage!=lastPercentage){
-				l.l(me, reqId + " percentage: " + percentage + " % (callback). Time elapsed: " + (double)((System.currentTimeMillis()-startTime)/1000) + "sec , duration stimated: "+ (double)((System.currentTimeMillis()-startTime)/(10*percentage))+" sec");
-				lastPercentage = percentage;
-			} else {
-				l.l(me, reqId + " percentage: " + percentage + " % (callback)");
-			}
-
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException ex) {
-				ex.printStackTrace();
-			}
-		}
-	}
-
-	public static void main(String[] args) {
+	public static void main(String args[]) {
 		new UserApp();
 	}
+
+	@Override
+	public void actionPerformed(ActionEvent ev) {
+		String cmd = ev.getActionCommand();
+		switch (cmd) {
+			case "Compute determinant":
+				handleCompute(Integer.parseInt(orderText.getText()),fileValuesText.getText());
+				break;
+			case "Synchronous":
+				policy = SYNCHRONOUS;
+				lbInfo.setText("Set SYNCHRONOUS");
+				synchButton.setEnabled(false);
+				pollingButton.setEnabled(true);
+				callbackButton.setEnabled(true);
+				break;
+			case "Polling":
+				policy = POLLING;
+				lbInfo.setText("Set POLLING");
+				synchButton.setEnabled(true);
+				pollingButton.setEnabled(false);
+				callbackButton.setEnabled(true);
+				break;
+			case "Callback":
+				policy = CALLBACK;
+				lbInfo.setText("Set CALLBACK");
+				synchButton.setEnabled(true);
+				pollingButton.setEnabled(true);
+				callbackButton.setEnabled(false);
+				break;
+		}
+	}
+
+	private void handleCompute(final int order, final String fileValues) {
+		this.order = order;
+		this.fileValues = fileValues;
+		
+		MatrixUtil.genAndWriteToFile(order, 0.1, 0.2, fileValues);
+		
+		final String reqId = servicePort.computeDeterminant(order, fileValues);
+		
+		switch (policy) {
+			case SYNCHRONOUS:
+				new SynchThread(reqId,servicePort,new SynchFrame(reqId+" - SYNCHRONOUS")).start();
+				break;
+			case POLLING:
+				new PollingThread(reqId,servicePort,new AsynchFrame(reqId+" - POLLING")).start();
+				break;
+			case CALLBACK:
+				new CallbackThread(reqId,servicePort,new AsynchFrame(reqId+" - CALLBACK")).start();
+				break;
+		}
+	}
+
 }
