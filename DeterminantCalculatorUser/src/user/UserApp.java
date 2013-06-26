@@ -41,10 +41,10 @@ public class UserApp extends JFrame implements ActionListener {
 				new DeterminantCalculatorService_Service();
 		servicePort = service.getDeterminantCalculatorServicePort();
 		
-		//fileValues = path + "matrix.txt";
+		fileValues = path + "matrix.txt";
 		//fileValues = path + "matrix" + order + ".txt";
 		//fileValues = path + "matrix300@6.03e60.txt";
-		fileValues = "http://pcddeterminant.altervista.org/matrix300@6.03e60.txt";
+		//fileValues = "http://pcddeterminant.altervista.org/matrix300@6.03e60.txt";
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Container cp = getContentPane();
