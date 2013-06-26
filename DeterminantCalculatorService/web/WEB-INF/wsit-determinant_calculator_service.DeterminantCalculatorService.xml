@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+ <definitions 
+ xmlns="http://schemas.xmlsoap.org/wsdl/" 
+ xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" name="DeterminantCalculatorService" targetNamespace="http://determinant_calculator_service/" xmlns:tns="http://determinant_calculator_service/" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:fi="http://java.sun.com/xml/ns/wsit/2006/09/policy/fastinfoset/service" xmlns:tcp="http://java.sun.com/xml/ns/wsit/2006/09/policy/soaptcp/service" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" 
+ >
+    <message name="computeDeterminant"/>
+    <message name="computeDeterminantResponse"/>
+    <message name="getPercentageDone"/>
+    <message name="getPercentageDoneResponse"/>
+    <message name="getResult"/>
+    <message name="getResultResponse"/>
+    <message name="addWorkerNode"/>
+    <message name="addWorkerNodeResponse"/>
+    <message name="removeWorkerNode"/>
+    <message name="removeWorkerNodeResponse"/>
+    <portType name="DeterminantCalculatorService">
+        <operation name="computeDeterminant">
+            <input message="tns:computeDeterminant"/>
+            <output message="tns:computeDeterminantResponse"/>
+        </operation>
+        <operation name="getPercentageDone">
+            <input message="tns:getPercentageDone"/>
+            <output message="tns:getPercentageDoneResponse"/>
+        </operation>
+        <operation name="getResult">
+            <input message="tns:getResult"/>
+            <output message="tns:getResultResponse"/>
+        </operation>
+        <operation name="addWorkerNode">
+            <input message="tns:addWorkerNode"/>
+            <output message="tns:addWorkerNodeResponse"/>
+        </operation>
+        <operation name="removeWorkerNode">
+            <input message="tns:removeWorkerNode"/>
+            <output message="tns:removeWorkerNodeResponse"/>
+        </operation>
+    </portType>
+    <binding name="DeterminantCalculatorServicePortBinding" type="tns:DeterminantCalculatorService">
+        <wsp:PolicyReference URI="#DeterminantCalculatorServicePortBindingPolicy"/>
+        <operation name="computeDeterminant">
+            <input/>
+            <output/>
+        </operation>
+        <operation name="getPercentageDone">
+            <input/>
+            <output/>
+        </operation>
+        <operation name="getResult">
+            <input/>
+            <output/>
+        </operation>
+        <operation name="addWorkerNode">
+            <input/>
+            <output/>
+        </operation>
+        <operation name="removeWorkerNode">
+            <input/>
+            <output/>
+        </operation>
+    </binding>
+    <service name="DeterminantCalculatorService">
+        <port name="DeterminantCalculatorServicePort" binding="tns:DeterminantCalculatorServicePortBinding"/>
+    </service>
+    <wsp:Policy wsu:Id="DeterminantCalculatorServicePortBindingPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All/>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+</definitions>
