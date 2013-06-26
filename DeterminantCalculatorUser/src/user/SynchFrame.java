@@ -29,7 +29,7 @@ public class SynchFrame extends JFrame{
 		lbResult = new JLabel("waiting for web service response...");
 		topPanel.add(lbResult);
 		lbDuration = new JLabel("Duration: ...");
-		bottomPanel.add(lbResult);
+		bottomPanel.add(lbDuration);
 		
 		globalPanel.add(topPanel);
 		globalPanel.add(bottomPanel);		

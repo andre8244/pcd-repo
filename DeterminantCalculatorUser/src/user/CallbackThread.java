@@ -12,6 +12,7 @@ public class CallbackThread extends Thread{
 	private String reqId;
 	private DeterminantCalculatorService servicePort;
 	private AsynchFrame view;
+	private long startTime;
 	
 	public CallbackThread(String reqId, DeterminantCalculatorService servicePort, AsynchFrame view) {
 		this.reqId = reqId;
@@ -27,6 +28,8 @@ public class CallbackThread extends Thread{
 			public void handleResponse(Response<GetResultResponse> response) {
 				try {
 					// process of asynchronous response goes here
+					int percentage = servicePort.getPercentageDone(reqId);
+					view.updatingData(percentage,"Time elapsed: " + (double)((System.currentTimeMillis()-startTime)/1000) + "sec","Duration estimated: "+ (double)((System.currentTimeMillis()-startTime)/(10*percentage))+" sec");
 					view.updateLabelResult("Result: " + response.get().getReturn());
 				} catch (InterruptedException | ExecutionException ex) {
 					ex.printStackTrace();
@@ -35,7 +38,7 @@ public class CallbackThread extends Thread{
 		};
 		Future<?> response = servicePort.getResultAsync(reqId, asyncHandler);
 		int lastPercentage = 0;
-		long startTime = System.currentTimeMillis();
+		startTime = System.currentTimeMillis();
 
 		while (!response.isDone()) {
 			//l.l(me, "dummy print... i could do something more useful while waiting (callback)");
@@ -54,8 +57,6 @@ public class CallbackThread extends Thread{
 				ex.printStackTrace();
 			}
 		}
-		int percentage = servicePort.getPercentageDone(reqId);
-		view.updatingData(percentage,"Time elapsed: " + (double)((System.currentTimeMillis()-startTime)/1000) + "sec","Duration estimated: "+ (double)((System.currentTimeMillis()-startTime)/(10*percentage))+" sec");
 	}
 	
 }
