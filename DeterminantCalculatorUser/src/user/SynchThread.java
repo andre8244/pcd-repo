@@ -18,7 +18,7 @@ public class SynchThread extends Thread{
 	public void run(){
 		long startTime = System.currentTimeMillis();
 		double res = servicePort.getResult(reqId);
-		view.updateData("Result: " + res,"Duration: " + (double)((System.currentTimeMillis()-startTime)/1000) + "sec");
+		view.updateData("Result: " + res,"Duration: " + ((System.currentTimeMillis()-startTime)/(double)1000) + "sec");
 	}
 	
 }
