@@ -19,7 +19,7 @@ public class UserApp {
 	private String path = System.getProperty("user.home") + System.getProperty("file.separator");
 	private String fileValues;
 	private URL fileValuesURL;
-	private int order = 300;
+	private int order = 1000;
 	// select execution policy:
 	private static final int policy = POLLING;
 
@@ -29,12 +29,12 @@ public class UserApp {
 				new DeterminantCalculatorService_Service();
 		servicePort = service.getDeterminantCalculatorServicePort();
 
-		//fileValues = path + "matrix.txt";
+		fileValues = path + "matrix.txt";
 		//fileValues = path + "matrix" + order + ".txt";
-		fileValues = path + "matrix300@6.03e60.txt";
+		//fileValues = path + "matrix300@6.03e60.txt";
 		//fileValues = "http://pcddeterminant.altervista.org/matrix300@6.03e60.txt";
 
-		//MatrixUtil.genAndWriteToFile(order, 0.1, 0.2, fileValues); // 4000
+		MatrixUtil.genAndWriteToFile(order, 0.1, 0.2, fileValues); // 4000
 
 		l.l(me, "waiting for web service response...");
 
