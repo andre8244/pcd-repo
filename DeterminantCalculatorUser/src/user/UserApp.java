@@ -132,7 +132,7 @@ public class UserApp extends JFrame implements ActionListener {
 		this.order = order;
 		this.fileValues = fileValues;
 		
-		//MatrixUtil.genAndWriteToFile(order, 0.1, 0.2, fileValues);
+		MatrixUtil.genAndWriteToFile(order, 0.1, 0.2, fileValues);
 		
 		final String reqId = servicePort.computeDeterminant(order, fileValues);
 		
