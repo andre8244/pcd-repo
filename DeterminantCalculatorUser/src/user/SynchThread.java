@@ -16,7 +16,9 @@ public class SynchThread extends Thread{
 	
 	@Override
 	public void run(){
-		view.updateLabel("Result: " + servicePort.getResult(reqId));
+		long startTime = System.currentTimeMillis();
+		double res = servicePort.getResult(reqId);
+		view.updateData("Result: " + res,"Duration: " + (double)((System.currentTimeMillis()-startTime)/1000) + "sec");
 	}
 	
 }

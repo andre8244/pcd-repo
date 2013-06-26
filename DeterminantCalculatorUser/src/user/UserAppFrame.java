@@ -139,13 +139,13 @@ public class UserAppFrame extends JFrame implements ActionListener {
 		
 		switch (policy) {
 			case SYNCHRONOUS:
-				new SynchThread(reqId,servicePort,new SynchFrame(reqId)).start();
+				new SynchThread(reqId,servicePort,new SynchFrame(reqId+" - SYNCHRONOUS")).start();
 				break;
 			case POLLING:
-				new PollingThread(reqId,servicePort,new AsynchFrame(reqId)).start();
+				new PollingThread(reqId,servicePort,new AsynchFrame(reqId+" - POLLING")).start();
 				break;
 			case CALLBACK:
-				new CallbackThread(reqId,servicePort,new AsynchFrame(reqId)).start();
+				new CallbackThread(reqId,servicePort,new AsynchFrame(reqId+" - CALLBACK")).start();
 				break;
 		}
 	}

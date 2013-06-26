@@ -34,11 +34,12 @@ public class AsynchFrame extends JFrame{
 		fourthPanel.setOpaque(true);
 		
 		progressBar = new JProgressBar();
+		progressBar.setStringPainted(true);
 		firstPanel.add(progressBar);
 		
 		lbTimeElapsed = new JLabel("Time elapsed: 0.0 sec");
 		secondPanel.add(lbTimeElapsed);
-		lbDuration = new JLabel("Duration estimated: : ...");
+		lbDuration = new JLabel("Duration estimated: ...");
 		thirdPanel.add(lbDuration);
 		lbResult = new JLabel("waiting for web service response...");
 		fourthPanel.add(lbResult);
