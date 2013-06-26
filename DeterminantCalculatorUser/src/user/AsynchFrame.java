@@ -35,6 +35,7 @@ public class AsynchFrame extends JFrame{
 		
 		progressBar = new JProgressBar();
 		progressBar.setStringPainted(true);
+		firstPanel.add(new JLabel("percentage "));
 		firstPanel.add(progressBar);
 		
 		lbTimeElapsed = new JLabel("Time elapsed: 0.0 sec");
