@@ -8,6 +8,7 @@ import akka.remote.RemoteActorRefProvider;
 // IMPORT DEL WEB SERVICE CLIENT:
 import localhost_client.*;
 //import windowsXP_client.*;
+//import windows8dualCore_client.*;
 
 public class Worker extends UntypedActor {
 
