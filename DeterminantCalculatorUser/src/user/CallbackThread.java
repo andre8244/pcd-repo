@@ -4,8 +4,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Response;
-import localhost_client.DeterminantCalculatorService;
-import localhost_client.GetResultResponse;
+// IMPORT DEL WEB SERVICE CLIENT:
+import localhost_client.*;
 
 public class CallbackThread extends Thread{
 

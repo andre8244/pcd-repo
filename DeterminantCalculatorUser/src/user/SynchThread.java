@@ -1,6 +1,7 @@
 package user;
 
-import localhost_client.DeterminantCalculatorService;
+// IMPORT DEL WEB SERVICE CLIENT:
+import localhost_client.*;
 
 public class SynchThread extends Thread{
 

@@ -2,8 +2,8 @@ package user;
 
 import java.util.concurrent.ExecutionException;
 import javax.xml.ws.Response;
-import localhost_client.DeterminantCalculatorService;
-import localhost_client.GetResultResponse;
+// IMPORT DEL WEB SERVICE CLIENT:
+import localhost_client.*;
 
 public class PollingThread extends Thread{
 
