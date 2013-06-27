@@ -6,7 +6,6 @@ import java.util.ArrayList;
 public class RemoteWorker {
 
 	private String remoteAddress;
-	//private String name;
 	private ActorRef actorRef;
 	private ArrayList<Work> works;
 
@@ -34,6 +33,5 @@ public class RemoteWorker {
 	
 	public void removeWork(Work work) {
 		works.remove(work);
-	}
-	
+	}	
 }

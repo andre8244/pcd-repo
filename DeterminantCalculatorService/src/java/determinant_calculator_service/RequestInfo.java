@@ -26,7 +26,7 @@ public class RequestInfo {
 		percentageDone = 0;
 		nRowsDone = 0;
 		changeSign = false;
-		startTime = System.currentTimeMillis(); // TODO a cosa serve?
+		startTime = System.currentTimeMillis();
 		computationEnded = new CountDownLatch(1);
 		lock = new ReentrantLock(true);
 	}
@@ -36,21 +36,18 @@ public class RequestInfo {
 		matrixLength = matrix.length;
 		totalWorkToDo = 0;
 
-		/* sums the elements of all the submatrices to be computed
+		/* sum the elements of all the submatrices to be computed
 		 * example: order = 1000 -> totalWorkToDo = (999 * 1000) + (998 * 999) + ... + (1 * 2)
 		 */
 		long startTime = System.currentTimeMillis();
 		for (long i = matrixLength; i > 0; i--) {
-			//l.l(me, "setOriginalMatrix: i("+i+")");
 			totalWorkToDo += i * (i + 1);
-			//l.l(me, "totalWorkToDo += i * (i + 1) = " + totalWorkToDo);
 		}
 		l.l(me, "setOriginalMatrix: computed totalWorkTodo (" + totalWorkToDo + "). Duration: " + (System.currentTimeMillis() - startTime) + " ms");
 	}
 
 	public void setMatrix(double[][] matrix) {
 		this.matrix = matrix;
-
 	}
 
 	public double[][] getMatrix() {

@@ -45,14 +45,12 @@ public class Master extends UntypedActor {
 			Messages.RemoveWorkerNode rw = (Messages.RemoveWorkerNode) msg;
 			handleRemoveWorkerNode(rw);
 		} else if (msg instanceof RemoteClientWriteFailed) {
-			l.l(me, "Remote Client Write Failed!");
 			RemoteClientWriteFailed rcwf = (RemoteClientWriteFailed) msg;
-			l.l(me, "address: " + rcwf.getRemoteAddress().toString());
+			l.l(me, "Remote Client Write Failed: "+ rcwf.getRemoteAddress().toString());
 			handleWorkerFailure(rcwf.getRemoteAddress().toString());
 		} else if (msg instanceof RemoteClientShutdown) {
-			l.l(me, "Remote Client Shutdown!");
 			RemoteClientShutdown rcs = (RemoteClientShutdown) msg;
-			l.l(me, "address: " + rcs.getRemoteAddress().toString());
+			l.l(me, "Remote Client Shutdown: " + rcs.getRemoteAddress().toString());
 			handleWorkerFailure(rcs.getRemoteAddress().toString());
 		} else {
 			unhandled(msg);
@@ -76,7 +74,6 @@ public class Master extends UntypedActor {
 			requestInfo.setPercentageDone(100); // TODO comunico al client di aver finito anche se non ho calcolato niente
 			return;
 		}
-
 		gauss(reqId);
 	}
 
@@ -86,7 +83,7 @@ public class Master extends UntypedActor {
 		int rowNumber = mrr.getRowNumber();
 
 		for (int i = 0; i < workers.size(); i++) {
-			// works.size è generalmente uno, tranne in casi di failure
+			// works.size è generalmente uguale al numero di richieste in corso, tranne in casi di failure
 			ArrayList<Work> works = workers.get(i).getWorks();
 			for (int j = 0; j < works.size(); j++) {
 				if (works.get(j).getReqId().equals(reqId) && works.get(j).getRowNumber() == rowNumber) {
@@ -95,13 +92,10 @@ public class Master extends UntypedActor {
 				}
 			}
 		}
-
 		RequestInfo requestInfo = manager.getRequestInfo(reqId);
-
 		int nRowsDone = requestInfo.getRowsDone();
 		nRowsDone = nRowsDone + rows.length;
 		requestInfo.setRowsDone(nRowsDone);
-
 		//l.l(me, reqId + ", receive rows from " + rowNumber + " to " + (rowNumber+rows.length-1) + "(" + rows.length + " rows)");
 		//l.l(me, reqId + ", nRowsDone: " + nRowsDone);
 
@@ -155,33 +149,13 @@ public class Master extends UntypedActor {
 				} else {
 					if (!requestInfo.getChangeSign()) {
 						l.l(me, reqId +", NOT CHANGING SIGN: determinant: " + determinant);
-						//requestInfo.setTempDeterminant(determinant);
 						requestInfo.setFinalDeterminant(determinant);
 					} else {
 						l.l(me, reqId +", CHANGING SIGN: determinant: " + (-determinant));
-						//requestInfo.setTempDeterminant(-determinant);
 						requestInfo.setFinalDeterminant(-determinant);
 					}
 				}
 				requestInfo.setPercentageDone(100);
-
-//				if (!requestInfo.getChangeSign()) {
-//					l.l(me, "NOT CHANGING SIGN: determinant: " + determinant);
-//					//requestInfo.setTempDeterminant(determinant);
-//					requestInfo.setFinalDeterminant(determinant);
-//				} else {
-//					l.l(me, "CHANGING SIGN: determinant: " + determinant);
-//					if (determinant == 0) {
-//						//requestInfo.setTempDeterminant(0);
-//						l.l(me, "determinant == 0, determinant: " + determinant);
-//						requestInfo.setFinalDeterminant(0);
-//					} else {
-//						l.l(me, "determinant != 0: determinant: " + determinant);
-//						//requestInfo.setTempDeterminant(-determinant);
-//						requestInfo.setFinalDeterminant(-determinant);
-//					}
-//				}
-//				requestInfo.setPercentageDone(100);
 			}
 		}
 	}
@@ -221,34 +195,8 @@ public class Master extends UntypedActor {
 		return false;
 	}
 
-	private void oldSendManyRowsPerMsg(String reqId, double[][] matrix) {
-		double[] firstRow = matrix[0];
-
-		// TODO provare a migliorare il bilanciamento del lavoro
-		int nRowsPerMsg = (matrix.length - 1) / workers.size();
-
-		if (nRowsPerMsg > 0) {
-			for (int i = 0; i < (workers.size() - 1); i++) {
-				double[][] rows = new double[nRowsPerMsg][matrix.length];
-
-				for (int j = 0; j < rows.length; j++) {
-					rows[j] = matrix[i * nRowsPerMsg + j + 1];
-				}
-				workers.get(i).addWork(reqId, rows, i * nRowsPerMsg + 1);
-				workers.get(i).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, i * nRowsPerMsg + 1), getSelf());
-				//l.l(me, "sent rows from " + (i*nRowsPerMsg+1) + " to " + (i*nRowsPerMsg+nRowsPerMsg) + " to " + workers.get(i).getRemoteAddress());
-			}
-		}
-		double[][] rows = new double[matrix.length - 1 - nRowsPerMsg * (workers.size() - 1)][matrix.length];
-
-		for (int j = 0; j < rows.length; j++) {
-			rows[j] = matrix[(workers.size() - 1) * nRowsPerMsg + j + 1];
-		}
-		workers.get(workers.size() - 1).addWork(reqId, rows, (workers.size() - 1) * nRowsPerMsg + 1);
-		workers.get(workers.size() - 1).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, (workers.size() - 1) * nRowsPerMsg + 1), getSelf());
-		//l.l(me, "sent rows from " + ((workers.size()-1)*nRowsPerMsg+1) + " to " + (matrix.length-1) + " to " + workers.get(workers.size()-1).getRemoteAddress());
-	}
-
+	// abbiamo cancellato per sbaglio la OneRowPerMsg --- da rimettere
+	
 	private void sendManyRowsPerMsg(String reqId, double[][] matrix) {
 		double[] firstRow = matrix[0];
 
@@ -263,7 +211,6 @@ public class Master extends UntypedActor {
 
 			if (nRowsToSend > 0) {
 				double[][] rows = new double[nRowsToSend][matrix.length];
-
 				for (int j = 0; j < rows.length; j++) {
 					rows[j] = matrix[nRowsSent + j + 1];
 				}
@@ -290,14 +237,12 @@ public class Master extends UntypedActor {
 				return true;
 			}
 		}
-
 		if (swapped) {
 			requestInfo.setChangeSign();
 		}
 		double oldDeterminant = requestInfo.getTempDeterminant();
 		requestInfo.setTempDeterminant(oldDeterminant * matrix[0][0]);
 		sendManyRowsPerMsg(reqId, matrix); // TODO provare a passare solo reqId
-		//oldSendManyRowsPerMsg(reqId,matrix);
 		return false;
 	}
 

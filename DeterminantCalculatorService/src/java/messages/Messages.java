@@ -37,7 +37,6 @@ public class Messages {
 	}
 
 	public static class OneRow implements Serializable {
-
 		private final double[] firstRow;
 		private final double[] row;
 		private final String reqId;
@@ -68,7 +67,6 @@ public class Messages {
 	}
 
 	public static class OneRowResult implements Serializable {
-
 		private final double[] row;
 		private final String reqId;
 		private final int rowNumber;
@@ -93,7 +91,6 @@ public class Messages {
 	}
 
     public static class ManyRows implements Serializable {
-
 		private final double[] firstRow;
 		private final double[][] rows;
 		private final String reqId;
@@ -124,7 +121,6 @@ public class Messages {
 	}
 
     public static class ManyRowsResult implements Serializable {
-
 		private final double[][] rows;
 		private final String reqId;
 		private final int rowNumber;
@@ -149,7 +145,6 @@ public class Messages {
 	}
 
 	public static class AddWorkerNode implements Serializable {
-
 		private final String remoteAddress;
 
 		public AddWorkerNode(String remoteAddress) {
@@ -162,7 +157,6 @@ public class Messages {
 	}
 
 	public static class RemoveWorkerNode implements Serializable {
-
 		private final String remoteAddress;
 
 		public RemoveWorkerNode(String remoteAddress) {
@@ -175,13 +169,11 @@ public class Messages {
 	}
 
 	public static class AddWorkerNodeAck implements Serializable {
-
 		public AddWorkerNodeAck() {
 		}
 	}
 
 	public static class RemoveWorkerNodeAck implements Serializable {
-
 		public RemoveWorkerNodeAck() {
 		}
 	}
