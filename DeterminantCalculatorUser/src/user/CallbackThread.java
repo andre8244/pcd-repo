@@ -7,6 +7,7 @@ import javax.xml.ws.Response;
 // IMPORT DEL WEB SERVICE CLIENT:
 import localhost_client.*;
 //import windowsXP_client.*;
+//import windows8dualCore_client.*;
 
 public class CallbackThread extends Thread{
 
