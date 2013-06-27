@@ -12,10 +12,10 @@ public class SynchFrame extends JFrame{
 
 	private JPanel globalPanel,topPanel,bottomPanel;
 	private JLabel lbResult, lbDuration;
-	
+
 	public SynchFrame(String reqId) {
 		super(reqId);
-		
+
 		Container cp = getContentPane();
 		globalPanel = new JPanel();
 		globalPanel.setLayout(new BoxLayout(globalPanel, BoxLayout.Y_AXIS));
@@ -25,21 +25,21 @@ public class SynchFrame extends JFrame{
 		bottomPanel = new JPanel();
 		bottomPanel.setBackground(Color.LIGHT_GRAY);
 		bottomPanel.setOpaque(true);
-		
-		lbResult = new JLabel("waiting for web service response...");
+
+		lbResult = new JLabel("Waiting for result...");
 		topPanel.add(lbResult);
-		lbDuration = new JLabel("Duration: ...");
+		lbDuration = new JLabel("Duration: --");
 		bottomPanel.add(lbDuration);
-		
+
 		globalPanel.add(topPanel);
-		globalPanel.add(bottomPanel);		
+		globalPanel.add(bottomPanel);
 		cp.add(globalPanel);
 		setSize(300,100);
 		setResizable(false);
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}
-	
+
 	public void updateData(final String result, final String duration) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -49,5 +49,5 @@ public class SynchFrame extends JFrame{
 			}
 		});
 	}
-	
+
 }

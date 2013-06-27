@@ -15,49 +15,49 @@ public class AsynchFrame extends JFrame{
 	private JPanel globalPanel,firstPanel,secondPanel,thirdPanel, fourthPanel;
 	private JLabel lbResult, lbTimeElapsed, lbDuration;
 	private JProgressBar progressBar;
-	
+
 	public AsynchFrame(String reqId) {
 		super(reqId);
-		
+
 		Container cp = getContentPane();
 		globalPanel = new JPanel();
 		globalPanel.setLayout(new BoxLayout(globalPanel, BoxLayout.Y_AXIS));
 		firstPanel = new JPanel();
 		secondPanel = new JPanel();
 		secondPanel.setBackground(Color.LIGHT_GRAY);
-		secondPanel.setOpaque(true);		
+		secondPanel.setOpaque(true);
 		thirdPanel = new JPanel();
 		thirdPanel.setBackground(Color.LIGHT_GRAY);
-		thirdPanel.setOpaque(true);		
+		thirdPanel.setOpaque(true);
 		fourthPanel = new JPanel();
 		fourthPanel.setBackground(Color.LIGHT_GRAY);
 		fourthPanel.setOpaque(true);
-		
+
 		progressBar = new JProgressBar();
 		progressBar.setStringPainted(true);
-		firstPanel.add(new JLabel("percentage "));
+		firstPanel.add(new JLabel("Computing "));
 		firstPanel.add(progressBar);
-		
-		lbTimeElapsed = new JLabel("Time elapsed: 0.0 sec");
+
+		lbTimeElapsed = new JLabel("Time elapsed: 0 sec");
 		secondPanel.add(lbTimeElapsed);
-		lbDuration = new JLabel("Duration estimated: ...");
+		lbDuration = new JLabel("ETA: --");
 		thirdPanel.add(lbDuration);
-		lbResult = new JLabel("waiting for web service response...");
+		lbResult = new JLabel("Waiting for result...");
 		fourthPanel.add(lbResult);
-		
+
 		globalPanel.add(Box.createVerticalStrut(25));
 		globalPanel.add(firstPanel);
 		globalPanel.add(Box.createVerticalStrut(25));
 		globalPanel.add(secondPanel);
 		globalPanel.add(thirdPanel);
-		globalPanel.add(fourthPanel);		
+		globalPanel.add(fourthPanel);
 		cp.add(globalPanel);
 		setSize(300,200);
 		setResizable(false);
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}
-		
+
 	public void updateLabelResult(final String text) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -66,7 +66,7 @@ public class AsynchFrame extends JFrame{
 			}
 		});
 	}
-	
+
 	public void updatingData(final int percentage, final String timeElapsed, final String duration) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override

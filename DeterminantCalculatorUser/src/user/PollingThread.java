@@ -10,13 +10,13 @@ public class PollingThread extends Thread{
 	private String reqId;
 	private DeterminantCalculatorService servicePort;
 	private AsynchFrame view;
-	
+
 	public PollingThread(String reqId, DeterminantCalculatorService servicePort, AsynchFrame view) {
 		this.reqId = reqId;
 		this.servicePort = servicePort;
 		this.view = view;
 	}
-	
+
 	@Override
 	public void run(){
 		Response<GetResultResponse> response = servicePort.getResultAsync(reqId);
@@ -26,10 +26,10 @@ public class PollingThread extends Thread{
 		while (!response.isDone()) {
 			int percentage = servicePort.getPercentageDone(reqId);
 			if (percentage!=lastPercentage){
-				view.updatingData(percentage,"Time elapsed: " + ((System.currentTimeMillis()-startTime)/(double)1000) + " sec","Duration estimated: "+ ((System.currentTimeMillis()-startTime)/(double)(10*percentage))+" sec");
+				view.updatingData(percentage,"Elapsed: " + (int)((System.currentTimeMillis()-startTime)/(double)1000) + " sec","ETA: "+ (int)((System.currentTimeMillis()-startTime)/(double)(10*percentage))+" sec");
 				lastPercentage = percentage;
 			} else {
-				view.updatingData(percentage,"Time elapsed: " + ((System.currentTimeMillis()-startTime)/(double) 1000) + " sec","");
+				view.updatingData(percentage,"Elapsed: " + (int)((System.currentTimeMillis()-startTime)/(double) 1000) + " sec","");
 			}
 
 			try {
@@ -39,14 +39,16 @@ public class PollingThread extends Thread{
 			}
 		}
 		int percentage = servicePort.getPercentageDone(reqId);
-		view.updatingData(percentage,"Time elapsed: " + ((System.currentTimeMillis()-startTime)/ (double) 1000) + " sec","Duration estimated: "+ ((System.currentTimeMillis()-startTime)/(double)(10*percentage))+" sec");
+		view.updatingData(percentage,"Elapsed: " + (int)((System.currentTimeMillis()-startTime)/ (double) 1000) + " sec","ETA: --");
 		try {
-			view.updateLabelResult("Result : " + response.get().getReturn());
-		} catch (InterruptedException ex) {
+			if (response.get().getReturn() != -0.0){
+				view.updateLabelResult("Result : " + response.get().getReturn());
+			} else {
+				view.updateLabelResult("Result: ERROR");
+			}
+		} catch (InterruptedException | ExecutionException ex) {
 			ex.printStackTrace();
-		} catch (ExecutionException ex) {
-			ex.printStackTrace();
-		}		
+		}
 	}
-	
+
 }

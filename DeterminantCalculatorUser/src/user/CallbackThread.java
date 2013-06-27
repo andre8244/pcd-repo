@@ -13,13 +13,13 @@ public class CallbackThread extends Thread{
 	private DeterminantCalculatorService servicePort;
 	private AsynchFrame view;
 	private long startTime;
-	
+
 	public CallbackThread(String reqId, DeterminantCalculatorService servicePort, AsynchFrame view) {
 		this.reqId = reqId;
 		this.servicePort = servicePort;
 		this.view = view;
 	}
-	
+
 	@Override
 	public void run(){
 		// definizione dell'handler
@@ -29,8 +29,12 @@ public class CallbackThread extends Thread{
 				try {
 					// process of asynchronous response goes here
 					int percentage = servicePort.getPercentageDone(reqId);
-					view.updatingData(percentage,"Time elapsed: " + ((System.currentTimeMillis()-startTime)/(double)1000) + " sec","Duration estimated: "+ ((System.currentTimeMillis()-startTime)/(double)(10*percentage))+" sec");
-					view.updateLabelResult("Result: " + response.get().getReturn());
+					view.updatingData(percentage,"Elapsed: " + ((System.currentTimeMillis()-startTime)/(double)1000) + " sec","ETA: --");
+					if (response.get().getReturn() != -0.0){
+						view.updateLabelResult("Result: " + response.get().getReturn());
+					} else {
+						view.updateLabelResult("Result: ERROR");
+					}
 				} catch (InterruptedException | ExecutionException ex) {
 					ex.printStackTrace();
 				}
@@ -44,11 +48,11 @@ public class CallbackThread extends Thread{
 			//l.l(me, "dummy print... i could do something more useful while waiting (callback)");
 //			l.l(me, "getting percentage...");
 			int percentage = servicePort.getPercentageDone(reqId);
-			if (percentage!=lastPercentage){
-				view.updatingData(percentage,"Time elapsed: " + ((System.currentTimeMillis()-startTime)/(double)1000) + " sec","Duration stimated: "+ ((System.currentTimeMillis()-startTime)/(double)(10*percentage))+" sec");
+			if (percentage != lastPercentage){
+				view.updatingData(percentage,"Elapsed: " + (int)((System.currentTimeMillis()-startTime)/(double)1000) + " sec","ETA: "+ (int)((System.currentTimeMillis()-startTime)/(double)(10*percentage))+" sec");
 				lastPercentage = percentage;
 			} else {
-				view.updatingData(percentage,"Time elapsed: " + ((System.currentTimeMillis()-startTime)/(double)1000) + " sec","");
+				view.updatingData(percentage,"Elapsed: " + (int)((System.currentTimeMillis()-startTime)/(double)1000) + " sec","");
 			}
 
 			try {
@@ -58,5 +62,5 @@ public class CallbackThread extends Thread{
 			}
 		}
 	}
-	
+
 }
