@@ -42,7 +42,6 @@ public class PollingThread extends Thread{
 		int percentage = servicePort.getPercentageDone(reqId);
 		view.updatingData(percentage,"Elapsed: " + (int)((System.currentTimeMillis()-startTime)/ (double) 1000) + " sec","ETA: --");
 		try {
-			l.l("", ""+response.get().getReturn());
 			if (!(""+response.get().getReturn()).equals("-0.0")){
 				view.updateLabelResult("Result : " + response.get().getReturn());
 			} else {
