@@ -6,7 +6,6 @@ import localhost_client.*;
 //import windows8dualCore_client.*;
 
 public class SynchThread extends Thread{
-
 	private String reqId;
 	private DeterminantCalculatorService servicePort;
 	private SynchFrame view;

@@ -10,7 +10,6 @@ import localhost_client.*;
 //import windows8dualCore_client.*;
 
 public class CallbackThread extends Thread{
-
 	private String reqId;
 	private DeterminantCalculatorService servicePort;
 	private AsynchFrame view;
@@ -47,8 +46,7 @@ public class CallbackThread extends Thread{
 		startTime = System.currentTimeMillis();
 
 		while (!response.isDone()) {
-			//l.l(me, "dummy print... i could do something more useful while waiting (callback)");
-//			l.l(me, "getting percentage...");
+			//l.l(me, "getting percentage...");
 			int percentage = servicePort.getPercentageDone(reqId);
 			if (percentage != lastPercentage){
 				view.updatingData(percentage,"Elapsed: " + (int)((System.currentTimeMillis()-startTime)/(double)1000) + " sec","ETA: "+ (int)((System.currentTimeMillis()-startTime)/(double)(10*percentage))+" sec");
@@ -56,7 +54,6 @@ public class CallbackThread extends Thread{
 			} else {
 				view.updatingData(percentage,"Elapsed: " + (int)((System.currentTimeMillis()-startTime)/(double)1000) + " sec","");
 			}
-
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException ex) {
@@ -64,5 +61,4 @@ public class CallbackThread extends Thread{
 			}
 		}
 	}
-
 }

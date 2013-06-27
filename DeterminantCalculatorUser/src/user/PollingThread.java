@@ -8,7 +8,6 @@ import localhost_client.*;
 //import windows8dualCore_client.*;
 
 public class PollingThread extends Thread{
-
 	private String reqId;
 	private DeterminantCalculatorService servicePort;
 	private AsynchFrame view;

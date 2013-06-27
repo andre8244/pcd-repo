@@ -28,7 +28,6 @@ public class MatrixUtil {
 			for (int row = 0; row < order; row++) {
 				for (int col = 0; col < order; col++) {
 					val = minAbs + rand.nextDouble() * (maxAbs - minAbs);
-
 					if (rand.nextBoolean()) {
 						val = -val;
 					}
@@ -38,7 +37,6 @@ public class MatrixUtil {
 						writer.write(val + " ");
 					}
 				}
-
 				if (row % 500 == 0) {
 					l.l(me, (int) ((double) row / order * 100) + " %");
 				}
