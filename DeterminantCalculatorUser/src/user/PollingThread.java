@@ -4,7 +4,7 @@ import java.util.concurrent.ExecutionException;
 import javax.xml.ws.Response;
 // IMPORT DEL WEB SERVICE CLIENT:
 import localhost_client.*;
-import log.l;
+//import windowsXP_client.*;
 
 public class PollingThread extends Thread{
 

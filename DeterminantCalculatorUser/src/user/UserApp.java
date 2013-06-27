@@ -2,6 +2,7 @@ package user;
 
 // IMPORT DEL WEB SERVICE CLIENT:
 import localhost_client.*;
+//import windowsXP_client.*;
 
 import java.awt.Container;
 import java.awt.event.ActionEvent;
