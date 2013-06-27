@@ -4,6 +4,7 @@ import java.util.concurrent.ExecutionException;
 import javax.xml.ws.Response;
 // IMPORT DEL WEB SERVICE CLIENT:
 import localhost_client.*;
+import log.l;
 
 public class PollingThread extends Thread{
 
@@ -41,7 +42,8 @@ public class PollingThread extends Thread{
 		int percentage = servicePort.getPercentageDone(reqId);
 		view.updatingData(percentage,"Elapsed: " + (int)((System.currentTimeMillis()-startTime)/ (double) 1000) + " sec","ETA: --");
 		try {
-			if (response.get().getReturn() != -0.0){
+			l.l("", ""+response.get().getReturn());
+			if (!(""+response.get().getReturn()).equals("-0.0")){
 				view.updateLabelResult("Result : " + response.get().getReturn());
 			} else {
 				view.updateLabelResult("Result: ERROR");

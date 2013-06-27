@@ -19,7 +19,11 @@ public class SynchThread extends Thread{
 	public void run(){
 		long startTime = System.currentTimeMillis();
 		double res = servicePort.getResult(reqId);
-		view.updateData("Result: " + res,"Duration: " + ((System.currentTimeMillis()-startTime)/(double)1000) + " sec");
-	}
+		if (!(""+res).equals("-0.0")){
+			view.updateData("Result: " + res,"Elapsed: " + (int)((System.currentTimeMillis()-startTime)/(double)1000) + " sec");
+		} else {
+			view.updateData("Result: ERROR","Elapsed: " + (int)((System.currentTimeMillis()-startTime)/(double)1000) + " sec");
+		}
+	}		
 	
 }

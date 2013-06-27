@@ -29,8 +29,8 @@ public class CallbackThread extends Thread{
 				try {
 					// process of asynchronous response goes here
 					int percentage = servicePort.getPercentageDone(reqId);
-					view.updatingData(percentage,"Elapsed: " + ((System.currentTimeMillis()-startTime)/(double)1000) + " sec","ETA: --");
-					if (response.get().getReturn() != -0.0){
+					view.updatingData(percentage,"Elapsed: " + (int)((System.currentTimeMillis()-startTime)/(double)1000) + " sec","ETA: --");
+					if (!(""+response.get().getReturn()).equals("-0.0")){
 						view.updateLabelResult("Result: " + response.get().getReturn());
 					} else {
 						view.updateLabelResult("Result: ERROR");
