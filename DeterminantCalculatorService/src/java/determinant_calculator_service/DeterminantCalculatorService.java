@@ -1,6 +1,5 @@
 package determinant_calculator_service;
 
-import java.net.URL;
 import javax.jws.WebService;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;

@@ -158,7 +158,7 @@ public class Master extends UntypedActor {
 						//requestInfo.setTempDeterminant(determinant);
 						requestInfo.setFinalDeterminant(determinant);
 					} else {
-						l.l(me, reqId +", CHANGING SIGN: determinant: " + determinant);
+						l.l(me, reqId +", CHANGING SIGN: determinant: " + (-determinant));
 						//requestInfo.setTempDeterminant(-determinant);
 						requestInfo.setFinalDeterminant(-determinant);
 					}

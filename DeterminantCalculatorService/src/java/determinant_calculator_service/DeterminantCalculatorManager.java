@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package determinant_calculator_service;
 
 import log.l;
@@ -14,9 +10,6 @@ import java.util.HashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- *
- */
 public class DeterminantCalculatorManager {
 
 	private static DeterminantCalculatorManager instance;

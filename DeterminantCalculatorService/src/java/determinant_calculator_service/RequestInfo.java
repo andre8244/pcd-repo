@@ -1,6 +1,8 @@
 package determinant_calculator_service;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import log.l;
 
 public class RequestInfo {
@@ -16,6 +18,7 @@ public class RequestInfo {
 	private boolean changeSign;
 	private long startTime;
 	private CountDownLatch computationEnded;
+	private static Lock lock;
 
 	public RequestInfo() {
 		tempDeterminant = 1;
@@ -25,6 +28,7 @@ public class RequestInfo {
 		changeSign = false;
 		startTime = System.currentTimeMillis(); // TODO a cosa serve?
 		computationEnded = new CountDownLatch(1);
+		lock = new ReentrantLock(true);
 	}
 
 	public void setOriginalMatrix(double[][] matrix) {
@@ -101,10 +105,20 @@ public class RequestInfo {
 	}
 
 	public void setPercentageDone(int percentage){
-		percentageDone = percentage;
+		lock.lock();
+		try {
+			percentageDone = percentage;
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	public int getPercentageDone(){
-		return percentageDone;
+		lock.lock();
+		try {
+			return percentageDone;
+		} finally {
+			lock.unlock();
+		}
 	}
 }
