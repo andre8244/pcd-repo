@@ -56,12 +56,10 @@ public class Worker extends UntypedActor {
 		final int rowNumber = oneRow.getRowNumber();
 
 		double factor = -row[0] / firstRow[0];
-		//l.l(me, "factor: " + factor);
-
+		
 		for (int i = 0; i < firstRow.length; i++) {
 			row[i] = row[i] + factor * firstRow[i];
 		}
-
 		final Messages.OneRowResult oneRowResult = new Messages.OneRowResult(reqId, row, rowNumber);
 		getSender().tell(oneRowResult, getSelf());
 		//l.l(me, "sent row " + rowNumber + " to master");
@@ -76,8 +74,7 @@ public class Worker extends UntypedActor {
 
         for (int i= 0; i < rows.length; i++){
             factor = -rows[i][0] / firstRow[0];
-            //l.l(me, "factor: " + factor);
-
+            
             for (int j = 0; j < firstRow.length; j++) {
                 rows[i][j] = rows[i][j] + factor * firstRow[j];
             }
