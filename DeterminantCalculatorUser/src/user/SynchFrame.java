@@ -26,7 +26,7 @@ public class SynchFrame extends JFrame{
 		bottomPanel.setBackground(Color.LIGHT_GRAY);
 		bottomPanel.setOpaque(true);
 
-		lbDuration = new JLabel("Duration: --");
+		lbDuration = new JLabel("");
 		topPanel.add(lbDuration);
 		lbResult = new JLabel("Waiting for result...");
 		bottomPanel.add(lbResult);
