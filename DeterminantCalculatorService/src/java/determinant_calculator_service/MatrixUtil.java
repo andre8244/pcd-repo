@@ -29,6 +29,7 @@ public class MatrixUtil {
 			String[] tokens;
 			int i = 0;
 			while (line != null) {
+				//gestione errore numero di righe maggiore di order
 				if (i==order){
 					l.l(me, "Error order!!!");
 					return null;
@@ -37,6 +38,7 @@ public class MatrixUtil {
 					l.l(me, "wrote " + i + " lines in list");
 				}
 				tokens = line.split(" ");
+				//gestione errore sul numero di colonne
 				if (tokens.length!=order){
 					l.l(me, "Error order!!!");
 					return null;
@@ -47,6 +49,7 @@ public class MatrixUtil {
 				line = reader.readLine();
 				i++;
 			}
+			//gestione errore numero di righe minore di order
 			if (order!=i){
 				l.l(me, "Error order!!!");
 				return null;

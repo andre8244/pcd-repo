@@ -73,7 +73,7 @@ public class Master extends UntypedActor {
 			requestInfo.setPercentageDone(100); // TODO comunico al client di aver finito anche se non ho calcolato niente
 			return;			
 		}
-		requestInfo.setOriginalMatrix(MatrixUtil.fromFileToList(order, fileValues));
+		requestInfo.setOriginalMatrix(matrix);
 
 		if (workers.isEmpty()) {
 			l.l(me, reqId + ", WORKERS.SIZE() = 0 !!!");
