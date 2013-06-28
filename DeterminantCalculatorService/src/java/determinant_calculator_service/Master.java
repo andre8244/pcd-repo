@@ -350,8 +350,8 @@ public class Master extends UntypedActor {
 		double oldDeterminant = requestInfo.getTempDeterminant();
 		requestInfo.setTempDeterminant(oldDeterminant * matrix[0][0]);
 		// SCELTA TRA MANYROWS E ONEROW
-		//sendManyRowsPerMsg(reqId, matrix); // TODO provare a passare solo reqId
-		sendOneRowPerMsg(reqId, matrix);
+		sendManyRowsPerMsg(reqId, matrix); // TODO provare a passare solo reqId
+		//sendOneRowPerMsg(reqId, matrix);
 		return false;
 	}
 
@@ -404,10 +404,10 @@ public class Master extends UntypedActor {
 							l.l(me, "index: " + index);
 							workers.get(index).addWork(reqId, rows, rowNumber);
 							// SCELTA TRA MANYROWS E ONEROW
-							//workers.get(index).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, rowNumber), getSelf());
+							workers.get(index).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, rowNumber), getSelf());
 							// per utilizzare la Work e il OneRow converto la matrice in un semplice array
-							double[] row = rows[0];
-							workers.get(index).getActorRef().tell(new Messages.OneRow(reqId, firstRow, row, rowNumber), getSelf());
+							//double[] row = rows[0];
+							//workers.get(index).getActorRef().tell(new Messages.OneRow(reqId, firstRow, row, rowNumber), getSelf());
 							l.l(me, reqId + ", call " + workers.get(index).getRemoteAddress() + " to do the job of the dead worker " + worker.getRemoteAddress());
 							if (j == works.size() - 1 && index < i) {
 								index = (index + 1) % workers.size();
