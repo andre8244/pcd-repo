@@ -63,9 +63,9 @@
       </wsimport-options>
     </client>
     <client name="DeterminantCalculatorService_1">
-      <wsdl-url>http://25.106.72.122:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsdl-url>
-      <local-wsdl-file>25.106.72.122_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl</local-wsdl-file>
-      <package-name forceReplace="true">andreafWindows8dualCore_client</package-name>
+      <wsdl-url>http://25.124.124.114:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsdl-url>
+      <local-wsdl-file>25.124.124.114_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl</local-wsdl-file>
+      <package-name forceReplace="true">leardini_linux</package-name>
       <catalog-file>catalog.xml</catalog-file>
       <wsimport-options>
         <wsimport-option>
@@ -78,7 +78,11 @@
         </wsimport-option>
         <wsimport-option>
           <wsimport-option-name>wsdlLocation</wsimport-option-name>
-          <wsimport-option-value>http://25.106.72.122:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsimport-option-value>
+          <wsimport-option-value>http://25.124.124.114:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsimport-option-value>
+        </wsimport-option>
+        <wsimport-option>
+          <wsimport-option-name>xnocompile</wsimport-option-name>
+          <wsimport-option-value>true</wsimport-option-value>
         </wsimport-option>
         <wsimport-option>
           <wsimport-option-name>xendorsed</wsimport-option-name>
@@ -86,7 +90,7 @@
         </wsimport-option>
         <wsimport-option>
           <wsimport-option-name>package</wsimport-option-name>
-          <wsimport-option-value>andreafWindows8dualCore_client</wsimport-option-value>
+          <wsimport-option-value>leardini_linux</wsimport-option-value>
         </wsimport-option>
       </wsimport-options>
     </client>

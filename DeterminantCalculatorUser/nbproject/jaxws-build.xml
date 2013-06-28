@@ -1,12 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
+<?xml version="1.0" encoding="UTF-8"?><!--
         *** GENERATED FROM jax-ws.xml - DO NOT EDIT !                             ***
         *** TO MODIFY wsimport options USE Web Service node -> Edit WS Attributes ***
         *** TO CHANGE TARGETS GENERATED TO jaxws-build.xml COPY THOSE             ***
         *** TARGETS TO ../build.xml AND MODIFY THAT FILE INSTEAD                  ***
 
-        -->
-<project xmlns:xalan="http://xml.apache.org/xslt" xmlns:j2seproject3="http://www.netbeans.org/ns/j2se-project/3" xmlns:jaxws="http://www.netbeans.org/ns/jax-ws/1">
+        --><project xmlns:xalan="http://xml.apache.org/xslt" xmlns:j2seproject3="http://www.netbeans.org/ns/j2se-project/3" xmlns:jaxws="http://www.netbeans.org/ns/jax-ws/1">
     <!--
                 ===================
                 JAX-WS WSIMPORT SECTION
@@ -54,8 +52,8 @@
     </target>
     <target name="wsimport-client-DeterminantCalculatorService_1" depends="wsimport-init">
         <mkdir dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1"/>
-        <property name="wsdl-DeterminantCalculatorService_1" location="xml-resources/web-service-references/DeterminantCalculatorService_1/wsdl/25.106.72.122_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl"/>
-        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1" destdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1" wsdl="${wsdl-DeterminantCalculatorService_1}" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" wsdlLocation="http://25.106.72.122:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl" xendorsed="true" package="andreafWindows8dualCore_client">
+        <property name="wsdl-DeterminantCalculatorService_1" location="xml-resources/web-service-references/DeterminantCalculatorService_1/wsdl/25.124.124.114_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl"/>
+        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1" destdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1" wsdl="${wsdl-DeterminantCalculatorService_1}" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" wsdlLocation="http://25.124.124.114:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl" xnocompile="true" xendorsed="true" package="leardini_linux">
             <depends file="${wsdl-DeterminantCalculatorService_1}"/>
             <produces dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1"/>
         </wsimport>
@@ -67,7 +65,7 @@
     </target>
     <target name="wsimport-client-clean-DeterminantCalculatorService_1" depends="-init-project">
         <delete dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1"/>
-        <delete dir="${build.generated.sources.dir}/jax-ws/andreafWindows8dualCore_client"/>
+        <delete dir="${build.generated.sources.dir}/jax-ws/leardini_linux"/>
     </target>
     <target name="wsimport-client-generate" depends="wsimport-client-DeterminantCalculatorService, wsimport-client-DeterminantCalculatorService_2, wsimport-client-DeterminantCalculatorService_1"/>
 </project>
