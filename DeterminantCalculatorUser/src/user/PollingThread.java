@@ -6,7 +6,8 @@ import javax.xml.ws.Response;
 //import localhost_client.*;
 import marco_client.*;
 //import marcoXP_client.*;
-//import windows8dualCore_client.*;
+//import andreaf_client.*;
+//import andreafWindows8dualCore_client.*;
 
 public class PollingThread extends Thread{
 	private String reqId;

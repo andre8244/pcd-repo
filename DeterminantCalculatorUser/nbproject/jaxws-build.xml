@@ -1,10 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
         *** GENERATED FROM jax-ws.xml - DO NOT EDIT !                             ***
         *** TO MODIFY wsimport options USE Web Service node -> Edit WS Attributes ***
         *** TO CHANGE TARGETS GENERATED TO jaxws-build.xml COPY THOSE             ***
         *** TARGETS TO ../build.xml AND MODIFY THAT FILE INSTEAD                  ***
 
-        --><project xmlns:xalan="http://xml.apache.org/xslt" xmlns:j2seproject3="http://www.netbeans.org/ns/j2se-project/3" xmlns:jaxws="http://www.netbeans.org/ns/jax-ws/1">
+        -->
+<project xmlns:xalan="http://xml.apache.org/xslt" xmlns:j2seproject3="http://www.netbeans.org/ns/j2se-project/3" xmlns:jaxws="http://www.netbeans.org/ns/jax-ws/1">
     <!--
                 ===================
                 JAX-WS WSIMPORT SECTION
@@ -33,22 +35,22 @@
         <delete dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService"/>
         <delete dir="${build.generated.sources.dir}/jax-ws/localhost_client"/>
     </target>
-    <target name="wsimport-client-DeterminantCalculatorService_1" depends="wsimport-init">
-        <mkdir dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1"/>
-        <property name="wsdl-DeterminantCalculatorService_1" location="xml-resources/web-service-references/DeterminantCalculatorService_1/wsdl/25.45.4.171_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl"/>
-        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1" destdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1" wsdl="${wsdl-DeterminantCalculatorService_1}" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" wsdlLocation="http://25.45.4.171:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl" xnocompile="true" xendorsed="true" package="marcoXP_client">
-            <depends file="${wsdl-DeterminantCalculatorService_1}"/>
-            <produces dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1"/>
+    <target name="wsimport-client-DeterminantCalculatorService_2" depends="wsimport-init">
+        <mkdir dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_2"/>
+        <property name="wsdl-DeterminantCalculatorService_2" location="xml-resources/web-service-references/DeterminantCalculatorService_2/wsdl/25.38.242.203_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl"/>
+        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_2" destdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_2" wsdl="${wsdl-DeterminantCalculatorService_2}" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" wsdlLocation="http://25.38.242.203:8080/DeterminantCalculatorService/DeterminantCalculatorService?WSDL" xendorsed="true" package="marco_client">
+            <depends file="${wsdl-DeterminantCalculatorService_2}"/>
+            <produces dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_2"/>
         </wsimport>
         <copy todir="${build.generated.sources.dir}/jax-ws">
-            <fileset dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1">
+            <fileset dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_2">
                 <include name="**/*.java"/>
             </fileset>
         </copy>
     </target>
-    <target name="wsimport-client-clean-DeterminantCalculatorService_1" depends="-init-project">
-        <delete dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1"/>
-        <delete dir="${build.generated.sources.dir}/jax-ws/marcoXP_client"/>
+    <target name="wsimport-client-clean-DeterminantCalculatorService_2" depends="-init-project">
+        <delete dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_2"/>
+        <delete dir="${build.generated.sources.dir}/jax-ws/marco_client"/>
     </target>
-    <target name="wsimport-client-generate" depends="wsimport-client-DeterminantCalculatorService, wsimport-client-DeterminantCalculatorService_1"/>
+    <target name="wsimport-client-generate" depends="wsimport-client-DeterminantCalculatorService, wsimport-client-DeterminantCalculatorService_2"/>
 </project>
