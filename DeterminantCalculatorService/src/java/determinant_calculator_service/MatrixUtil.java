@@ -29,15 +29,27 @@ public class MatrixUtil {
 			String[] tokens;
 			int i = 0;
 			while (line != null) {
+				if (i==order){
+					l.l(me, "Error order!!!");
+					return null;
+				}
 				if (i % 500 == 0) {
 					l.l(me, "wrote " + i + " lines in list");
 				}
 				tokens = line.split(" ");
+				if (tokens.length!=order){
+					l.l(me, "Error order!!!");
+					return null;
+				}
 				for (int j = 0; j < tokens.length; j++) {
 					matrix[i][j] = Double.parseDouble(tokens[j]);
 				}
 				line = reader.readLine();
 				i++;
+			}
+			if (order!=i){
+				l.l(me, "Error order!!!");
+				return null;
 			}
 		} catch (FileNotFoundException ex) {
 			ex.printStackTrace();

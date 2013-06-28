@@ -32,9 +32,9 @@ public class Master extends UntypedActor {
 		if (msg instanceof Messages.Compute) {
 			Messages.Compute c = (Messages.Compute) msg;
 			handleCompute(c);
-//		} else if (msg instanceof Messages.OneRowResult) {
-//			Messages.OneRowResult orr = (Messages.OneRowResult) msg;
-//			handleOneRowResult(orr);
+		} else if (msg instanceof Messages.OneRowResult) {
+			Messages.OneRowResult orr = (Messages.OneRowResult) msg;
+			handleOneRowResult(orr);
 		} else if (msg instanceof Messages.ManyRowsResult) {
 			Messages.ManyRowsResult mrr = (Messages.ManyRowsResult) msg;
 			handleManyRowsResult(mrr);
@@ -66,6 +66,13 @@ public class Master extends UntypedActor {
 		String reqId = compute.getReqId();
 		l.l(me, "handleCompute, reqId: " + reqId + ", order: " + order + ", workers.size():" + workers.size());
 		RequestInfo requestInfo = manager.getRequestInfo(reqId);
+		double[][] matrix = MatrixUtil.fromFileToList(order, fileValues);
+		if (matrix==null){
+			l.l(me, reqId + ", matrix Error !!!");
+			requestInfo.setFinalDeterminant(-0.0);
+			requestInfo.setPercentageDone(100); // TODO comunico al client di aver finito anche se non ho calcolato niente
+			return;			
+		}
 		requestInfo.setOriginalMatrix(MatrixUtil.fromFileToList(order, fileValues));
 
 		if (workers.isEmpty()) {
@@ -77,6 +84,92 @@ public class Master extends UntypedActor {
 		gauss(reqId);
 	}
 
+	private void handleOneRowResult(Messages.OneRowResult orr) {
+		String reqId = orr.getReqId();
+		double[] row = orr.getRow();
+		int rowNumber = orr.getRowNumber();
+
+		for (int i = 0; i < workers.size(); i++) {
+			// works.size è generalmente uguale al numero di richieste in corso, tranne in casi di failure
+			ArrayList<Work> works = workers.get(i).getWorks();
+			for (int j = 0; j < works.size(); j++) {
+				if (works.get(j).getReqId().equals(reqId) && works.get(j).getRowNumber() == rowNumber) {
+					workers.get(i).removeWork(works.get(j));
+					break;
+				}
+			}
+		}		
+		
+		RequestInfo requestInfo = manager.getRequestInfo(reqId);
+		int nRowsDone = requestInfo.getRowsDone();
+		nRowsDone++;
+		requestInfo.setRowsDone(nRowsDone);
+		
+		/*if (nRowsDone % 500 == 0) {
+			l.l(me, reqId + ", nRowsDone: " + nRowsDone);
+		}*/
+
+		double[][] matrix = requestInfo.getMatrix();
+		matrix[rowNumber] = row;
+
+		// TODO serve? oppure è sufficiente il side-effect?
+		requestInfo.setMatrix(matrix);
+		
+		if (nRowsDone == matrix.length - 1) {
+			if (matrix.length % 500 == 0) {
+				l.l(me, reqId + ", received all rows, submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
+			}
+			if (matrix.length > 2) {
+				requestInfo.setRowsDone(0);
+				requestInfo.setMatrix(subMatrix(reqId, matrix));
+
+				if (workers.isEmpty()) {
+					l.l(me, reqId + ", WORKERS.SIZE() = 0 !!!");
+					requestInfo.setFinalDeterminant(-0.0);
+					requestInfo.setPercentageDone(100);
+					return;
+				}
+				boolean zeroColumn = gauss(reqId);
+
+				if (!zeroColumn) {
+					long startTime = System.currentTimeMillis();
+					long totalWorkToDo = requestInfo.getTotalWorkToDo();
+					long workToDo = 0;
+
+					for (long i = requestInfo.getMatrix().length - 1; i > 0; i--) {
+						workToDo += i * (i + 1);
+					}
+					//l.l(me, "WorkToDo: " + workToDo);
+					long workDone = totalWorkToDo - workToDo;
+					//l.l(me, "workDone(" + workDone + ") = totalWorkToDo("+ totalWorkToDo + ") - workToDo(" + workToDo + ")");
+					//l.l(me, "WorkDone: " + workDone);
+					int percentage = (int) (((double) workDone / totalWorkToDo) * 100);
+					//l.l(me, "percentage: " + percentage);
+					//l.l(me, "percentage computation duration: " + (System.currentTimeMillis() - startTime) + " ms");
+					requestInfo.setPercentageDone(percentage);
+				}
+			} else { // matrix.length = 2
+				l.l(me, reqId + ", received all rows, submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
+				double oldDeterminant = requestInfo.getTempDeterminant();
+				double determinant = oldDeterminant * matrix[1][1];
+
+				if (determinant == 0) { // needed in case determinant = -0.0
+					l.l(me, reqId +", determinant == 0 || determinant == -0, determinant: " + determinant);
+					requestInfo.setFinalDeterminant(0);
+				} else {
+					if (!requestInfo.getChangeSign()) {
+						l.l(me, reqId +", NOT CHANGING SIGN: determinant: " + determinant);
+						requestInfo.setFinalDeterminant(determinant);
+					} else {
+						l.l(me, reqId +", CHANGING SIGN: determinant: " + (-determinant));
+						requestInfo.setFinalDeterminant(-determinant);
+					}
+				}
+				requestInfo.setPercentageDone(100);
+			}
+		}
+	}		
+	
 	private void handleManyRowsResult(Messages.ManyRowsResult mrr) {
 		String reqId = mrr.getReqId();
 		double[][] rows = mrr.getRows();
@@ -195,7 +288,21 @@ public class Master extends UntypedActor {
 		return false;
 	}
 
-	// abbiamo cancellato per sbaglio la OneRowPerMsg --- da rimettere
+	private void sendOneRowPerMsg(String reqId, double[][] matrix) {
+		double[] firstRow = matrix[0];
+
+		for (int i = 1; i < matrix.length; i++) {
+			double[] row = matrix[i];
+			// per utilizzare la OneRow e i Work passo una matrice con una sola riga
+			double[][] rows = new double[1][matrix.length];
+			rows[0]=row;
+			workers.get(((i - 1) % workers.size())).addWork(reqId, rows, i);
+			workers.get(((i - 1) % workers.size())).getActorRef().tell(new Messages.OneRow(reqId, firstRow, row, i), getSelf());
+			//if (i % 500 == 0) {
+			//l.l(me, reqId + ", sent row " + i + " to " + workers.get(((i - 1) % workers.size())).getRemoteAddress());
+			//}
+		}
+	}
 	
 	private void sendManyRowsPerMsg(String reqId, double[][] matrix) {
 		double[] firstRow = matrix[0];
@@ -242,7 +349,9 @@ public class Master extends UntypedActor {
 		}
 		double oldDeterminant = requestInfo.getTempDeterminant();
 		requestInfo.setTempDeterminant(oldDeterminant * matrix[0][0]);
-		sendManyRowsPerMsg(reqId, matrix); // TODO provare a passare solo reqId
+		// SCELTA TRA MANYROWS E ONEROW
+		//sendManyRowsPerMsg(reqId, matrix); // TODO provare a passare solo reqId
+		sendOneRowPerMsg(reqId, matrix);
 		return false;
 	}
 
@@ -294,7 +403,11 @@ public class Master extends UntypedActor {
 						if (!tokens[0].equals(workerSystem)) {
 							l.l(me, "index: " + index);
 							workers.get(index).addWork(reqId, rows, rowNumber);
-							workers.get(index).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, rowNumber), getSelf());
+							// SCELTA TRA MANYROWS E ONEROW
+							//workers.get(index).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, rowNumber), getSelf());
+							// per utilizzare la Work e il OneRow converto la matrice in un semplice array
+							double[] row = rows[0];
+							workers.get(index).getActorRef().tell(new Messages.OneRow(reqId, firstRow, row, rowNumber), getSelf());
 							l.l(me, reqId + ", call " + workers.get(index).getRemoteAddress() + " to do the job of the dead worker " + worker.getRemoteAddress());
 							if (j == works.size() - 1 && index < i) {
 								index = (index + 1) % workers.size();
