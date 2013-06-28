@@ -105,9 +105,9 @@ public class Master extends UntypedActor {
 		nRowsDone++;
 		requestInfo.setRowsDone(nRowsDone);
 		
-		/*if (nRowsDone % 500 == 0) {
-			l.l(me, reqId + ", nRowsDone: " + nRowsDone);
-		}*/
+		//if (nRowsDone % 500 == 0) {
+		//l.l(me, reqId + ", nRowsDone: " + nRowsDone);
+		//}
 
 		double[][] matrix = requestInfo.getMatrix();
 		matrix[rowNumber] = row;
@@ -189,8 +189,8 @@ public class Master extends UntypedActor {
 		int nRowsDone = requestInfo.getRowsDone();
 		nRowsDone = nRowsDone + rows.length;
 		requestInfo.setRowsDone(nRowsDone);
-		//l.l(me, reqId + ", receive rows from " + rowNumber + " to " + (rowNumber+rows.length-1) + "(" + rows.length + " rows)");
-		//l.l(me, reqId + ", nRowsDone: " + nRowsDone);
+		l.l(me, reqId + ", receive rows from " + rowNumber + " to " + (rowNumber+rows.length-1) + "(" + rows.length + " rows)");
+		l.l(me, reqId + ", nRowsDone: " + nRowsDone);
 
 		double[][] matrix = requestInfo.getMatrix();
 		System.arraycopy(rows, 0, matrix, rowNumber, rows.length);
@@ -257,7 +257,7 @@ public class Master extends UntypedActor {
 		String remoteAddress = rw.getRemoteAddress();
 		ActorRef actorRef = getContext().actorFor(remoteAddress);
 		RemoteWorker worker = new RemoteWorker(remoteAddress, actorRef);
-		workers.add(worker);
+		workers.add(0, worker);
 		actorRef.tell(new Messages.AddWorkerNodeAck(), getSelf());
 		l.l(me, worker.getRemoteAddress() + " added, workers size: " + workers.size());
 	}
@@ -323,7 +323,7 @@ public class Master extends UntypedActor {
 				}
 				workers.get(i).addWork(reqId, rows, nRowsSent + 1);
 				workers.get(i).getActorRef().tell(new Messages.ManyRows(reqId, firstRow, rows, nRowsSent + 1), getSelf());
-				//l.l(me, reqId + ", sent rows from " + (nRowsSent+1) + " to " + (nRowsSent+nRowsToSend) + "(" + nRowsToSend + " rows) to " + workers.get(i).getRemoteAddress());
+				l.l(me, reqId + ", sent rows from " + (nRowsSent+1) + " to " + (nRowsSent+nRowsToSend) + "(" + nRowsToSend + " rows) to " + workers.get(i).getRemoteAddress());
 				nRowsSent += nRowsToSend;
 			}
 		}

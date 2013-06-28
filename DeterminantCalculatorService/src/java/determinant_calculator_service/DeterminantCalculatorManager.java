@@ -6,6 +6,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import com.typesafe.config.ConfigFactory;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -14,15 +15,22 @@ public class DeterminantCalculatorManager {
 
 	private static DeterminantCalculatorManager instance;
 	private int reqNumber;
-	private ActorRef master;
+	private final int nProcessors = Runtime.getRuntime().availableProcessors();
+	private ArrayList<ActorRef> masters;
 	private HashMap<String, RequestInfo> requestsInfo;
 	private static Lock lock = new ReentrantLock(true);
 	private String me = "manager";
+	private int index=0;
 
 	private DeterminantCalculatorManager() {
 		reqNumber = 0;
+		masters = new ArrayList<ActorRef>();
 		ActorSystem system = ActorSystem.create("masterSystem", ConfigFactory.load().getConfig("masterSystem"));
-		master = system.actorOf(new Props(Master.class), "master");
+		//master = system.actorOf(new Props(Master.class), "master");
+		for (int i = 0; i < nProcessors; i++) {
+			String masterId = "master-" +i;
+			masters.add(system.actorOf(new Props(Master.class), masterId));
+		}
 		requestsInfo = new HashMap<String, RequestInfo>();
 	}
 
@@ -46,7 +54,8 @@ public class DeterminantCalculatorManager {
 			String reqId = "req" + reqNumber;
 			reqNumber = reqNumber + 1;
 			requestsInfo.put(reqId, new RequestInfo());
-			master.tell(new Messages.Compute(order, fileValues, reqId, this));
+			masters.get(index).tell(new Messages.Compute(order, fileValues, reqId, this));
+			index=(index+1)%masters.size();
 			return reqId;
 		} finally {
 			lock.unlock();
@@ -88,7 +97,9 @@ public class DeterminantCalculatorManager {
 		lock.lock();
 
 		try {
-			master.tell(new Messages.AddWorkerNode(remoteAddress));
+			for (int i = 0; i < masters.size(); i++) {
+				masters.get(i).tell(new Messages.AddWorkerNode(remoteAddress));
+			}
 			// TODO ha senso che restituisca sempre true?
 			return true;
 		} finally {
@@ -100,7 +111,9 @@ public class DeterminantCalculatorManager {
 		lock.lock();
 
 		try {
-			master.tell(new Messages.RemoveWorkerNode(remoteAddress));
+			for (int i = 0; i < masters.size(); i++) {
+				masters.get(i).tell(new Messages.RemoveWorkerNode(remoteAddress));
+			}
 			return true;
 		} finally {
 			lock.unlock();
