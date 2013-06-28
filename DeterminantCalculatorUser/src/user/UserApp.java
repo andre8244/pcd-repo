@@ -1,8 +1,8 @@
 package user;
 
 // IMPORT DEL WEB SERVICE CLIENT:
-import localhost_client.*;
-//import windowsXP_client.*;
+//import localhost_client.*;
+import marco_client.*;
 //import windows8dualCore_client.*;
 
 import java.awt.Container;
@@ -27,9 +27,9 @@ public class UserApp extends JFrame implements ActionListener {
 	private ButtonGroup group = new ButtonGroup();
 	private JButton computeButton;
 	private DeterminantCalculatorService servicePort;
-	private static final String INITIAL_FILE_VALUES = System.getProperty("user.home") + System.getProperty("file.separator") + "matrix.txt";
-	//private static final String INITIAL_FILE_VALUES = "http://pcddeterminant.altervista.org/matrix300@6.03e60.txt";
-	private static final int INITIAL_ORDER = 1000;
+	//private static final String INITIAL_FILE_VALUES = System.getProperty("user.home") + System.getProperty("file.separator") + "matrix.txt";
+	private static final String INITIAL_FILE_VALUES = "http://pcddeterminant.altervista.org/matrix300@6.03e60.txt";
+	private static final int INITIAL_ORDER = 300;
 	private String me = "userApp";
 
 	public UserApp() {
