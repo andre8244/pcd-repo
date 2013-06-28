@@ -35,9 +35,9 @@
       </wsimport-options>
     </client>
     <client name="DeterminantCalculatorService_1">
-      <wsdl-url>http://25.38.242.203:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsdl-url>
-      <local-wsdl-file>25.38.242.203_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl</local-wsdl-file>
-      <package-name forceReplace="true">marco_client</package-name>
+      <wsdl-url>http://25.45.4.171:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsdl-url>
+      <local-wsdl-file>25.45.4.171_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl</local-wsdl-file>
+      <package-name forceReplace="true">marcoXP_client</package-name>
       <catalog-file>catalog.xml</catalog-file>
       <wsimport-options>
         <wsimport-option>
@@ -50,7 +50,7 @@
         </wsimport-option>
         <wsimport-option>
           <wsimport-option-name>wsdlLocation</wsimport-option-name>
-          <wsimport-option-value>http://25.38.242.203:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsimport-option-value>
+          <wsimport-option-value>http://25.45.4.171:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsimport-option-value>
         </wsimport-option>
         <wsimport-option>
           <wsimport-option-name>xnocompile</wsimport-option-name>
@@ -62,7 +62,7 @@
         </wsimport-option>
         <wsimport-option>
           <wsimport-option-name>package</wsimport-option-name>
-          <wsimport-option-value>marco_client</wsimport-option-value>
+          <wsimport-option-value>marcoXP_client</wsimport-option-value>
         </wsimport-option>
       </wsimport-options>
     </client>

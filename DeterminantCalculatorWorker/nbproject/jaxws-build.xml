@@ -35,8 +35,8 @@
     </target>
     <target name="wsimport-client-DeterminantCalculatorService_1" depends="wsimport-init">
         <mkdir dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1"/>
-        <property name="wsdl-DeterminantCalculatorService_1" location="xml-resources/web-service-references/DeterminantCalculatorService_1/wsdl/25.38.242.203_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl"/>
-        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1" destdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1" wsdl="${wsdl-DeterminantCalculatorService_1}" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" wsdlLocation="http://25.38.242.203:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl" xnocompile="true" xendorsed="true" package="marco_client">
+        <property name="wsdl-DeterminantCalculatorService_1" location="xml-resources/web-service-references/DeterminantCalculatorService_1/wsdl/25.45.4.171_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl"/>
+        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1" destdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1" wsdl="${wsdl-DeterminantCalculatorService_1}" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" wsdlLocation="http://25.45.4.171:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl" xnocompile="true" xendorsed="true" package="marcoXP_client">
             <depends file="${wsdl-DeterminantCalculatorService_1}"/>
             <produces dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1"/>
         </wsimport>
@@ -48,7 +48,7 @@
     </target>
     <target name="wsimport-client-clean-DeterminantCalculatorService_1" depends="-init-project">
         <delete dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1"/>
-        <delete dir="${build.generated.sources.dir}/jax-ws/marco_client"/>
+        <delete dir="${build.generated.sources.dir}/jax-ws/marcoXP_client"/>
     </target>
     <target name="wsimport-client-generate" depends="wsimport-client-DeterminantCalculatorService, wsimport-client-DeterminantCalculatorService_1"/>
 </project>
