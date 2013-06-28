@@ -67,5 +67,22 @@
         <delete dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1"/>
         <delete dir="${build.generated.sources.dir}/jax-ws/leardini_linux"/>
     </target>
-    <target name="wsimport-client-generate" depends="wsimport-client-DeterminantCalculatorService, wsimport-client-DeterminantCalculatorService_2, wsimport-client-DeterminantCalculatorService_1"/>
+    <target name="wsimport-client-DeterminantCalculatorService_3" depends="wsimport-init">
+        <mkdir dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_3"/>
+        <property name="wsdl-DeterminantCalculatorService_3" location="xml-resources/web-service-references/DeterminantCalculatorService_3/wsdl/25.55.146.75_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl"/>
+        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_3" destdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_3" wsdl="${wsdl-DeterminantCalculatorService_3}" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" wsdlLocation="http://25.55.146.75:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl" xnocompile="true" xendorsed="true" package="andreaf_client">
+            <depends file="${wsdl-DeterminantCalculatorService_3}"/>
+            <produces dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_3"/>
+        </wsimport>
+        <copy todir="${build.generated.sources.dir}/jax-ws">
+            <fileset dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_3">
+                <include name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="wsimport-client-clean-DeterminantCalculatorService_3" depends="-init-project">
+        <delete dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_3"/>
+        <delete dir="${build.generated.sources.dir}/jax-ws/andreaf_client"/>
+    </target>
+    <target name="wsimport-client-generate" depends="wsimport-client-DeterminantCalculatorService, wsimport-client-DeterminantCalculatorService_2, wsimport-client-DeterminantCalculatorService_1, wsimport-client-DeterminantCalculatorService_3"/>
 </project>
