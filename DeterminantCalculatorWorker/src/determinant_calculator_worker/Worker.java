@@ -91,11 +91,11 @@ public class Worker extends UntypedActor {
 	}
 
 	private void handleAddWorkerNodeAck() {
-		l.l(me, "worker registered");
+		l.l(me, "worker registered to master: " + this.getSender().toString());
 	}
 
 	private void handleRemoveWorkerNodeAck() {
-		l.l(me, "worker removed");
+		l.l(me, "worker removed to master: " + this.getSender().toString());
 		this.getContext().stop(this.getSelf());
 	}
 }
