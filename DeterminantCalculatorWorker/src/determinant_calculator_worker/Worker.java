@@ -10,7 +10,8 @@ import akka.remote.RemoteActorRefProvider;
 //import marco_client.*;
 //import marcoXP_client.*;
 //import andreaf_client.*;
-import andreafWindows8dualCore_client.*;
+//import andreafWindows8dualCore_client.*;
+import leardini_linux.*;
 
 public class Worker extends UntypedActor {
 
@@ -58,7 +59,7 @@ public class Worker extends UntypedActor {
 		final int rowNumber = oneRow.getRowNumber();
 
 		double factor = -row[0] / firstRow[0];
-		
+
 		for (int i = 0; i < firstRow.length; i++) {
 			row[i] = row[i] + factor * firstRow[i];
 		}
@@ -76,7 +77,7 @@ public class Worker extends UntypedActor {
 
         for (int i= 0; i < rows.length; i++){
             factor = -rows[i][0] / firstRow[0];
-            
+
             for (int j = 0; j < firstRow.length; j++) {
                 rows[i][j] = rows[i][j] + factor * firstRow[j];
             }
