@@ -9,8 +9,8 @@ import akka.remote.RemoteActorRefProvider;
 //import localhost_client.*;
 //import marco_client.*;
 //import marcoXP_client.*;
-import andreaf_client.*;
-//import andreafWindows8dualCore_client.*;
+//import andreaf_client.*;
+import andreafWindows8dualCore_client.*;
 
 public class Worker extends UntypedActor {
 
