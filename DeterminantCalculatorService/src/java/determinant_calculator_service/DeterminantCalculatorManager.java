@@ -1,16 +1,22 @@
 package determinant_calculator_service;
 
-import log.l;
-import messages.Messages;
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.Props;
-import com.typesafe.config.ConfigFactory;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import log.l;
+import messages.Messages;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.Props;
+
+import com.typesafe.config.ConfigFactory;
+
+/**
+ * The manager of the requests sent to the web service.
+ *
+ */
 public class DeterminantCalculatorManager {
 
 	private static DeterminantCalculatorManager instance;
@@ -26,7 +32,7 @@ public class DeterminantCalculatorManager {
 		reqNumber = 0;
 		masters = new ArrayList<ActorRef>();
 		ActorSystem system = ActorSystem.create("masterSystem", ConfigFactory.load().getConfig("masterSystem"));
-		//master = system.actorOf(new Props(Master.class), "master");
+		// master = system.actorOf(new Props(Master.class), "master");
 
 		for (int i = 0; i < nProcessors; i++) {
 			String masterId = "master-" + i;
@@ -35,6 +41,11 @@ public class DeterminantCalculatorManager {
 		requestsInfo = new ConcurrentHashMap<String, RequestInfo>();
 	}
 
+	/**
+	 * Returns an istance of the manager, using the singleton pattern.
+	 *
+	 * @return an istance of the manager.
+	 */
 	public static DeterminantCalculatorManager getInstance() {
 		lock.lock();
 
@@ -48,6 +59,13 @@ public class DeterminantCalculatorManager {
 		}
 	}
 
+	/**
+	 * TODO
+	 *
+	 * @param order
+	 * @param fileValues
+	 * @return
+	 */
 	public String computeDeterminant(int order, String fileValues) {
 		lock.lock();
 
@@ -64,26 +82,26 @@ public class DeterminantCalculatorManager {
 	}
 
 	public int getPercentageDone(String reqId) {
-//		lock.lock();
+		// lock.lock();
 
-//		try {
-			RequestInfo requestInfo = requestsInfo.get(reqId);
+		// try {
+		RequestInfo requestInfo = requestsInfo.get(reqId);
 
-			if (requestInfo != null) {
-				return requestInfo.getPercentageDone();
-			} else {
-				l.l(me, reqId + ": invalid requestId");
-				return -1;
-			}
-//		} finally {
-//			lock.unlock();
-//		}
+		if (requestInfo != null) {
+			return requestInfo.getPercentageDone();
+		} else {
+			l.l(me, reqId + ": invalid requestId");
+			return -1;
+		}
+		// } finally {
+		// lock.unlock();
+		// }
 	}
 
 	public double getResult(String reqId) {
-//		lock.lock();
+		// lock.lock();
 		RequestInfo requestInfo = requestsInfo.get(reqId);
-//		lock.unlock();
+		// lock.unlock();
 
 		if (requestInfo != null) {
 			// blocking operation:
@@ -95,30 +113,30 @@ public class DeterminantCalculatorManager {
 	}
 
 	public boolean addWorkerNode(String remoteAddress) {
-//		lock.lock();
+		// lock.lock();
 
-//		try {
-			for (int i = 0; i < masters.size(); i++) {
-				masters.get(i).tell(new Messages.AddWorkerNode(remoteAddress));
-			}
-			// TODO ha senso che restituisca sempre true?
-			return true;
-//		} finally {
-//			lock.unlock();
-//		}
+		// try {
+		for (int i = 0; i < masters.size(); i++) {
+			masters.get(i).tell(new Messages.AddWorkerNode(remoteAddress));
+		}
+		// TODO ha senso che restituisca sempre true?
+		return true;
+		// } finally {
+		// lock.unlock();
+		// }
 	}
 
 	public boolean removeWorkerNode(String remoteAddress) {
-//		lock.lock();
+		// lock.lock();
 
-//		try {
-			for (int i = 0; i < masters.size(); i++) {
-				masters.get(i).tell(new Messages.RemoveWorkerNode(remoteAddress));
-			}
-			return true;
-//		} finally {
-//			lock.unlock();
-//		}
+		// try {
+		for (int i = 0; i < masters.size(); i++) {
+			masters.get(i).tell(new Messages.RemoveWorkerNode(remoteAddress));
+		}
+		return true;
+		// } finally {
+		// lock.unlock();
+		// }
 	}
 
 	public RequestInfo getRequestInfo(String reqId) {
