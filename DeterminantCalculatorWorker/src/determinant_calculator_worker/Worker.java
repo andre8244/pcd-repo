@@ -30,7 +30,7 @@ public class Worker extends UntypedActor {
 
 		Address systemRemoteAddress = ((RemoteActorRefProvider) context().provider()).transport().address();
 		remoteAddress = getSelf().path().toStringWithAddress(systemRemoteAddress);
-		servicePort.addWorkerNode(remoteAddress); // TODO non ignorare il valore booleano di ritorno
+		servicePort.addWorker(remoteAddress);
 	}
 
 	@Override
@@ -43,9 +43,9 @@ public class Worker extends UntypedActor {
 			handleManyRows(manyRows);
         } else if (msg instanceof Messages.Remove) { // TODO da eliminare?
 			handleRemove();
-		} else if (msg instanceof Messages.AddWorkerNodeAck) {
+		} else if (msg instanceof Messages.AddWorkerAck) {
 			handleAddWorkerNodeAck();
-		} else if (msg instanceof Messages.RemoveWorkerNodeAck) {
+		} else if (msg instanceof Messages.RemoveWorkerAck) {
 			handleRemoveWorkerNodeAck();
 		} else {
 			unhandled(msg);
@@ -88,7 +88,7 @@ public class Worker extends UntypedActor {
 	}
 
 	private void handleRemove() {
-		servicePort.removeWorkerNode(remoteAddress);
+		servicePort.removeWorker(remoteAddress);
 	}
 
 	private void handleAddWorkerNodeAck() {

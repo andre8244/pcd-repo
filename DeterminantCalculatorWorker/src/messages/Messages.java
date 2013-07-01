@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class Messages {
 
+	// TODO eliminare
 	public static class OneRow implements Serializable {
 
 		private final double[] firstRow;
@@ -35,6 +36,7 @@ public class Messages {
 		}
 	}
 
+	// TODO eliminare
 	public static class OneRowResult implements Serializable {
 
 		private final double[] row;
@@ -122,15 +124,15 @@ public class Messages {
 		}
 	}
 
-	public static class AddWorkerNodeAck implements Serializable {
+	public static class AddWorkerAck implements Serializable {
 
-		public AddWorkerNodeAck() {
+		public AddWorkerAck() {
 		}
 	}
 
-	public static class RemoveWorkerNodeAck implements Serializable {
+	public static class RemoveWorkerAck implements Serializable {
 
-		public RemoveWorkerNodeAck() {
+		public RemoveWorkerAck() {
 		}
 	}
 }

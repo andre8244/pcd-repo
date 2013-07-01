@@ -33,39 +33,5 @@
         <delete dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService"/>
         <delete dir="${build.generated.sources.dir}/jax-ws/localhost_client"/>
     </target>
-    <target name="wsimport-client-DeterminantCalculatorService_1" depends="wsimport-init">
-        <mkdir dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1"/>
-        <property name="wsdl-DeterminantCalculatorService_1" location="xml-resources/web-service-references/DeterminantCalculatorService_1/wsdl/25.38.242.203_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl"/>
-        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1" destdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1" wsdl="${wsdl-DeterminantCalculatorService_1}" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" wsdlLocation="http://25.38.242.203:8080/DeterminantCalculatorService/DeterminantCalculatorService?WSDL" xendorsed="true" package="marco_client">
-            <depends file="${wsdl-DeterminantCalculatorService_1}"/>
-            <produces dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1"/>
-        </wsimport>
-        <copy todir="${build.generated.sources.dir}/jax-ws">
-            <fileset dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1">
-                <include name="**/*.java"/>
-            </fileset>
-        </copy>
-    </target>
-    <target name="wsimport-client-clean-DeterminantCalculatorService_1" depends="-init-project">
-        <delete dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_1"/>
-        <delete dir="${build.generated.sources.dir}/jax-ws/marco_client"/>
-    </target>
-    <target name="wsimport-client-DeterminantCalculatorService_2" depends="wsimport-init">
-        <mkdir dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_2"/>
-        <property name="wsdl-DeterminantCalculatorService_2" location="xml-resources/web-service-references/DeterminantCalculatorService_2/wsdl/25.124.124.114_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl"/>
-        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_2" destdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_2" wsdl="${wsdl-DeterminantCalculatorService_2}" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" wsdlLocation="http://25.124.124.114:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl" xnocompile="true" xendorsed="true" package="leardini_linux">
-            <depends file="${wsdl-DeterminantCalculatorService_2}"/>
-            <produces dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_2"/>
-        </wsimport>
-        <copy todir="${build.generated.sources.dir}/jax-ws">
-            <fileset dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_2">
-                <include name="**/*.java"/>
-            </fileset>
-        </copy>
-    </target>
-    <target name="wsimport-client-clean-DeterminantCalculatorService_2" depends="-init-project">
-        <delete dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_2"/>
-        <delete dir="${build.generated.sources.dir}/jax-ws/leardini_linux"/>
-    </target>
-    <target name="wsimport-client-generate" depends="wsimport-client-DeterminantCalculatorService, wsimport-client-DeterminantCalculatorService_1, wsimport-client-DeterminantCalculatorService_2"/>
+    <target name="wsimport-client-generate" depends="wsimport-client-DeterminantCalculatorService"/>
 </project>
