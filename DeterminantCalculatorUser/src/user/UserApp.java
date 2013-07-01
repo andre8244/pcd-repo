@@ -30,9 +30,9 @@ public class UserApp extends JFrame implements ActionListener {
 	private ButtonGroup group = new ButtonGroup();
 	private JButton computeButton;
 	private DeterminantCalculatorService servicePort;
-	//private static final String INITIAL_FILE_VALUES = System.getProperty("user.home") + System.getProperty("file.separator") + "matrix.txt";
-	private static final String INITIAL_FILE_VALUES = "http://pcddeterminant.altervista.org/matrix300@6.03e60.txt";
-	private static final int INITIAL_ORDER = 300;
+	private static final String INITIAL_FILE_VALUES = System.getProperty("user.home") + System.getProperty("file.separator") + "matrix.txt";
+	//private static final String INITIAL_FILE_VALUES = "http://pcddeterminant.altervista.org/matrix300@6.03e60.txt";
+	private static final int INITIAL_ORDER = 1000;
 	private String me = "userApp";
 
 	public UserApp() {
@@ -106,33 +106,37 @@ public class UserApp extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent ev) {
 		String cmd = ev.getActionCommand();
 
-		if (cmd.equals("Compute determinant")){
-			handleCompute();
+		if (cmd.equals("Compute determinant")) {
+			new Thread() {
+				public void run() {
+					handleCompute();
+				}
+			}.start();
 		}
 	}
 
-	private void handleCompute(){
+	private void handleCompute() {
 		int order;
 
 		try {
 			order = Integer.parseInt(orderText.getText());
-		} catch (NumberFormatException ex){
+		} catch (NumberFormatException ex) {
 			ex.printStackTrace();
 			return;
 		}
 		String fileValues = fileValuesText.getText();
 
-		if (fileValues.equals(System.getProperty("user.home") + System.getProperty("file.separator") + "matrix.txt")){
-			MatrixFileGenerator.generate(order, 0.1, 0.2, fileValues);
+		if (fileValues.equals(System.getProperty("user.home") + System.getProperty("file.separator") + "matrix.txt")) {
+			MatrixFileGenerator.generate(order, 0.001, 0.002, fileValues);
 		}
 		final String reqId = servicePort.computeDeterminant(order, fileValues);
 
-		if (callbackButton.isSelected()){
-			new CallbackThread(reqId,servicePort,new AsynchFrame(reqId+" - Callback")).start();
+		if (callbackButton.isSelected()) {
+			new CallbackThread(reqId, servicePort, new AsynchFrame(reqId + " - Callback")).start();
 		} else if (pollingButton.isSelected()) {
-			new PollingThread(reqId,servicePort,new AsynchFrame(reqId+" - Polling")).start();
+			new PollingThread(reqId, servicePort, new AsynchFrame(reqId + " - Polling")).start();
 		} else if (synchronousButton.isSelected()) {
-			new SynchThread(reqId,servicePort,new SynchFrame(reqId+" - Synchronous")).start();
+			new SynchThread(reqId, servicePort, new SynchFrame(reqId + " - Synchronous")).start();
 		}
 	}
 }
