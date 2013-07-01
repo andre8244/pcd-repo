@@ -38,11 +38,11 @@ public class Master extends UntypedActor {
 		} else if (msg instanceof Messages.ManyRowsResult) {
 			Messages.ManyRowsResult mrr = (Messages.ManyRowsResult) msg;
 			handleManyRowsResult(mrr);
-		} else if (msg instanceof Messages.AddWorkerNode) {
-			Messages.AddWorkerNode rw = (Messages.AddWorkerNode) msg;
+		} else if (msg instanceof Messages.AddWorker) {
+			Messages.AddWorker rw = (Messages.AddWorker) msg;
 			handleAddWorkerNode(rw);
-		} else if (msg instanceof Messages.RemoveWorkerNode) {
-			Messages.RemoveWorkerNode rw = (Messages.RemoveWorkerNode) msg;
+		} else if (msg instanceof Messages.RemoveWorker) {
+			Messages.RemoveWorker rw = (Messages.RemoveWorker) msg;
 			handleRemoveWorkerNode(rw);
 		} else if (msg instanceof RemoteClientWriteFailed) {
 			RemoteClientWriteFailed rcwf = (RemoteClientWriteFailed) msg;
@@ -254,23 +254,23 @@ public class Master extends UntypedActor {
 		}
 	}
 
-	private void handleAddWorkerNode(Messages.AddWorkerNode rw) {
+	private void handleAddWorkerNode(Messages.AddWorker rw) {
 		String remoteAddress = rw.getRemoteAddress();
 		ActorRef actorRef = getContext().actorFor(remoteAddress);
 		RemoteWorker worker = new RemoteWorker(remoteAddress, actorRef);
 		workers.add(0, worker);
-		actorRef.tell(new Messages.AddWorkerNodeAck(), getSelf());
+		actorRef.tell(new Messages.AddWorkerAck(), getSelf());
 		l.l(me, worker.getRemoteAddress() + " added, workers size: " + workers.size());
 	}
 
-	private void handleRemoveWorkerNode(Messages.RemoveWorkerNode rw) {
+	private void handleRemoveWorkerNode(Messages.RemoveWorker rw) {
 		String remoteAddress = rw.getRemoteAddress();
 
 		// TODO si potrebbe usare una hashmap per rendere la ricerca più performante
 		for (int i = 0; i < workers.size(); i++) {
 			if (workers.get(i).getRemoteAddress().equals(remoteAddress)) {
 				RemoteWorker worker = workers.remove(i);
-				worker.getActorRef().tell(new Messages.RemoveWorkerNodeAck(), getSelf());
+				worker.getActorRef().tell(new Messages.RemoveWorkerAck(), getSelf());
 				l.l(me, worker.getRemoteAddress() + " removed, workers size: " + workers.size());
 				return;
 			}

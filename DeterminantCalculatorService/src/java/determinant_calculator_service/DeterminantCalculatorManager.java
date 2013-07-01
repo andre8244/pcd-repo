@@ -15,10 +15,10 @@ import com.typesafe.config.ConfigFactory;
 
 /**
  * The manager of the requests sent to the web service.
- *
+ * 
  */
 public class DeterminantCalculatorManager {
-
+	
 	private static DeterminantCalculatorManager instance;
 	private int reqNumber;
 	private final int nProcessors = Runtime.getRuntime().availableProcessors();
@@ -27,28 +27,28 @@ public class DeterminantCalculatorManager {
 	private static Lock lock = new ReentrantLock(true);
 	private String me = "manager";
 	private int index = 0;
-
+	
 	private DeterminantCalculatorManager() {
 		reqNumber = 0;
 		masters = new ArrayList<ActorRef>();
 		ActorSystem system = ActorSystem.create("masterSystem", ConfigFactory.load().getConfig("masterSystem"));
 		// master = system.actorOf(new Props(Master.class), "master");
-
+		
 		for (int i = 0; i < nProcessors; i++) {
 			String masterId = "master-" + i;
 			masters.add(system.actorOf(new Props(Master.class), masterId));
 		}
 		requestsInfo = new ConcurrentHashMap<String, RequestInfo>();
 	}
-
+	
 	/**
 	 * Returns an istance of the manager, using the singleton pattern.
-	 *
+	 * 
 	 * @return an istance of the manager.
 	 */
 	public static DeterminantCalculatorManager getInstance() {
 		lock.lock();
-
+		
 		try {
 			if (instance == null) {
 				instance = new DeterminantCalculatorManager();
@@ -58,17 +58,17 @@ public class DeterminantCalculatorManager {
 			lock.unlock();
 		}
 	}
-
+	
 	/**
-	 * TODO
-	 *
-	 * @param order
-	 * @param fileValues
-	 * @return
+	 * Create a new determinant computation request and forwards it to a master actor.
+	 * 
+	 * @param order the order of the matrix
+	 * @param fileValues the URL to the file that stores the values of the matrix
+	 * @return a <code>String</code> that identifies the request
 	 */
 	public String computeDeterminant(int order, String fileValues) {
 		lock.lock();
-
+		
 		try {
 			String reqId = "req" + reqNumber;
 			reqNumber = reqNumber + 1;
@@ -80,65 +80,70 @@ public class DeterminantCalculatorManager {
 			lock.unlock();
 		}
 	}
-
+	
+	/**
+	 * Returns an estimation of percentage of a previously requested computation.
+	 * 
+	 * @param reqId the request of interest
+	 * @return an estimation of percentage of a previously requested computation.
+	 */
 	public int getPercentageDone(String reqId) {
-		// lock.lock();
-
-		// try {
 		RequestInfo requestInfo = requestsInfo.get(reqId);
-
+		
 		if (requestInfo != null) {
 			return requestInfo.getPercentageDone();
 		} else {
 			l.l(me, reqId + ": invalid requestId");
 			return -1;
 		}
-		// } finally {
-		// lock.unlock();
-		// }
 	}
-
+	
+	/**
+	 * Returns the determinant computed
+	 * 
+	 * @param reqId the request of interest
+	 * @return the determinant computed
+	 */
 	public double getResult(String reqId) {
-		// lock.lock();
 		RequestInfo requestInfo = requestsInfo.get(reqId);
-		// lock.unlock();
-
+		
 		if (requestInfo != null) {
-			// blocking operation:
+			// blocking operation
 			return requestInfo.getFinalDeterminant();
 		} else {
 			l.l(me, reqId + ": invalid requestId");
 			return -0.0;
 		}
 	}
-
-	public boolean addWorkerNode(String remoteAddress) {
-		// lock.lock();
-
-		// try {
+	
+	/**
+	 * Adds a worker actor to the system.
+	 * 
+	 * @param remoteAddress remote path of the worker actor
+	 */
+	public void addWorker(String remoteAddress) {
 		for (int i = 0; i < masters.size(); i++) {
-			masters.get(i).tell(new Messages.AddWorkerNode(remoteAddress));
+			masters.get(i).tell(new Messages.AddWorker(remoteAddress));
 		}
-		// TODO ha senso che restituisca sempre true?
-		return true;
-		// } finally {
-		// lock.unlock();
-		// }
 	}
-
-	public boolean removeWorkerNode(String remoteAddress) {
-		// lock.lock();
-
-		// try {
+	
+	/**
+	 * Removes a worker actor from the system
+	 * 
+	 * @param remoteAddress remote path of the worker actor
+	 */
+	public void removeWorker(String remoteAddress) {
 		for (int i = 0; i < masters.size(); i++) {
-			masters.get(i).tell(new Messages.RemoveWorkerNode(remoteAddress));
+			masters.get(i).tell(new Messages.RemoveWorker(remoteAddress));
 		}
-		return true;
-		// } finally {
-		// lock.unlock();
-		// }
 	}
-
+	
+	/**
+	 * Returns a <code>RequestInfo</code>, given its <code>reqId</code>
+	 * 
+	 * @param reqId the request of interest
+	 * @return a <code>RequestInfo</code>
+	 */
 	public RequestInfo getRequestInfo(String reqId) {
 		return requestsInfo.get(reqId);
 	}
