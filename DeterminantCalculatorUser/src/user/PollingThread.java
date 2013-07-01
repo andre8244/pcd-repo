@@ -24,17 +24,28 @@ public class PollingThread extends Thread{
 	@Override
 	public void run(){
 		Response<GetResultResponse> response = servicePort.getResultAsync(reqId);
-		int lastPercentage = 0;
+//		int lastPercentage = 0;
 		long startTime = System.currentTimeMillis();
 
 		while (!response.isDone()) {
 			int percentage = servicePort.getPercentageDone(reqId);
-			if (percentage!=lastPercentage){
-				view.updatingData(percentage,"Elapsed: " + (int)((System.currentTimeMillis()-startTime)/(double)1000) + " sec","ETA: "+ (int)((System.currentTimeMillis()-startTime)/(double)(10*percentage))+" sec");
-				lastPercentage = percentage;
+			int elapsedTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
+
+			if (percentage > 0){
+				int eta = (int) ((System.currentTimeMillis() - startTime) / (double)(10 * percentage) - elapsedTime);
+				view.updateReqData(percentage, elapsedTime, eta);
 			} else {
-				view.updatingData(percentage,"Elapsed: " + (int)((System.currentTimeMillis()-startTime)/(double) 1000) + " sec","");
+				view.updateReqData(percentage, elapsedTime, -1);
 			}
+
+//			if (percentage!=lastPercentage){
+//				view.updateReqData(percentage,"Elapsed: " + (int)((System.currentTimeMillis()-startTime)/(double)1000) + " sec","ETA: "+ (int)((System.currentTimeMillis()-startTime)/(double)(10*percentage))+" sec");
+//				lastPercentage = percentage;
+//			} else {
+//				view.updateReqData(percentage,"Elapsed: " + (int)((System.currentTimeMillis()-startTime)/(double) 1000) + " sec","");
+//			}
+
+			//TODO
 
 			try {
 				Thread.sleep(1000);
@@ -42,8 +53,12 @@ public class PollingThread extends Thread{
 				ex.printStackTrace();
 			}
 		}
+
+		// Response is done
 		int percentage = servicePort.getPercentageDone(reqId);
-		view.updatingData(percentage,"Elapsed: " + (int)((System.currentTimeMillis()-startTime)/ (double) 1000) + " sec","ETA: --");
+		int elapsedTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
+		view.updateReqData(percentage, elapsedTime, -1);
+
 		try {
 			if (!(""+response.get().getReturn()).equals("-0.0")){
 				view.updateLabelResult("Result : " + response.get().getReturn());

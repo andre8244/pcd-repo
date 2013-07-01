@@ -123,7 +123,7 @@ public class UserApp extends JFrame implements ActionListener {
 		String fileValues = fileValuesText.getText();
 
 		if (fileValues.equals(System.getProperty("user.home") + System.getProperty("file.separator") + "matrix.txt")){
-			MatrixUtil.genAndWriteToFile(order, 0.1, 0.2, fileValues);
+			MatrixFileGenerator.generate(order, 0.1, 0.2, fileValues);
 		}
 		final String reqId = servicePort.computeDeterminant(order, fileValues);
 

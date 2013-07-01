@@ -34,7 +34,7 @@ public class OldUserApp {
 		//fileValues = path + "matrix300@6.03e60.txt";
 		//fileValues = "http://pcddeterminant.altervista.org/matrix300@6.03e60.txt";
 
-		MatrixUtil.genAndWriteToFile(order, 0.1, 0.2, fileValues); // 4000
+		MatrixFileGenerator.generate(order, 0.1, 0.2, fileValues); // 4000
 
 		/*l.l(me, "waiting for web service response...");
 

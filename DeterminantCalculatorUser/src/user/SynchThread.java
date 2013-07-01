@@ -8,7 +8,8 @@ import localhost_client.*;
 //import andreafWindows8dualCore_client.*;
 //import leardini_linux.*;
 
-public class SynchThread extends Thread{
+public class SynchThread extends Thread {
+
 	private String reqId;
 	private DeterminantCalculatorService servicePort;
 	private SynchFrame view;
@@ -20,14 +21,10 @@ public class SynchThread extends Thread{
 	}
 
 	@Override
-	public void run(){
+	public void run() {
 		long startTime = System.currentTimeMillis();
 		double res = servicePort.getResult(reqId);
-		if (!(""+res).equals("-0.0")){
-			view.updateData("Result: " + res,"Elapsed: " + (int)((System.currentTimeMillis()-startTime)/(double)1000) + " sec");
-		} else {
-			view.updateData("Result: ERROR","Elapsed: " + (int)((System.currentTimeMillis()-startTime)/(double)1000) + " sec");
-		}
+		int elapsedTimeSecs = (int) ((System.currentTimeMillis() - startTime) / (double) 1000);
+		view.updateReqData(res, elapsedTimeSecs);
 	}
-
 }

@@ -7,13 +7,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
 
-public class MatrixUtil {
+public class MatrixFileGenerator {
 
 	private static BufferedWriter writer;
 	private static Random rand;
 	private static String me = "matrixUtil";
 
-	public static void genAndWriteToFile(int order, double minAbs, double maxAbs, String fileName) {
+	public static void generate(int order, double minAbs, double maxAbs, String fileName) {
 		long startTime = System.currentTimeMillis();
 		rand = new Random();
 
