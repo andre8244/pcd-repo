@@ -66,12 +66,13 @@ public class Master extends UntypedActor {
 		String reqId = compute.getReqId();
 		l.l(me, "handleCompute, reqId: " + reqId + ", order: " + order + ", workers.size():" + workers.size());
 		RequestInfo requestInfo = manager.getRequestInfo(reqId);
-		double[][] matrix = MatrixUtil.fromFileToList(order, fileValues);
-		if (matrix==null){
+		double[][] matrix = MatrixReader.read(order, fileValues);
+		
+		if (matrix == null){
 			l.l(me, reqId + ", matrix Error !!!");
 			requestInfo.setFinalDeterminant(-0.0);
 			requestInfo.setPercentageDone(100); // TODO comunico al client di aver finito anche se non ho calcolato niente
-			return;			
+			return;
 		}
 		requestInfo.setOriginalMatrix(matrix);
 
@@ -98,13 +99,13 @@ public class Master extends UntypedActor {
 					break;
 				}
 			}
-		}		
-		
+		}
+
 		RequestInfo requestInfo = manager.getRequestInfo(reqId);
 		int nRowsDone = requestInfo.getRowsDone();
 		nRowsDone++;
 		requestInfo.setRowsDone(nRowsDone);
-		
+
 		//if (nRowsDone % 500 == 0) {
 		//l.l(me, reqId + ", nRowsDone: " + nRowsDone);
 		//}
@@ -114,7 +115,7 @@ public class Master extends UntypedActor {
 
 		// TODO serve? oppure è sufficiente il side-effect?
 		requestInfo.setMatrix(matrix);
-		
+
 		if (nRowsDone == matrix.length - 1) {
 			if (matrix.length % 500 == 0) {
 				l.l(me, reqId + ", received all rows, submatrix " + matrix.length + ". Duration: " + ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
@@ -168,8 +169,8 @@ public class Master extends UntypedActor {
 				requestInfo.setPercentageDone(100);
 			}
 		}
-	}		
-	
+	}
+
 	private void handleManyRowsResult(Messages.ManyRowsResult mrr) {
 		String reqId = mrr.getReqId();
 		double[][] rows = mrr.getRows();
@@ -303,7 +304,7 @@ public class Master extends UntypedActor {
 			//}
 		}
 	}
-	
+
 	private void sendManyRowsPerMsg(String reqId, double[][] matrix) {
 		double[] firstRow = matrix[0];
 
