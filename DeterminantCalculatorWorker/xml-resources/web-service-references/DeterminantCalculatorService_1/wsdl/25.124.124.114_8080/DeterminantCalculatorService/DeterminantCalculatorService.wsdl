@@ -2,20 +2,20 @@
 <wsp:Policy wsu:Id="DeterminantCalculatorServicePortBindingPolicy"/>
 <types>
 <xsd:schema>
-<xsd:import namespace="http://determinant_calculator_service/" schemaLocation="http://localhost:8080/DeterminantCalculatorService/DeterminantCalculatorService?xsd=1"/>
+<xsd:import namespace="http://determinant_calculator_service/" schemaLocation="http://25.124.124.114:8080/DeterminantCalculatorService/DeterminantCalculatorService?xsd=1"/>
 </xsd:schema>
 </types>
-<message name="addWorker">
-<part name="parameters" element="tns:addWorker"/>
-</message>
-<message name="addWorkerResponse">
-<part name="parameters" element="tns:addWorkerResponse"/>
-</message>
 <message name="getResult">
 <part name="parameters" element="tns:getResult"/>
 </message>
 <message name="getResultResponse">
 <part name="parameters" element="tns:getResultResponse"/>
+</message>
+<message name="addWorker">
+<part name="parameters" element="tns:addWorker"/>
+</message>
+<message name="addWorkerResponse">
+<part name="parameters" element="tns:addWorkerResponse"/>
 </message>
 <message name="computeDeterminant">
 <part name="parameters" element="tns:computeDeterminant"/>
@@ -36,13 +36,13 @@
 <part name="parameters" element="tns:removeWorkerResponse"/>
 </message>
 <portType name="DeterminantCalculatorService">
-<operation name="addWorker">
-<input wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/addWorkerRequest" message="tns:addWorker"/>
-<output wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/addWorkerResponse" message="tns:addWorkerResponse"/>
-</operation>
 <operation name="getResult">
 <input wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/getResultRequest" message="tns:getResult"/>
 <output wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/getResultResponse" message="tns:getResultResponse"/>
+</operation>
+<operation name="addWorker">
+<input wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/addWorkerRequest" message="tns:addWorker"/>
+<output wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/addWorkerResponse" message="tns:addWorkerResponse"/>
 </operation>
 <operation name="computeDeterminant">
 <input wsam:Action="http://determinant_calculator_service/DeterminantCalculatorService/computeDeterminantRequest" message="tns:computeDeterminant"/>
@@ -60,7 +60,7 @@
 <binding name="DeterminantCalculatorServicePortBinding" type="tns:DeterminantCalculatorService">
 <wsp:PolicyReference URI="#DeterminantCalculatorServicePortBindingPolicy"/>
 <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-<operation name="addWorker">
+<operation name="getResult">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -69,7 +69,7 @@
 <soap:body use="literal"/>
 </output>
 </operation>
-<operation name="getResult">
+<operation name="addWorker">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -108,7 +108,7 @@
 </binding>
 <service name="DeterminantCalculatorService">
 <port name="DeterminantCalculatorServicePort" binding="tns:DeterminantCalculatorServicePortBinding">
-<soap:address location="http://localhost:8080/DeterminantCalculatorService/DeterminantCalculatorService"/>
+<soap:address location="http://25.124.124.114:8080/DeterminantCalculatorService/DeterminantCalculatorService"/>
 </port>
 </service>
 </definitions>
