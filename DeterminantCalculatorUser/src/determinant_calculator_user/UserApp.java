@@ -1,4 +1,4 @@
-package user;
+package determinant_calculator_user;
 
 // IMPORT DEL WEB SERVICE CLIENT:
 //import localhost_client.*;

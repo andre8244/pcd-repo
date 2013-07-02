@@ -1,4 +1,4 @@
-package user;
+package determinant_calculator_user;
 
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
