@@ -194,18 +194,18 @@ public class Master extends UntypedActor {
 		int nRowsDone = requestInfo.getRowsDone();
 		nRowsDone = nRowsDone + rows.length;
 		requestInfo.setRowsDone(nRowsDone);
-		l.l(me, reqId + ", receive rows from " + rowNumber + " to " + (rowNumber + rows.length - 1) + "(" + rows.length
-				+ " rows)");
-		l.l(me, reqId + ", nRowsDone: " + nRowsDone);
+//		l.l(me, reqId + ", receive rows from " + rowNumber + " to " + (rowNumber + rows.length - 1) + "(" + rows.length
+//				+ " rows)");
+//		l.l(me, reqId + ", nRowsDone: " + nRowsDone);
 
 		double[][] matrix = requestInfo.getCurrentMatrix();
 		System.arraycopy(rows, 0, matrix, rowNumber, rows.length);
 
 		if (nRowsDone == matrix.length - 1) {
 			if (matrix.length % 500 == 0) {
-				l.l(me,
-						reqId + ", received all rows, submatrix " + matrix.length + ". Duration: "
-								+ ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
+//				l.l(me,
+//						reqId + ", received all rows, submatrix " + matrix.length + ". Duration: "
+//								+ ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
 			}
 
 			if (matrix.length > 2) {
@@ -231,13 +231,13 @@ public class Master extends UntypedActor {
 					long workDone = totalWorkToDo - workToDo;
 					int percentage = (int) (((double) workDone / totalWorkToDo) * 100);
 					// TODO testare la durata del calcolo di percentuale con 10000
-					l.l(me, "percentage computation duration: " + (System.currentTimeMillis() - startTime) + " ms");
+//					l.l(me, "percentage computation duration: " + (System.currentTimeMillis() - startTime) + " ms");
 					requestInfo.setPercentageDone(percentage);
 				}
 			} else { // matrix.length = 2
-				l.l(me,
-						reqId + ", received all rows, submatrix " + matrix.length + ". Duration: "
-								+ ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
+//				l.l(me,
+//						reqId + ", received all rows, submatrix " + matrix.length + ". Duration: "
+//								+ ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
 				double oldDeterminant = requestInfo.getTempDeterminant();
 				double determinant = oldDeterminant * matrix[1][1];
 				requestInfo.setPercentageDone(100);
@@ -329,8 +329,8 @@ public class Master extends UntypedActor {
 				workers.get(i).addJob(reqId, rows, nRowsSent + 1);
 				workers.get(i).getActorRef()
 						.tell(new Messages.ManyRows(reqId, firstRow, rows, nRowsSent + 1), getSelf());
-				l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + nRowsToSend) + "("
-						+ nRowsToSend + " rows) to " + workers.get(i).getRemoteAddress());
+//				l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + nRowsToSend) + "("
+//						+ nRowsToSend + " rows) to " + workers.get(i).getRemoteAddress());
 				nRowsSent += nRowsToSend;
 			}
 		}
