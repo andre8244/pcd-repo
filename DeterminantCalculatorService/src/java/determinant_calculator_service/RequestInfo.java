@@ -7,7 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import log.l;
 
 public class RequestInfo {
-	
+
 	private String me = "requestInfo";
 	private double[][] matrix;
 	private int matrixLength;
@@ -20,7 +20,7 @@ public class RequestInfo {
 	private long startTime;
 	private CountDownLatch computationEnded;
 	private static Lock lock;
-	
+
 	public RequestInfo() {
 		tempDeterminant = 1;
 		finalDeterminant = -0.0; // -0.0 is not a valid result
@@ -31,18 +31,18 @@ public class RequestInfo {
 		computationEnded = new CountDownLatch(1);
 		lock = new ReentrantLock(true);
 	}
-	
+
 	public void setOriginalMatrix(double[][] matrix) {
 		this.matrix = matrix;
 		matrixLength = matrix.length;
 		totalWorkToDo = 0;
-		
+
 		/*
 		 * sum the elements of all the submatrices to be computed example: order = 1000 -> totalWorkToDo = (999 * 1000)
 		 * + (998 * 999) + ... + (1 * 2)
 		 */
 		long startTime = System.currentTimeMillis();
-		
+
 		for (long i = matrixLength; i > 0; i--) {
 			totalWorkToDo += i * (i + 1);
 		}
@@ -50,52 +50,52 @@ public class RequestInfo {
 				"setOriginalMatrix: computed totalWorkTodo (" + totalWorkToDo + "). Duration: "
 						+ (System.currentTimeMillis() - startTime) + " ms");
 	}
-	
+
 	public void setMatrix(double[][] matrix) {
 		this.matrix = matrix;
 	}
-	
+
 	public double[][] getCurrentMatrix() {
 		return matrix;
 	}
-	
+
 	public int getRowsDone() {
 		return nRowsDone;
 	}
-	
+
 	public double getTempDeterminant() {
 		return tempDeterminant;
 	}
-	
+
 	public boolean getChangeSign() {
 		return changeSign;
 	}
-	
+
 	public long getStartTime() {
 		return startTime;
 	}
-	
+
 	public long getTotalWorkToDo() {
 		return totalWorkToDo;
 	}
-	
+
 	public void setTempDeterminant(double tempDeterminant) {
 		this.tempDeterminant = tempDeterminant;
 	}
-	
+
 	public void setRowsDone(int nRowsDone) {
 		this.nRowsDone = nRowsDone;
 	}
-	
+
 	public void setChangeSign() {
 		changeSign = !changeSign;
 	}
-	
+
 	public void setFinalDeterminant(double finalDeterminant) {
 		this.finalDeterminant = finalDeterminant;
 		computationEnded.countDown();
 	}
-	
+
 	public double getFinalDeterminant() {
 		try {
 			computationEnded.await();
@@ -105,7 +105,7 @@ public class RequestInfo {
 			return -0.0;
 		}
 	}
-	
+
 	public void setPercentageDone(int percentage) {
 		lock.lock();
 		try {
@@ -114,7 +114,7 @@ public class RequestInfo {
 			lock.unlock();
 		}
 	}
-	
+
 	public int getPercentageDone() {
 		lock.lock();
 		try {
