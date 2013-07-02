@@ -203,9 +203,9 @@ public class Master extends UntypedActor {
 
 		if (nRowsDone == matrix.length - 1) {
 			if (matrix.length % 500 == 0) {
-//				l.l(me,
-//						reqId + ", received all rows, submatrix " + matrix.length + ". Duration: "
-//								+ ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
+				l.l(me,
+						reqId + ", received all rows, submatrix " + matrix.length + ". Duration: "
+								+ ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
 			}
 
 			if (matrix.length > 2) {
@@ -235,9 +235,9 @@ public class Master extends UntypedActor {
 					requestInfo.setPercentageDone(percentage);
 				}
 			} else { // matrix.length = 2
-//				l.l(me,
-//						reqId + ", received all rows, submatrix " + matrix.length + ". Duration: "
-//								+ ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
+				l.l(me,
+					reqId + ", received all rows, submatrix " + matrix.length + ". Duration: "
+								+ ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
 				double oldDeterminant = requestInfo.getTempDeterminant();
 				double determinant = oldDeterminant * matrix[1][1];
 				requestInfo.setPercentageDone(100);
