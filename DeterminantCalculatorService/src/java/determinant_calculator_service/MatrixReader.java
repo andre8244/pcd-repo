@@ -1,6 +1,5 @@
 package determinant_calculator_service;
 
-import log.l;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -8,19 +7,33 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 
+import log.l;
+
+/**
+ * An utility class to read the values of a matrix from a HTTP or local URL.
+ * 
+ */
 public class MatrixReader {
-
+	
 	private static String me = "matrixUtil";
-
-	// provati anche: ArrayList<ArrayList<Double>> e HashMap<Integer,HashMap<Integer,Double>> ma meno performanti
+	
+	/**
+	 * Reads the values of a matrix from a HTTP or local URL
+	 * 
+	 * @param order the order of the matrix
+	 * @param filePath the HTTP or local URL of the matrix file
+	 * @return an array of array of <code>double </code> containing the values of the matrix
+	 */
 	public static double[][] read(int order, String filePath) {
 		l.l(me, "writing list");
 		long startTime = System.currentTimeMillis();
+		// TODO provati anche: ArrayList<ArrayList<Double>> e HashMap<Integer,HashMap<Integer,Double>> ma meno
+		// performanti
 		double[][] matrix = new double[order][order];
 		BufferedReader reader;
-
+		
 		try {
-			if (filePath.contains("http://")){
+			if (filePath.contains("http://")) {
 				URL url = new URL(filePath);
 				reader = new BufferedReader(new InputStreamReader(url.openStream()));
 			} else {
@@ -28,31 +41,37 @@ public class MatrixReader {
 			}
 			String line = reader.readLine();
 			String[] tokens;
-			int i = 0;
+			int nLines = 0;
+			
 			while (line != null) {
-				//gestione errore numero di righe maggiore di order
-				if (i==order){
+				// the number of lines can't be greater than the order
+				if (nLines == order) {
 					l.l(me, "Order error!");
 					return null;
 				}
-				if (i % 500 == 0) {
-					l.l(me, "wrote " + i + " lines in list");
+				
+				if (nLines % 500 == 0) {
+					l.l(me, "wrote " + nLines + " lines in list");
 				}
 				tokens = line.split(" ");
-				//gestione errore sul numero di colonne
-				if (tokens.length!=order){
-					l.l(me, "Error order!!!");
+				
+				// every line must have <order> elements
+				if (tokens.length != order) {
+					l.l(me, "Order error!");
 					return null;
 				}
+				
 				for (int j = 0; j < tokens.length; j++) {
-					matrix[i][j] = Double.parseDouble(tokens[j]);
+					matrix[nLines][j] = Double.parseDouble(tokens[j]);
 				}
 				line = reader.readLine();
-				i++;
+				nLines++;
 			}
-			//gestione errore numero di righe minore di order
-			if (order!=i){
-				l.l(me, "Error order!!!");
+			reader.close();
+			
+			// the number of lines can't be less than the order
+			if (order != nLines) {
+				l.l(me, "Order error!");
 				return null;
 			}
 		} catch (FileNotFoundException ex) {
@@ -62,7 +81,8 @@ public class MatrixReader {
 			ex.printStackTrace();
 			return null;
 		}
-		l.l(me, "finished reading file and writing list: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
+		l.l(me, "finished reading file and writing list: " + ((System.currentTimeMillis() - startTime) / (double) 1000)
+				+ " sec");
 		return matrix;
 	}
 }

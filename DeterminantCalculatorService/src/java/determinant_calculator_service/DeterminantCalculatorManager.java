@@ -7,9 +7,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import log.l;
 import messages.Messages;
+import akka.actor.Actor;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
+import akka.actor.UntypedActorFactory;
 
 import com.typesafe.config.ConfigFactory;
 
@@ -31,12 +33,18 @@ public class DeterminantCalculatorManager {
 	private DeterminantCalculatorManager() {
 		reqNumber = 0;
 		masters = new ArrayList<ActorRef>();
+		final DeterminantCalculatorManager manager = this;
 		ActorSystem system = ActorSystem.create("masterSystem", ConfigFactory.load().getConfig("masterSystem"));
-		// master = system.actorOf(new Props(Master.class), "master");
 		
 		for (int i = 0; i < nProcessors; i++) {
 			String masterId = "master-" + i;
-			masters.add(system.actorOf(new Props(Master.class), masterId));
+			// masters.add(system.actorOf(new Props(Master.class), masterId));
+			masters.add(system.actorOf(new Props(new UntypedActorFactory() {
+				@Override
+				public Actor create() {
+					return new Master(manager);
+				}
+			}), masterId));
 		}
 		requestsInfo = new ConcurrentHashMap<String, RequestInfo>();
 	}
@@ -73,7 +81,7 @@ public class DeterminantCalculatorManager {
 			String reqId = "req" + reqNumber;
 			reqNumber = reqNumber + 1;
 			requestsInfo.put(reqId, new RequestInfo());
-			masters.get(index).tell(new Messages.Compute(order, fileValues, reqId, this));
+			masters.get(index).tell(new Messages.Compute(order, fileValues, reqId));
 			index = (index + 1) % masters.size();
 			return reqId;
 		} finally {
@@ -119,7 +127,7 @@ public class DeterminantCalculatorManager {
 	/**
 	 * Adds a worker actor to the system.
 	 * 
-	 * @param remoteAddress remote path of the worker actor
+	 * @param remoteAddress the remote path of the worker actor
 	 */
 	public void addWorker(String remoteAddress) {
 		for (int i = 0; i < masters.size(); i++) {
@@ -128,9 +136,9 @@ public class DeterminantCalculatorManager {
 	}
 	
 	/**
-	 * Removes a worker actor from the system
+	 * Removes a worker actor from the system.
 	 * 
-	 * @param remoteAddress remote path of the worker actor
+	 * @param remoteAddress the remote path of the worker actor
 	 */
 	public void removeWorker(String remoteAddress) {
 		for (int i = 0; i < masters.size(); i++) {
@@ -139,7 +147,7 @@ public class DeterminantCalculatorManager {
 	}
 	
 	/**
-	 * Returns a <code>RequestInfo</code>, given its <code>reqId</code>
+	 * Returns the <code>RequestInfo</code> associated to the given <code>reqId</code>.
 	 * 
 	 * @param reqId the request of interest
 	 * @return a <code>RequestInfo</code>

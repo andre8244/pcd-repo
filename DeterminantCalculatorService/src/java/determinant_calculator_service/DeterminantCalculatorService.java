@@ -50,7 +50,7 @@ public class DeterminantCalculatorService {
 	/**
 	 * Operation to add a worker actor.
 	 * 
-	 * @param remoteAddress remote path of the worker actor
+	 * @param remoteAddress the remote path of the worker actor
 	 */
 	@WebMethod(operationName = "addWorker")
 	public void addWorker(@WebParam(name = "remoteAddress") String remoteAddress) {
@@ -60,7 +60,7 @@ public class DeterminantCalculatorService {
 	/**
 	 * Operation to remove a worker actor.
 	 * 
-	 * @param remoteAddress remote path of the worker actor
+	 * @param remoteAddress the remote path of the worker actor
 	 */
 	@WebMethod(operationName = "removeWorker")
 	public void removeWorker(@WebParam(name = "remoteAddress") String remoteAddress) {
