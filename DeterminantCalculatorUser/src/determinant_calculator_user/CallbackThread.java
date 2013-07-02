@@ -5,14 +5,13 @@ import java.util.concurrent.Future;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Response;
 // IMPORT DEL WEB SERVICE CLIENT:
-//import localhost_client.*;
-import log.l;
+import localhost_client.*;
 //import marco_client.*;
 //import marcoXP_client.*;
 //import andreaf_client.*;
 //import andreafWindows8dualCore_client.*;
 //import leardini_linux.*;
-import leardini_mac.*;
+//import leardini_mac.*;
 
 public class CallbackThread extends Thread {
 
@@ -51,17 +50,18 @@ public class CallbackThread extends Thread {
 		};
 		Future<?> response = servicePort.getResultAsync(reqId, asyncHandler);
 		startTime = System.currentTimeMillis();
-
+		int lastPercentage = 0;
+		int eta = -1;
+		
 		while (!response.isDone()) {
 			int percentage = servicePort.getPercentageDone(reqId);
 			int elapsedTimeSecs = (int) ((System.currentTimeMillis() - startTime) / 1000);
 
-			if (percentage > 0){
-				int eta = (int) ((System.currentTimeMillis() - startTime) / (double)(10 * percentage) - elapsedTimeSecs);
-				view.updateReqData(percentage, elapsedTimeSecs, eta);
-			} else {
-				view.updateReqData(percentage, elapsedTimeSecs, -1);
+			if (percentage!=lastPercentage){
+				lastPercentage = percentage;
+				eta = (int) ((System.currentTimeMillis() - startTime) / (double)(10 * percentage) - elapsedTimeSecs);
 			}
+			view.updateReqData(percentage, elapsedTimeSecs, eta);
 
 			try {
 				Thread.sleep(1000);
