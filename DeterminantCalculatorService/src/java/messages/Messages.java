@@ -184,8 +184,4 @@ public class Messages {
 		}
 	}
 	
-	public static class RemoveWorkerAck implements Serializable {
-		public RemoveWorkerAck() {
-		}
-	}
 }
