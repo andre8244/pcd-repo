@@ -199,9 +199,9 @@ public class Master extends UntypedActor {
 		int nRowsDone = requestInfo.getRowsDone();
 		nRowsDone = nRowsDone + rows.length;
 		requestInfo.setRowsDone(nRowsDone);
-//		l.l(me, reqId + ", receive rows from " + rowNumber + " to " + (rowNumber + rows.length - 1) + "(" + rows.length
-//				+ " rows)");
-//		l.l(me, reqId + ", nRowsDone: " + nRowsDone);
+		l.l(me, reqId + ", receive rows from " + rowNumber + " to " + (rowNumber + rows.length - 1) + "(" + rows.length
+				+ " rows)");
+		l.l(me, reqId + ", nRowsDone: " + nRowsDone);
 
 		double[][] matrix = requestInfo.getCurrentMatrix();
 		System.arraycopy(rows, 0, matrix, rowNumber, rows.length);
@@ -352,17 +352,17 @@ public class Master extends UntypedActor {
 		for (int i = 0; i < (workers.size()); i++) {
 			// number of rows to send to worker i:
 			nRowsToSend = (int) (Math.round((i + 1) * nRowsPerWorker) - nRowsSent);
-			//l.l(me, "nRowsToSend: " + nRowsToSend);
+			l.l(me, "nRowsToSend: " + nRowsToSend);
 
 			if (nRowsToSend > 0) {
 				
 				int maxNRowsPerMsg = maxMatrixElements/matrix.length; // maxMatrixElements deve essere maggiore dell'ordine massimo possibile
 				
 				int nMsgToSend = (int) (nRowsToSend/maxNRowsPerMsg);
-				//l.l(me, "nMsgToSend with " + maxNRowsPerMsg + " rows: " + nMsgToSend);
+				l.l(me, "nMsgToSend with " + (maxNRowsPerMsg*matrix.length) + " elements: " + nMsgToSend);
 								
 				int nRowsOfFirstMsg = nRowsToSend%maxNRowsPerMsg;
-				//l.l(me, "nRowsOfFirstMsg: " + nRowsOfFirstMsg);
+				l.l(me, "nRowsOfFirstMsg: " + nRowsOfFirstMsg);
 				
 				if (nRowsOfFirstMsg!=0){
 					double[][] rows = new double[nRowsOfFirstMsg][matrix.length];
@@ -372,23 +372,23 @@ public class Master extends UntypedActor {
 					workers.get(i).addJob(reqId, rows, nRowsSent + 1);
 					workers.get(i).getActorRef()
 							.tell(new Messages.ManyRows(reqId, firstRow, rows, nRowsSent + 1), getSelf());
-					//l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + nRowsOfFirstMsg) + "("
-					//		+ nRowsOfFirstMsg + " rows) to " + workers.get(i).getRemoteAddress());
+					l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + nRowsOfFirstMsg) + "("
+							+ nRowsOfFirstMsg + " rows) to " + workers.get(i).getRemoteAddress());
 					nRowsSent += nRowsOfFirstMsg;
 				}
-					
+				
+				double[][] rows = new double[maxNRowsPerMsg][matrix.length];
+				
 				for (int j = 0; j < nMsgToSend; j++) {
 					
-					double[][] rows = new double[maxNRowsPerMsg][matrix.length];
-
 					for (int k = 0; k < rows.length; k++) {
 						rows[k] = matrix[nRowsSent + k + 1];
 					}
 					workers.get(i).addJob(reqId, rows, nRowsSent + 1);
 					workers.get(i).getActorRef()
 							.tell(new Messages.ManyRows(reqId, firstRow, rows, nRowsSent + 1), getSelf());
-					//l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + maxNRowsPerMsg) + "("
-					//		+ maxNRowsPerMsg + " rows) to " + workers.get(i).getRemoteAddress());
+					l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + maxNRowsPerMsg) + "("
+							+ maxNRowsPerMsg + " rows) to " + workers.get(i).getRemoteAddress());
 					nRowsSent += maxNRowsPerMsg;
 				}
 			}
