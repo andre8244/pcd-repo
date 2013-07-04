@@ -19,7 +19,7 @@ public class OldUserApp {
 	private String path = System.getProperty("user.home") + System.getProperty("file.separator");
 	private String fileValues;
 	private URL fileValuesURL;
-	private int order = 30;
+	private int order = 5000;
 	// select execution policy:
 	private static final int policy = POLLING;
 
