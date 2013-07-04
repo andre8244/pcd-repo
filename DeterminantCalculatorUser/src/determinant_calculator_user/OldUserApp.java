@@ -49,14 +49,14 @@ public class OldUserApp {
 			case CALLBACK:
 				callbackRequest();
 				break;
-		}*/
+		}
 
 		// non eliminare per ora: a volte la riga con il risultato non viene stampata
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException ex) {
 			ex.printStackTrace();
-		}
+		}*/
 	}
 
 	private void pollingRequest() {
