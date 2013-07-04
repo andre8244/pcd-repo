@@ -19,8 +19,7 @@ public class Master extends UntypedActor {
 	private ArrayList<WorkerInfo> workers;
 	private DeterminantCalculatorManager manager;
 	private String me;
-	private int maxNRowsPerMsg = 10;//1000;
-	private int maxMatrixElements = 100;//1000000;
+	private int maxMatrixElements = 1000000;
 
 	/**
 	 * Constructs a master actor.
@@ -362,32 +361,37 @@ public class Master extends UntypedActor {
 
 			if (nRowsToSend > 0) {
 				
-				int nMsgPerWorker = (int) (nRowsToSend/maxNRowsPerMsg);
-				l.l(me, "nMsgPerWorker with " + maxNRowsPerMsg + " rows: " + nMsgPerWorker);
-				//int nMsgPerWorker = (int) ((nRowsToSend*matrix.length)/maxMatrixElements);
-				//l.l(me, "nMsgPerWorker with " + maxMatrixElements + " matrix elements: " + nMsgPerWorker);
+				int maxNRowsPerMsg = maxMatrixElements/matrix.length; // maxMatrixElements deve essere maggiore dell'ordine massimo possibile
+				
+				int nMsgToSend = (int) (nRowsToSend/maxNRowsPerMsg);
+				l.l(me, "nMsgToSend with " + maxNRowsPerMsg + " rows: " + nMsgToSend);
+				//int nMsgToSend = (int) ((nRowsToSend*matrix.length)/maxMatrixElements);
+				//l.l(me, "nMsgToSend with " + maxMatrixElements + " matrix elements: " + nMsgToSend);
 								
-				int nRowsFirstMsg = nRowsToSend%maxNRowsPerMsg;
-				l.l(me, "nRowsFirstMsg: " + nRowsFirstMsg);
-				//int nRowsFirstMsg = ((nRowsToSend*matrix.length)%maxMatrixElements)/matrix.length;
+				int nRowsOfFirstMsg = nRowsToSend%maxNRowsPerMsg;
+				l.l(me, "nRowsOfFirstMsg: " + nRowsOfFirstMsg);
+				//int nElemsOfFirstMsg = (nRowsToSend*matrix.length)%maxMatrixElements;
+				//l.l(me, "nElemsOfFirstMsg: " + nElemsOfFirstMsg);
+				//int nRowsFirstMsg = nElemsOfFirstMsg/matrix.length;
 				//l.l(me, "nRowsFirstMsg: " + nRowsFirstMsg);
 				// TODO uso questa variabile per provare entrambe le versioni
-				//maxNRowsPerMsg = maxMatrixElements/matrix.length;
+				//maxNRowsPerMsg = nRowsToSend/nMsgToSend;
+				l.l(me, "maxNRowsPerMsg: " + maxNRowsPerMsg);
 				
-				if (nRowsFirstMsg!=0){
-					double[][] rows = new double[nRowsFirstMsg][matrix.length];
+				if (nRowsOfFirstMsg!=0){
+					double[][] rows = new double[nRowsOfFirstMsg][matrix.length];
 					for (int k = 0; k < rows.length; k++) {
 						rows[k] = matrix[nRowsSent + k + 1];
 					}
 					workers.get(i).addJob(reqId, rows, nRowsSent + 1);
 					workers.get(i).getActorRef()
 							.tell(new Messages.ManyRows(reqId, firstRow, rows, nRowsSent + 1), getSelf());
-//					l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + nRowsToSend) + "("
-//							+ nRowsToSend + " rows) to " + workers.get(i).getRemoteAddress());
-					nRowsSent += nRowsFirstMsg;
+					l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + nRowsOfFirstMsg) + "("
+							+ nRowsOfFirstMsg + " rows) to " + workers.get(i).getRemoteAddress());
+					nRowsSent += nRowsOfFirstMsg;
 				}
 					
-				for (int j = 0; j < nMsgPerWorker; j++) {
+				for (int j = 0; j < nMsgToSend; j++) {
 					
 					double[][] rows = new double[maxNRowsPerMsg][matrix.length];
 
@@ -397,9 +401,9 @@ public class Master extends UntypedActor {
 					workers.get(i).addJob(reqId, rows, nRowsSent + 1);
 					workers.get(i).getActorRef()
 							.tell(new Messages.ManyRows(reqId, firstRow, rows, nRowsSent + 1), getSelf());
-//					l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + nRowsToSend) + "("
-//							+ nRowsToSend + " rows) to " + workers.get(i).getRemoteAddress());
-					nRowsSent += nMsgPerWorker;
+					l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + maxNRowsPerMsg) + "("
+							+ maxNRowsPerMsg + " rows) to " + workers.get(i).getRemoteAddress());
+					nRowsSent += maxNRowsPerMsg;
 				}
 			}
 		}
