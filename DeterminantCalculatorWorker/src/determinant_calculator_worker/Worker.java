@@ -13,6 +13,9 @@ import localhost_client.*;
 //import andreafWindows8dualCore_client.*;
 //import leardini_linux.*;
 //import leardini_mac.*;
+//import marco_almawifi_client.*;
+//import andreaf_almawifi_client.*;
+//import leardini_almawifi_client.*;
 
 public class Worker extends UntypedActor {
 
@@ -45,9 +48,7 @@ public class Worker extends UntypedActor {
         } else if (msg instanceof Messages.Remove) { // TODO da eliminare?
 			handleRemove();
 		} else if (msg instanceof Messages.AddWorkerAck) {
-			handleAddWorkerNodeAck();
-		} else if (msg instanceof Messages.RemoveWorkerAck) {
-			handleRemoveWorkerNodeAck();
+			handleAddWorkerAck();
 		} else {
 			unhandled(msg);
 		}
@@ -85,19 +86,17 @@ public class Worker extends UntypedActor {
         }
 		final Messages.ManyRowsResult manyRowsResult = new Messages.ManyRowsResult(reqId, rows, rowNumber);
 		getSender().tell(manyRowsResult, getSelf());
-        //l.l(me, reqId + ", sent rows from " + rowNumber + " to " + (rowNumber+rows.length-1) + " to master");
+        l.l(me, reqId + ", sent rows from " + rowNumber + " to " + (rowNumber+rows.length-1) + " to master");
 	}
 
 	private void handleRemove() {
 		servicePort.removeWorker(remoteAddress);
-	}
-
-	private void handleAddWorkerNodeAck() {
-		l.l(me, "worker registered to master: " + this.getSender().toString());
-	}
-
-	private void handleRemoveWorkerNodeAck() {
 		l.l(me, "worker removed");
 		this.getContext().stop(this.getSelf());
 	}
+
+	private void handleAddWorkerAck() {
+		l.l(me, "worker registered to master: " + this.getSender().toString());
+	}
+
 }
