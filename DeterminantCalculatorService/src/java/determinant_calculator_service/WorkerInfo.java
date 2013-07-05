@@ -60,8 +60,8 @@ public class WorkerInfo {
 	 * @param rows the set of rows of the <code>GaussJob</code> to add
 	 * @param rowNumber the index of the first row of the <code>GaussJob</code> to add
 	 */
-	public void addJob(String reqId, double[][] rows, int rowNumber) {
-		jobs.add(new GaussJob(reqId, rows, rowNumber));
+	public void addJob(String reqId, int nRows, int offset) {
+		jobs.add(new GaussJob(reqId, nRows, offset));
 	}
 	
 	/**

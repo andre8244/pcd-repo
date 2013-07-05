@@ -284,21 +284,24 @@ public class Master extends UntypedActor {
 				// nel caso di shutdown -> pending request = 0 !
 				for (int j = 0; j < works.size(); j++) {
 					String reqId = works.get(j).getReqId();
-					double[][] rows = works.get(j).getRows();
+					int nRows = works.get(j).getNRows();
 					int rowNumber = works.get(j).getRowNumber();
 					RequestInfo requestInfo = manager.getRequestInfo(reqId);
 
 					// caso particolare: non abbiamo altri worker a disposizione
 					if (workers.size() < 2) {
-						//l.l(me, reqId + ", WORKERS.SIZE() = 0 !!!");
+						l.l(me, reqId + ", WORKERS.SIZE() = 0 !!!");
 						requestInfo.setPercentageDone(100);
 						requestInfo.setFinalDeterminant(-0.0);
 						continue;
 					}
-					double[] firstRow = requestInfo.getCurrentMatrix()[0];
-
+					double[][] matrix = requestInfo.getCurrentMatrix();
+					double[] firstRow = matrix[0];
+					double[][] rows = new double[nRows][matrix.length];
+					System.arraycopy(rows, 0, matrix, rowNumber, rows.length);
+					
 					//l.l(me, "index: " + index);
-					workers.get(index).addJob(reqId, rows, rowNumber);
+					workers.get(index).addJob(reqId, nRows, rowNumber);
 					workers.get(index).getActorRef()
 							.tell(new Messages.ManyRows(reqId, firstRow, rows, rowNumber), getSelf());
 					//l.l(me, reqId + ", handleRemove, sent row " + rowNumber + " to " + workers.get(index).getRemoteAddress());
@@ -333,7 +336,7 @@ public class Master extends UntypedActor {
 			// per utilizzare la OneRow e i Work passo una matrice con una sola riga
 			double[][] rows = new double[1][matrix.length];
 			rows[0] = row;
-			workers.get(((i - 1) % workers.size())).addJob(reqId, rows, i);
+			workers.get(((i - 1) % workers.size())).addJob(reqId, 1, i);
 			workers.get(((i - 1) % workers.size())).getActorRef()
 					.tell(new Messages.OneRow(reqId, firstRow, row, i), getSelf());
 //			if (i % 500 == 0) {
@@ -369,7 +372,7 @@ public class Master extends UntypedActor {
 					for (int k = 0; k < rows.length; k++) {
 						rows[k] = matrix[nRowsSent + k + 1];
 					}
-					workers.get(i).addJob(reqId, rows, nRowsSent + 1);
+					workers.get(i).addJob(reqId, nRowsOfFirstMsg, nRowsSent + 1);
 					workers.get(i).getActorRef()
 							.tell(new Messages.ManyRows(reqId, firstRow, rows, nRowsSent + 1), getSelf());
 					l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + nRowsOfFirstMsg) + "("
@@ -384,7 +387,7 @@ public class Master extends UntypedActor {
 					for (int k = 0; k < rows.length; k++) {
 						rows[k] = matrix[nRowsSent + k + 1];
 					}
-					workers.get(i).addJob(reqId, rows, nRowsSent + 1);
+					workers.get(i).addJob(reqId, maxNRowsPerMsg, nRowsSent + 1);
 					workers.get(i).getActorRef()
 							.tell(new Messages.ManyRows(reqId, firstRow, rows, nRowsSent + 1), getSelf());
 					l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + maxNRowsPerMsg) + "("
@@ -461,7 +464,7 @@ public class Master extends UntypedActor {
 						first = false;
 					}
 					String reqId = works.get(j).getReqId();
-					double[][] rows = works.get(j).getRows();
+					int nRows = works.get(j).getNRows();
 					int rowNumber = works.get(j).getRowNumber();
 					RequestInfo requestInfo = manager.getRequestInfo(reqId);
 
@@ -472,7 +475,10 @@ public class Master extends UntypedActor {
 						requestInfo.setFinalDeterminant(-0.0);
 						continue;
 					}
-					double[] firstRow = requestInfo.getCurrentMatrix()[0];
+					double[][] matrix = requestInfo.getCurrentMatrix();
+					double[] firstRow = matrix[0];
+					double[][] rows = new double[nRows][matrix.length];
+					System.arraycopy(rows, 0, matrix, rowNumber, rows.length);
 
 					for (int k = 0; k < workers.size(); k++) {
 						index = index % workers.size();
@@ -480,7 +486,7 @@ public class Master extends UntypedActor {
 
 						if (!tokens[0].equals(workerSystem)) {
 							l.l(me, "index: " + index);
-							workers.get(index).addJob(reqId, rows, rowNumber);
+							workers.get(index).addJob(reqId, nRows, rowNumber);
 							workers.get(index).getActorRef()
 									.tell(new Messages.ManyRows(reqId, firstRow, rows, rowNumber), getSelf());
 							l.l(me, reqId + ", call " + workers.get(index).getRemoteAddress()

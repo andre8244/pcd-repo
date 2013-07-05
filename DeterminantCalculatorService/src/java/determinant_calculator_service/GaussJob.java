@@ -8,7 +8,7 @@ package determinant_calculator_service;
 public class GaussJob {
 	
 	private String reqId;
-	private double[][] rows;
+	private int nRows;
 	private int rowNumber;
 	
 	/**
@@ -18,9 +18,9 @@ public class GaussJob {
 	 * @param rows the set of rows of the job
 	 * @param rowNumber the index of the first row of the job
 	 */
-	public GaussJob(String reqId, double[][] rows, int rowNumber) {
+	public GaussJob(String reqId, int nRows, int rowNumber) {
 		this.reqId = reqId;
-		this.rows = rows;
+		this.nRows = nRows;
 		this.rowNumber = rowNumber;
 	}
 	
@@ -38,8 +38,8 @@ public class GaussJob {
 	 * 
 	 * @return the set of rows of the job
 	 */
-	public double[][] getRows() {
-		return rows;
+	public int getNRows() {
+		return nRows;
 	}
 	
 	/**
