@@ -11,27 +11,27 @@ import log.l;
 
 /**
  * An utility class to read the values of a matrix from a HTTP or local URL.
- * 
+ *
  */
 public class MatrixReader {
-	
+
 	private static String me = "matrixUtil";
-	
+
 	/**
 	 * Reads the values of a matrix from a HTTP or local URL
-	 * 
+	 *
 	 * @param order the order of the matrix
 	 * @param filePath the HTTP or local URL of the matrix file
 	 * @return an array of array of <code>double </code> containing the values of the matrix
 	 */
-	public static double[][] read(int order, String filePath) {
+	public double[][] read(int order, String filePath) {
 		l.l(me, "writing list");
 		long startTime = System.currentTimeMillis();
 		// TODO provati anche: ArrayList<ArrayList<Double>> e HashMap<Integer,HashMap<Integer,Double>> ma meno
 		// performanti
 		double[][] matrix = new double[order][order];
 		BufferedReader reader;
-		
+
 		try {
 			if (filePath.contains("http://")) {
 				URL url = new URL(filePath);
@@ -42,25 +42,25 @@ public class MatrixReader {
 			String line = reader.readLine();
 			String[] tokens;
 			int nLines = 0;
-			
+
 			while (line != null) {
 				// the number of lines can't be greater than the order
 				if (nLines == order) {
 					l.l(me, "Order error!");
 					return null;
 				}
-				
+
 				if (nLines % 500 == 0) {
 					l.l(me, "wrote " + nLines + " lines in list");
 				}
 				tokens = line.split(" ");
-				
+
 				// every line must have <order> elements
 				if (tokens.length != order) {
 					l.l(me, "Order error!");
 					return null;
 				}
-				
+
 				for (int j = 0; j < tokens.length; j++) {
 					matrix[nLines][j] = Double.parseDouble(tokens[j]);
 				}
@@ -68,7 +68,7 @@ public class MatrixReader {
 				nLines++;
 			}
 			reader.close();
-			
+
 			// the number of lines can't be less than the order
 			if (order != nLines) {
 				l.l(me, "Order error!");

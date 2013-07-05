@@ -19,7 +19,7 @@ public class Master extends UntypedActor {
 	private ArrayList<WorkerInfo> workers;
 	private DeterminantCalculatorManager manager;
 	private String me;
-	private int maxMatrixElements = 1000000;
+	private static final int MAX_ELEMS_PER_MSG = 1000000;
 
 	/**
 	 * Constructs a master actor.
@@ -72,7 +72,8 @@ public class Master extends UntypedActor {
 		String reqId = compute.getReqId();
 		l.l(me, "handleCompute, reqId: " + reqId + ", order: " + order + ", workers.size():" + workers.size());
 		RequestInfo requestInfo = manager.getRequestInfo(reqId);
-		double[][] matrix = MatrixReader.read(order, fileValues); // TODO ho più master, serve un lock?
+		MatrixReader matrixReader = new MatrixReader();
+		double[][] matrix = matrixReader.read(order, fileValues);
 
 		if (matrix == null) {
 			l.l(me, reqId + ", matrix Error !!!");
@@ -111,7 +112,7 @@ public class Master extends UntypedActor {
 		int nRowsDone = requestInfo.getRowsDone();
 		nRowsDone++;
 		requestInfo.setRowsDone(nRowsDone);
-		
+
 		//if (nRowsDone % 500 == 0){
 		//	l.l(me, reqId + ", 	received row " + rowNumber + " , nRowsDone: " + nRowsDone);
 		//}
@@ -123,7 +124,7 @@ public class Master extends UntypedActor {
 			if (matrix.length % 500 == 0) {
 				l.l(me,
 						reqId + ", received all rows, submatrix " + matrix.length + ". Duration: "
-								+ ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
+						+ ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
 			}
 			if (matrix.length > 2) {
 				requestInfo.setRowsDone(0);
@@ -158,7 +159,7 @@ public class Master extends UntypedActor {
 			} else { // matrix.length = 2
 				l.l(me,
 						reqId + ", received all rows, submatrix " + matrix.length + ". Duration: "
-								+ ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
+						+ ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
 				double oldDeterminant = requestInfo.getTempDeterminant();
 				double determinant = oldDeterminant * matrix[1][1];
 				requestInfo.setPercentageDone(100);
@@ -199,9 +200,9 @@ public class Master extends UntypedActor {
 		int nRowsDone = requestInfo.getRowsDone();
 		nRowsDone = nRowsDone + rows.length;
 		requestInfo.setRowsDone(nRowsDone);
-		l.l(me, reqId + ", receive rows from " + rowNumber + " to " + (rowNumber + rows.length - 1) + "(" + rows.length
-				+ " rows)");
-		l.l(me, reqId + ", nRowsDone: " + nRowsDone);
+//		l.l(me, reqId + ", receive rows from " + rowNumber + " to " + (rowNumber + rows.length - 1) + "(" + rows.length
+//				+ " rows)");
+//		l.l(me, reqId + ", nRowsDone: " + nRowsDone);
 
 		double[][] matrix = requestInfo.getCurrentMatrix();
 		// TODO controllo matrix null
@@ -211,7 +212,7 @@ public class Master extends UntypedActor {
 			if (matrix.length % 500 == 0) {
 				l.l(me,
 						reqId + ", received all rows, submatrix " + matrix.length + ". Duration: "
-								+ ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
+						+ ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
 			}
 
 			if (matrix.length > 2) {
@@ -242,8 +243,8 @@ public class Master extends UntypedActor {
 				}
 			} else { // matrix.length = 2
 				l.l(me,
-					reqId + ", received all rows, submatrix " + matrix.length + ". Duration: "
-								+ ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
+						reqId + ", received all rows, submatrix " + matrix.length + ". Duration: "
+						+ ((System.currentTimeMillis() - requestInfo.getStartTime()) / (double) 1000) + " sec");
 				double oldDeterminant = requestInfo.getTempDeterminant();
 				double determinant = oldDeterminant * matrix[1][1];
 				requestInfo.setPercentageDone(100);
@@ -303,7 +304,7 @@ public class Master extends UntypedActor {
 					for (int k = 0; k < rows.length; k++) {
 						rows[k] = matrix[rowNumber + k];
 					}
-					
+
 					worker.removeJob(works.get(j)); // rimuovo prima il job dal worker per liberare memoria
 					//l.l(me, "index: " + index);
 					workers.get(index).addJob(reqId, nRows, rowNumber);
@@ -335,7 +336,7 @@ public class Master extends UntypedActor {
 
 	private void sendOneRowPerMsg(String reqId, double[][] matrix) {
 		double[] firstRow = matrix[0];
-		
+
 		for (int i = 1; i < matrix.length; i++) {
 			double[] row = matrix[i];
 			// per utilizzare la OneRow e i Work passo una matrice con una sola riga
@@ -350,7 +351,7 @@ public class Master extends UntypedActor {
 		}
 	}
 
-	private void sendRowsPerMsg(String reqId, double[][] matrix) {
+	private void sendRowsToWorkers(String reqId, double[][] matrix) {
 		double[] firstRow = matrix[0];
 		double nRowsPerWorker = (double) (matrix.length - 1) / workers.size();
 		// l.l(me, "nRowsPerWorker: " + nRowsPerWorker);
@@ -360,19 +361,19 @@ public class Master extends UntypedActor {
 		for (int i = 0; i < (workers.size()); i++) {
 			// number of rows to send to worker i:
 			nRowsToSend = (int) (Math.round((i + 1) * nRowsPerWorker) - nRowsSent);
-			l.l(me, "nRowsToSend: " + nRowsToSend);
+//			l.l(me, "nRowsToSend: " + nRowsToSend);
 
 			if (nRowsToSend > 0) {
-				
-				int maxNRowsPerMsg = maxMatrixElements/matrix.length; // maxMatrixElements deve essere maggiore dell'ordine massimo possibile
-				
-				int nMsgToSend = (int) (nRowsToSend/maxNRowsPerMsg);
-				l.l(me, "nMsgToSend with " + (maxNRowsPerMsg*matrix.length) + " elements: " + nMsgToSend);
-								
-				int nRowsOfFirstMsg = nRowsToSend%maxNRowsPerMsg;
-				l.l(me, "nRowsOfFirstMsg: " + nRowsOfFirstMsg);
-				
-				if (nRowsOfFirstMsg!=0){
+
+				int maxNRowsPerMsg = MAX_ELEMS_PER_MSG / matrix.length; // MAX_ELEMS_PER_MSG deve essere maggiore dell'ordine massimo possibile
+
+				int nMsgToSend = (int) (nRowsToSend / maxNRowsPerMsg);
+//				l.l(me, "nMsgToSend with " + (maxNRowsPerMsg*matrix.length) + " elements: " + nMsgToSend);
+
+				int nRowsOfFirstMsg = nRowsToSend % maxNRowsPerMsg;
+//				l.l(me, "nRowsOfFirstMsg: " + nRowsOfFirstMsg);
+
+				if (nRowsOfFirstMsg != 0) {
 					double[][] rows = new double[nRowsOfFirstMsg][matrix.length];
 					for (int k = 0; k < rows.length; k++) {
 						rows[k] = matrix[nRowsSent + k + 1];
@@ -380,23 +381,23 @@ public class Master extends UntypedActor {
 					workers.get(i).addJob(reqId, nRowsOfFirstMsg, nRowsSent + 1);
 					workers.get(i).getActorRef()
 							.tell(new Messages.ManyRows(reqId, firstRow, rows, nRowsSent + 1), getSelf());
-					l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + nRowsOfFirstMsg) + "("
-							+ nRowsOfFirstMsg + " rows) to " + workers.get(i).getRemoteAddress());
+//					l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + nRowsOfFirstMsg) + "("
+//							+ nRowsOfFirstMsg + " rows) to " + workers.get(i).getRemoteAddress());
 					nRowsSent += nRowsOfFirstMsg;
 				}
-				
+
 				double[][] rows = new double[maxNRowsPerMsg][matrix.length];
-				
+
 				for (int j = 0; j < nMsgToSend; j++) {
-					
+
 					for (int k = 0; k < rows.length; k++) {
 						rows[k] = matrix[nRowsSent + k + 1];
 					}
 					workers.get(i).addJob(reqId, maxNRowsPerMsg, nRowsSent + 1);
 					workers.get(i).getActorRef()
 							.tell(new Messages.ManyRows(reqId, firstRow, rows, nRowsSent + 1), getSelf());
-					l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + maxNRowsPerMsg) + "("
-							+ maxNRowsPerMsg + " rows) to " + workers.get(i).getRemoteAddress());
+//					l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + maxNRowsPerMsg) + "("
+//							+ maxNRowsPerMsg + " rows) to " + workers.get(i).getRemoteAddress());
 					nRowsSent += maxNRowsPerMsg;
 				}
 			}
@@ -404,11 +405,12 @@ public class Master extends UntypedActor {
 	}
 
 	/**
-	 * Implements the Gaussian elimination algorithm. If a zero column is detected the computation can stop, the
-	 * determinant of the matrix is zero.
+	 * Implements the Gaussian elimination algorithm. If a zero column is
+	 * detected the computation can stop, the determinant of the matrix is zero.
 	 *
 	 * @param reqId the request of interest
-	 * @return <code>true</code> if a zero column is detected, <code>false</code> otherwise
+	 * @return <code>true</code> if a zero column is
+	 * detected, <code>false</code> otherwise
 	 */
 	private boolean gauss(String reqId) {
 		RequestInfo requestInfo = manager.getRequestInfo(reqId);
@@ -432,7 +434,7 @@ public class Master extends UntypedActor {
 		}
 		double oldDeterminant = requestInfo.getTempDeterminant();
 		requestInfo.setTempDeterminant(oldDeterminant * matrix[0][0]);
-		sendRowsPerMsg(reqId, matrix);
+		sendRowsToWorkers(reqId, matrix);
 		return false;
 	}
 
@@ -489,7 +491,7 @@ public class Master extends UntypedActor {
 					}
 
 					worker.removeJob(works.get(j)); // rimuovo prima il job dal worker per liberare memoria
-					
+
 					for (int k = 0; k < workers.size(); k++) {
 						index = index % workers.size();
 						tokens = workers.get(index).getRemoteAddress().split("/user");
