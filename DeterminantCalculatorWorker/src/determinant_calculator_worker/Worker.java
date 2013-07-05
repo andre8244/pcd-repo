@@ -84,8 +84,7 @@ public class Worker extends UntypedActor {
                 rows[i][j] = rows[i][j] + factor * firstRow[j];
             }
         }
-		final Messages.ManyRowsResult manyRowsResult = new Messages.ManyRowsResult(reqId, rows, rowNumber);
-		getSender().tell(manyRowsResult, getSelf());
+		getSender().tell(new Messages.ManyRowsResult(reqId, rows, rowNumber));
         l.l(me, reqId + ", sent rows from " + rowNumber + " to " + (rowNumber+rows.length-1) + " to master");
 	}
 
