@@ -1,14 +1,11 @@
 package determinant_calculator_worker;
 
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.Props;
-import com.typesafe.config.ConfigFactory;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -19,15 +16,21 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
+
 import log.l;
 import messages.Messages;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.Props;
+
+import com.typesafe.config.ConfigFactory;
 
 /**
- * This class deploys a set of workers on a network node.
- *
+ * An application to deploy a set of worker actors on a network node.
+ * 
  */
 public class WorkerNodeApp extends JFrame implements ActionListener {
-
+	
 	private JPanel globalPanel, topPanel, bottomPanel;
 	private JLabel lbWorkersToDeploy, lbWorkersDeployed;
 	private JSpinner spWorkers;
@@ -36,12 +39,13 @@ public class WorkerNodeApp extends JFrame implements ActionListener {
 	private ActorSystem actorSystem;
 	private ArrayList<ActorRef> workers;
 	private String me = "workerNodeApp";
-
+	
 	public WorkerNodeApp() {
 		super("Worker Node App");
 		workers = new ArrayList<>();
-		actorSystem = ActorSystem.create("workerSystem_" + System.currentTimeMillis(), ConfigFactory.load().getConfig("worker"));
-
+		actorSystem = ActorSystem.create("workerSystem_" + System.currentTimeMillis(),
+				ConfigFactory.load().getConfig("worker"));
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Container cp = getContentPane();
 		globalPanel = new JPanel();
@@ -50,7 +54,7 @@ public class WorkerNodeApp extends JFrame implements ActionListener {
 		bottomPanel = new JPanel();
 		bottomPanel.setBackground(Color.LIGHT_GRAY);
 		bottomPanel.setOpaque(true);
-
+		
 		lbWorkersToDeploy = new JLabel("<html>Workers to deploy<br>(recommended: " + nProcessors + ")</html>");
 		SpinnerModel model = new SpinnerNumberModel(nProcessors, 0, 100, 1);
 		spWorkers = new JSpinner(model);
@@ -59,10 +63,10 @@ public class WorkerNodeApp extends JFrame implements ActionListener {
 		topPanel.add(lbWorkersToDeploy);
 		topPanel.add(spWorkers);
 		topPanel.add(btDeploy);
-
+		
 		lbWorkersDeployed = new JLabel("0 workers deployed");
 		bottomPanel.add(lbWorkersDeployed);
-
+		
 		globalPanel.add(Box.createVerticalStrut(25));
 		globalPanel.add(topPanel);
 		globalPanel.add(Box.createVerticalStrut(25));
@@ -73,19 +77,19 @@ public class WorkerNodeApp extends JFrame implements ActionListener {
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}
-
+	
 	public static void main(String args[]) {
 		new WorkerNodeApp();
 	}
-
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		int nWorkersToDeploy = (int) spWorkers.getValue();
-
+		
 		if (workers.size() < nWorkersToDeploy) {
 			int nWorkersToAdd = nWorkersToDeploy - workers.size();
 			l.l(me, "nWorkersToAdd: " + nWorkersToAdd);
-
+			
 			for (int i = 0; i < nWorkersToAdd; i++) {
 				String workerId = "worker" + i + "-" + System.currentTimeMillis();
 				workers.add(actorSystem.actorOf(new Props(Worker.class), workerId));
@@ -94,7 +98,7 @@ public class WorkerNodeApp extends JFrame implements ActionListener {
 		} else if (workers.size() > nWorkersToDeploy) {
 			int nWorkersToRemove = workers.size() - nWorkersToDeploy;
 			l.l(me, "nWorkersToRemove: " + nWorkersToRemove);
-
+			
 			for (int i = 0; i < nWorkersToRemove; i++) {
 				int last = workers.size() - 1;
 				workers.get(last).tell(new Messages.Remove());
@@ -103,7 +107,7 @@ public class WorkerNodeApp extends JFrame implements ActionListener {
 			refreshWorkersDeployedLabel(workers.size());
 		}
 	}
-
+	
 	private void refreshWorkersDeployedLabel(final int nWorkers) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override

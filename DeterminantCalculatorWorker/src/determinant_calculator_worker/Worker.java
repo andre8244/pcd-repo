@@ -41,7 +41,7 @@ public class Worker extends UntypedActor {
 	public void onReceive(Object msg) throws Exception {
 		if (msg instanceof Messages.OneRow) { // TODO eliminare OneRow
 			Messages.OneRow oneRow = (Messages.OneRow) msg;
-			handleOneRow(oneRow);
+//			handleOneRow(oneRow);
 		} else if (msg instanceof Messages.ManyRows) {
 			Messages.ManyRows manyRows = (Messages.ManyRows) msg;
 			handleManyRows(manyRows);
@@ -54,29 +54,29 @@ public class Worker extends UntypedActor {
 		}
 	}
 
-	private void handleOneRow(Messages.OneRow oneRow) {
-		final String reqId = oneRow.getReqId();
-		final double[] firstRow = oneRow.getFirstRow();
-		final double[] row = oneRow.getRow();
-		final int rowNumber = oneRow.getRowNumber();
-
-		double factor = -row[0] / firstRow[0];
-
-		for (int i = 0; i < firstRow.length; i++) {
-			row[i] = row[i] + factor * firstRow[i];
-		}
-		final Messages.OneRowResult oneRowResult = new Messages.OneRowResult(reqId, row, rowNumber);
-		getSender().tell(oneRowResult, getSelf());
-		//l.l(me, reqId + ", sent row " + rowNumber + " to master");
-	}
+//	private void handleOneRow(Messages.OneRow oneRow) {
+//		final String reqId = oneRow.getReqId();
+//		final double[] firstRow = oneRow.getFirstRow();
+//		final double[] row = oneRow.getRow();
+//		final int rowNumber = oneRow.getRowNumber();
+//
+//		double factor = -row[0] / firstRow[0];
+//
+//		for (int i = 0; i < firstRow.length; i++) {
+//			row[i] = row[i] + factor * firstRow[i];
+//		}
+//		final Messages.OneRowResult oneRowResult = new Messages.OneRowResult(reqId, row, rowNumber);
+//		getSender().tell(oneRowResult, getSelf());
+//		//l.l(me, reqId + ", sent row " + rowNumber + " to master");
+//	}
 
 	private void handleManyRows(Messages.ManyRows manyRows) {
-		final String reqId = manyRows.getReqId();
-		final double[] firstRow = manyRows.getFirstRow();
-		final double[][] rows = manyRows.getRows();
-		final int rowNumber = manyRows.getRowNumber();
+		String reqId = manyRows.getReqId();
+		double[] firstRow = manyRows.getFirstRow();
+		double[][] rows = manyRows.getRows();
+		int rowNumber = manyRows.getRowNumber();
         double factor;
-		
+
         for (int i= 0; i < rows.length; i++){
             factor = -rows[i][0] / firstRow[0];
 
@@ -84,8 +84,8 @@ public class Worker extends UntypedActor {
                 rows[i][j] = rows[i][j] + factor * firstRow[j];
             }
         }
-		getSender().tell(new Messages.ManyRowsResult(reqId, rows, rowNumber));
-        l.l(me, reqId + ", sent rows from " + rowNumber + " to " + (rowNumber+rows.length-1) + " to master");
+		getSender().tell(new Messages.ManyRowsResult(reqId, rows, rowNumber), getSelf());
+//        l.l(me, reqId + ", sent rows from " + rowNumber + " to " + (rowNumber+rows.length-1) + " to master");
 	}
 
 	private void handleRemove() {
