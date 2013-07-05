@@ -98,5 +98,69 @@
         </wsimport-option>
       </wsimport-options>
     </client>
+    <client name="DeterminantCalculatorService_3">
+      <wsdl-url>http://192.168.0.7:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsdl-url>
+      <local-wsdl-file>192.168.0.7_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl</local-wsdl-file>
+      <package-name forceReplace="true">leardini_linux_192_168_0_7</package-name>
+      <catalog-file>catalog.xml</catalog-file>
+      <wsimport-options>
+        <wsimport-option>
+          <wsimport-option-name>extension</wsimport-option-name>
+          <wsimport-option-value>true</wsimport-option-value>
+        </wsimport-option>
+        <wsimport-option>
+          <wsimport-option-name>verbose</wsimport-option-name>
+          <wsimport-option-value>true</wsimport-option-value>
+        </wsimport-option>
+        <wsimport-option>
+          <wsimport-option-name>wsdlLocation</wsimport-option-name>
+          <wsimport-option-value>http://192.168.0.7:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsimport-option-value>
+        </wsimport-option>
+        <wsimport-option>
+          <wsimport-option-name>xnocompile</wsimport-option-name>
+          <wsimport-option-value>true</wsimport-option-value>
+        </wsimport-option>
+        <wsimport-option>
+          <wsimport-option-name>xendorsed</wsimport-option-name>
+          <wsimport-option-value>true</wsimport-option-value>
+        </wsimport-option>
+        <wsimport-option>
+          <wsimport-option-name>package</wsimport-option-name>
+          <wsimport-option-value>leardini_linux_192_168_0_7</wsimport-option-value>
+        </wsimport-option>
+      </wsimport-options>
+    </client>
+    <client name="DeterminantCalculatorService_4">
+      <wsdl-url>http://169.254.234.80:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsdl-url>
+      <local-wsdl-file>169.254.234.80_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl</local-wsdl-file>
+      <package-name forceReplace="true">marco_almawifi_client</package-name>
+      <catalog-file>catalog.xml</catalog-file>
+      <wsimport-options>
+        <wsimport-option>
+          <wsimport-option-name>extension</wsimport-option-name>
+          <wsimport-option-value>true</wsimport-option-value>
+        </wsimport-option>
+        <wsimport-option>
+          <wsimport-option-name>verbose</wsimport-option-name>
+          <wsimport-option-value>true</wsimport-option-value>
+        </wsimport-option>
+        <wsimport-option>
+          <wsimport-option-name>wsdlLocation</wsimport-option-name>
+          <wsimport-option-value>http://169.254.234.80:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl</wsimport-option-value>
+        </wsimport-option>
+        <wsimport-option>
+          <wsimport-option-name>xnocompile</wsimport-option-name>
+          <wsimport-option-value>true</wsimport-option-value>
+        </wsimport-option>
+        <wsimport-option>
+          <wsimport-option-name>xendorsed</wsimport-option-name>
+          <wsimport-option-value>true</wsimport-option-value>
+        </wsimport-option>
+        <wsimport-option>
+          <wsimport-option-name>package</wsimport-option-name>
+          <wsimport-option-value>marco_almawifi_client</wsimport-option-value>
+        </wsimport-option>
+      </wsimport-options>
+    </client>
   </clients>
 </jax-ws>

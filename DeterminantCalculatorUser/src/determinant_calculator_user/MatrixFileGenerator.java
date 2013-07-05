@@ -9,13 +9,13 @@ import java.util.Random;
 
 public class MatrixFileGenerator {
 
-	private static BufferedWriter writer;
-	private static Random rand;
+	private BufferedWriter writer;
 	private static String me = "matrixUtil";
 
-	public static void generate(int order, double minAbs, double maxAbs, String fileName) {
+	public void generate(int order, double minAbs, double maxAbs, String fileName) {
 		long startTime = System.currentTimeMillis();
-		rand = new Random();
+		Random rand = new Random();
+
 
 		File file = new File(fileName);
 		l.l("MATRIXUTIL ", file.getAbsolutePath());

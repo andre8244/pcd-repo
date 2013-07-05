@@ -55,7 +55,7 @@ public class CallbackThread extends Thread {
 		startTime = System.currentTimeMillis();
 		int lastPercentage = 0;
 		int eta = -1;
-		
+
 		while (!response.isDone()) {
 			int percentage = servicePort.getPercentageDone(reqId);
 			int elapsedTimeSecs = (int) ((System.currentTimeMillis() - startTime) / 1000);
