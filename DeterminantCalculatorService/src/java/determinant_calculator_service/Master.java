@@ -127,7 +127,7 @@ public class Master extends UntypedActor {
 			}
 			if (matrix.length > 2) {
 				requestInfo.setRowsDone(0);
-				requestInfo.setMatrix(subMatrix(reqId, matrix));
+				requestInfo.setMatrix(subMatrix(matrix));
 
 				if (workers.isEmpty()) {
 					l.l(me, reqId + ", WORKERS.SIZE() = 0 !!!");
@@ -204,6 +204,7 @@ public class Master extends UntypedActor {
 		l.l(me, reqId + ", nRowsDone: " + nRowsDone);
 
 		double[][] matrix = requestInfo.getCurrentMatrix();
+		// TODO controllo matrix null
 		System.arraycopy(rows, 0, matrix, rowNumber, rows.length);
 
 		if (nRowsDone == matrix.length - 1) {
@@ -215,7 +216,7 @@ public class Master extends UntypedActor {
 
 			if (matrix.length > 2) {
 				requestInfo.setRowsDone(0);
-				requestInfo.setMatrix(subMatrix(reqId, matrix));
+				requestInfo.setMatrix(subMatrix(matrix));
 
 				if (workers.isEmpty()) {
 					l.l(me, reqId + ", WORKERS.SIZE() = 0 !!!");
@@ -295,6 +296,7 @@ public class Master extends UntypedActor {
 						requestInfo.setFinalDeterminant(-0.0);
 						continue;
 					}
+					// recupero sottomatrice relativa al GaussJob del worker da rimuovere
 					double[][] matrix = requestInfo.getCurrentMatrix();
 					double[] firstRow = matrix[0];
 					double[][] rows = new double[nRows][matrix.length];
@@ -434,7 +436,7 @@ public class Master extends UntypedActor {
 		return false;
 	}
 
-	private double[][] subMatrix(String reqId, double[][] matrix) {
+	private double[][] subMatrix(double[][] matrix) {
 		double[][] subMatrix = new double[matrix.length - 1][matrix.length - 1];
 
 		for (int i = 0; i < subMatrix.length; i++) {
@@ -478,6 +480,7 @@ public class Master extends UntypedActor {
 						requestInfo.setFinalDeterminant(-0.0);
 						continue;
 					}
+					// recupero sottomatrice relativa al GaussJob del worker crashato
 					double[][] matrix = requestInfo.getCurrentMatrix();
 					double[] firstRow = matrix[0];
 					double[][] rows = new double[nRows][matrix.length];
