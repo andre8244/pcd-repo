@@ -300,6 +300,7 @@ public class Master extends UntypedActor {
 					double[][] rows = new double[nRows][matrix.length];
 					System.arraycopy(rows, 0, matrix, rowNumber, rows.length);
 					
+					worker.removeJob(works.get(j)); // rimuovo prima il job dal worker per liberare memoria
 					//l.l(me, "index: " + index);
 					workers.get(index).addJob(reqId, nRows, rowNumber);
 					workers.get(index).getActorRef()
@@ -480,6 +481,8 @@ public class Master extends UntypedActor {
 					double[][] rows = new double[nRows][matrix.length];
 					System.arraycopy(rows, 0, matrix, rowNumber, rows.length);
 
+					worker.removeJob(works.get(j)); // rimuovo prima il job dal worker per liberare memoria
+					
 					for (int k = 0; k < workers.size(); k++) {
 						index = index % workers.size();
 						tokens = workers.get(index).getRemoteAddress().split("/user");

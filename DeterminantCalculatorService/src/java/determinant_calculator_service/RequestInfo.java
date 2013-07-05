@@ -92,6 +92,7 @@ public class RequestInfo {
 	}
 
 	public void setFinalDeterminant(double finalDeterminant) {
+		this.matrix = null;
 		this.finalDeterminant = finalDeterminant;
 		computationEnded.countDown();
 	}
