@@ -32,7 +32,10 @@ public class RequestInfo {
 		lock = new ReentrantLock(true);
 	}
 
-	public void setOriginalMatrix(double[][] matrix) {
+	public boolean setOriginalMatrix(double[][] matrix) {
+		if (matrix == null){
+			return false;
+		}
 		this.matrix = matrix;
 		matrixLength = matrix.length;
 		totalWorkToDo = 0;
@@ -49,6 +52,7 @@ public class RequestInfo {
 		l.l(me,
 				"setOriginalMatrix: computed totalWorkTodo (" + totalWorkToDo + "). Duration: "
 						+ (System.currentTimeMillis() - startTime) + " ms");
+		return true;
 	}
 
 	public void setMatrix(double[][] matrix) {
@@ -124,4 +128,76 @@ public class RequestInfo {
 			lock.unlock();
 		}
 	}
+
+	public void updateCurrentMatrix(double[] row, int rowNumber) {
+		matrix[rowNumber] = row;
+	}
+	
+	public void updateCurrentMatrix(double[][] rows, int rowNumber) {
+		System.arraycopy(rows, 0, matrix, rowNumber, rows.length);
+	}
+
+	public int getCurrentOrder() {
+		return matrix.length;
+	}
+
+	public void subMatrix() {
+		double[][] subMatrix = new double[matrix.length - 1][matrix.length - 1];
+
+		for (int i = 0; i < subMatrix.length; i++) {
+			for (int j = 0; j < subMatrix.length; j++) {
+				subMatrix[i][j] = matrix[i + 1][j + 1];
+			}
+		}
+		matrix = subMatrix;
+		nRowsDone = 0;
+	}
+	
+	public void updateTempDeterminant() {
+		tempDeterminant = tempDeterminant * matrix[0][0];
+	}
+
+	public double updateLastTempDeterminant() {
+		tempDeterminant = tempDeterminant * matrix[1][1];
+		return tempDeterminant;
+	}
+	
+	public boolean swapFirtsRow() {
+		for (int i = 1; i < matrix.length; i++) {
+			if (matrix[i][0] != 0) {
+				double[] tempRow = matrix[i];
+				matrix[i] = matrix[0];
+				matrix[0] = tempRow;
+				return true;
+			}
+		}
+		return false;
+	}
+		
+	public int updateRowsDone(int n) {
+		nRowsDone = nRowsDone + n;
+		return nRowsDone;
+	}
+	
+	public double[] getFirstRow() {
+		return matrix[0];
+	}
+	
+	public double getFirstElement() {
+		return matrix[0][0];
+	}
+		
+	
+	public double[] getRow(int rowNumber) {
+		return matrix[rowNumber];
+	}
+	
+	public double[][] getRows(int size, int rowNumber) {
+		double[][] rows = new double[size][matrix.length];
+		for (int i = 0; i < rows.length; i++) {
+			rows[i] = matrix[rowNumber + i];
+		}
+		return rows;
+	}
+
 }
