@@ -386,7 +386,7 @@ public class Master extends UntypedActor {
 		}
 		requestInfo.updateTempDeterminant();
 		sendRowsToWorkers(requestInfo,reqId);
-		sendOneRowPerMsg(requestInfo,reqId);
+		//sendOneRowPerMsg(requestInfo,reqId);
 		return false;
 	}
 

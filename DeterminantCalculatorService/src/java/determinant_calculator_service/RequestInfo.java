@@ -55,22 +55,6 @@ public class RequestInfo {
 		return true;
 	}
 
-	public void setMatrix(double[][] matrix) {
-		this.matrix = matrix;
-	}
-
-	public double[][] getCurrentMatrix() {
-		return matrix;
-	}
-
-	public int getRowsDone() {
-		return nRowsDone;
-	}
-
-	public double getTempDeterminant() {
-		return tempDeterminant;
-	}
-
 	public boolean getChangeSign() {
 		return changeSign;
 	}
@@ -81,14 +65,6 @@ public class RequestInfo {
 
 	public long getTotalWorkToDo() {
 		return totalWorkToDo;
-	}
-
-	public void setTempDeterminant(double tempDeterminant) {
-		this.tempDeterminant = tempDeterminant;
-	}
-
-	public void setRowsDone(int nRowsDone) {
-		this.nRowsDone = nRowsDone;
 	}
 
 	public void setChangeSign() {
