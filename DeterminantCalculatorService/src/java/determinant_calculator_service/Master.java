@@ -19,7 +19,7 @@ public class Master extends UntypedActor {
 	private ArrayList<WorkerInfo> workers;
 	private DeterminantCalculatorManager manager;
 	private String me;
-	private static final int MAX_ELEMS_PER_MSG = 1000000;
+	private static final int MAX_ELEMS_PER_MSG = 10000000; // 10 milioni
 
 	/**
 	 * Constructs a master actor.
