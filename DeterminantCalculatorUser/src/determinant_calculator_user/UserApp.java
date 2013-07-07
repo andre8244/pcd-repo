@@ -34,8 +34,8 @@ public class UserApp extends JFrame implements ActionListener {
 	private ButtonGroup group = new ButtonGroup();
 	private JButton computeButton;
 	private DeterminantCalculatorService servicePort;
-//	private static final String INITIAL_FILE_VALUES = System.getProperty("user.home") + System.getProperty("file.separator") + "matrix.txt";
-	private static final String INITIAL_FILE_VALUES = "http://pcddeterminant.altervista.org/matrix100@-4.23e84.txt";
+	private static final String INITIAL_FILE_VALUES = System.getProperty("user.home") + System.getProperty("file.separator") + "matrix.txt";
+	//private static final String INITIAL_FILE_VALUES = "http://pcddeterminant.altervista.org/matrix100@-4.23e84.txt";
 	private static final int INITIAL_ORDER = 1000;
 	private String me = "userApp";
 
