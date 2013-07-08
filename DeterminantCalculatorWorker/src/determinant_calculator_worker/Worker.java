@@ -85,7 +85,7 @@ public class Worker extends UntypedActor {
             }
         }
 		getSender().tell(new Messages.ManyRowsResult(reqId, rows, rowNumber), getSelf());
-//        l.l(me, reqId + ", sent rows from " + rowNumber + " to " + (rowNumber+rows.length-1) + " to master");
+        l.l(me, reqId + ", sent rows from " + rowNumber + " to " + (rowNumber+rows.length-1) + " to master");
 	}
 
 	private void handleRemove() {
