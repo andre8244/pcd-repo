@@ -81,9 +81,9 @@ public class DeterminantCalculatorManager {
 		try {
 			String reqId = "req" + reqNumber;
 			reqNumber = reqNumber + 1;
-			requestsInfo.put(reqId, new RequestInfo());
-			new MatrixReader(order,fileValues,reqId,masters.get(index)).start();
-			//masters.get(index).tell(new Messages.Compute(order, fileValues, reqId));
+			RequestInfo requestInfo = new RequestInfo();
+			requestsInfo.put(reqId, requestInfo);
+			new MatrixReader(order, fileValues, reqId, requestInfo, masters.get(index)).start();
 			index = (index + 1) % masters.size();
 			return reqId;
 		} finally {

@@ -67,22 +67,12 @@ public class Master extends UntypedActor {
 	}
 
 	private void handleCompute(Messages.Compute compute) {
-		//int order = compute.getOrder();
-		//String fileValues = compute.getFileValues();
 		String reqId = compute.getReqId();
 		double[][] matrix = compute.getMatrix();
 		l.l(me, "handleCompute, reqId: " + reqId + ", order: " + matrix.length + ", workers.size():" + workers.size());
 		RequestInfo requestInfo = manager.getRequestInfo(reqId);
-		//MatrixReader matrixReader = new MatrixReader();
-		//boolean set = requestInfo.setOriginalMatrix(matrixReader.read(order, fileValues));
-		boolean set = requestInfo.setOriginalMatrix(matrix);
-
-		if (!set) {
-			l.l(me, reqId + ", matrix Error !!!");
-			requestInfo.setPercentageDone(100);
-			requestInfo.setFinalDeterminant(-0.0);
-			return;
-		}
+		
+		requestInfo.setOriginalMatrix(matrix);
 
 		if (workers.isEmpty()) {
 			l.l(me, reqId + ", WORKERS.SIZE() = 0 !!!");
@@ -188,9 +178,9 @@ public class Master extends UntypedActor {
 
 		RequestInfo requestInfo = manager.getRequestInfo(reqId);
 		int nRowsDone = requestInfo.updateRowsDone(rows.length);
-		l.l(me, reqId + ", receive rows from " + rowNumber + " to " + (rowNumber + rows.length - 1) + "(" + rows.length
-				+ " rows)");
-		l.l(me, reqId + ", nRowsDone: " + nRowsDone);
+		//l.l(me, reqId + ", receive rows from " + rowNumber + " to " + (rowNumber + rows.length - 1) + "(" + rows.length
+		//		+ " rows)");
+		//l.l(me, reqId + ", nRowsDone: " + nRowsDone);
 
 		requestInfo.updateCurrentMatrix(rows, rowNumber);
 		int currentOrder = requestInfo.getCurrentOrder();
@@ -341,8 +331,8 @@ public class Master extends UntypedActor {
 					workers.get(i).addJob(reqId, nRowsOfFirstMsg, nRowsSent + 1);
 					workers.get(i).getActorRef()
 							.tell(new Messages.ManyRows(reqId, requestInfo.getFirstRow(), requestInfo.getRows(nRowsOfFirstMsg, nRowsSent+1), nRowsSent + 1), getSelf());
-					l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + nRowsOfFirstMsg) + "("
-							+ nRowsOfFirstMsg + " rows) to " + workers.get(i).getRemoteAddress());
+					//l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + nRowsOfFirstMsg) + "("
+					//		+ nRowsOfFirstMsg + " rows) to " + workers.get(i).getRemoteAddress());
 					nRowsSent += nRowsOfFirstMsg;
 				}
 
@@ -350,8 +340,8 @@ public class Master extends UntypedActor {
 					workers.get(i).addJob(reqId, maxNRowsPerMsg, nRowsSent + 1);
 					workers.get(i).getActorRef()
 							.tell(new Messages.ManyRows(reqId, requestInfo.getFirstRow(), requestInfo.getRows(maxNRowsPerMsg, nRowsSent+1), nRowsSent + 1), getSelf());
-					l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + maxNRowsPerMsg) + "("
-							+ maxNRowsPerMsg + " rows) to " + workers.get(i).getRemoteAddress());
+					//l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + maxNRowsPerMsg) + "("
+					//		+ maxNRowsPerMsg + " rows) to " + workers.get(i).getRemoteAddress());
 					nRowsSent += maxNRowsPerMsg;
 				}
 			}
@@ -397,10 +387,8 @@ public class Master extends UntypedActor {
 				ArrayList<GaussJob> works = workers.get(i).getJobs();
 
 				for (int j = 0; j < works.size(); j++) {
-					l.l(me, "work n." + j + ": " + works.get(j).getRowNumber() + ", reqId: " + works.get(j).getReqId());
 					if (works.get(j).getReqId().equals(reqId) && works.get(j).getRowNumber() == rowNumber) {
 						workers.get(i).removeJob(works.get(j));
-						l.l(me, "worker remove job: " + workers.get(i).getRemoteAddress());
 						return true;
 					}
 				}
@@ -452,7 +440,7 @@ public class Master extends UntypedActor {
 						tokens = workers.get(index).getRemoteAddress().split("/user");
 
 						if (!tokens[0].equals(workerSystem)) {
-							l.l(me, "index: " + index);
+							//l.l(me, "index: " + index);
 							workers.get(index).addJob(reqId, nRows, rowNumber);
 							workers.get(index).getActorRef()
 									.tell(new Messages.ManyRows(reqId, requestInfo.getFirstRow(), requestInfo.getRows(nRows, rowNumber), rowNumber), getSelf());

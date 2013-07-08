@@ -20,13 +20,15 @@ public class MatrixReader extends Thread {
 	private int order;
 	private String fileValues;
 	private String reqId;
+	private RequestInfo requestInfo;
 	private ActorRef master;
 	private static String me = "matrixReader";
 
-	public MatrixReader(int order, String fileValues, String reqId, ActorRef master) {
+	public MatrixReader(int order, String fileValues, String reqId, RequestInfo requestInfo, ActorRef master) {
 		this.order = order;
 		this.fileValues = fileValues;
 		this.reqId = reqId;
+		this.requestInfo = requestInfo;
 		this.master = master;
 	}
 
@@ -61,7 +63,8 @@ public class MatrixReader extends Thread {
 				// the number of lines can't be greater than the order
 				if (nLines == order) {
 					l.l(me, reqId + ", Order error!");
-					//return null;
+					requestInfo.setPercentageDone(100);
+					requestInfo.setFinalDeterminant(-0.0);
 					return;
 				}
 
@@ -73,7 +76,8 @@ public class MatrixReader extends Thread {
 				// every line must have <order> elements
 				if (tokens.length != order) {
 					l.l(me, reqId + ", Order error!");
-					//return null;
+					requestInfo.setPercentageDone(100);
+					requestInfo.setFinalDeterminant(-0.0);
 					return;
 				}
 
@@ -88,21 +92,23 @@ public class MatrixReader extends Thread {
 			// the number of lines can't be less than the order
 			if (order != nLines) {
 				l.l(me, reqId + ", Order error!");
-				//return null;
+				requestInfo.setPercentageDone(100);
+				requestInfo.setFinalDeterminant(-0.0);
 				return;
 			}
 		} catch (FileNotFoundException ex) {
 			ex.printStackTrace();
-			//return null;
+			requestInfo.setPercentageDone(100);
+			requestInfo.setFinalDeterminant(-0.0);
 			return;
 		} catch (IOException ex) {
 			ex.printStackTrace();
-			//return null;
+			requestInfo.setPercentageDone(100);
+			requestInfo.setFinalDeterminant(-0.0);
 			return;
 		}
 		l.l(me, reqId + ", finished reading file and writing list: " + ((System.currentTimeMillis() - startTime) / (double) 1000)
 				+ " sec");
-		//return matrix;
 		master.tell(new Messages.Compute(reqId, matrix));
 	}
 }

@@ -32,10 +32,7 @@ public class RequestInfo {
 		lock = new ReentrantLock(true);
 	}
 
-	public boolean setOriginalMatrix(double[][] matrix) {
-		if (matrix == null){
-			return false;
-		}
+	public void setOriginalMatrix(double[][] matrix) {
 		this.matrix = matrix;
 		matrixLength = matrix.length;
 		totalWorkToDo = 0;
@@ -52,7 +49,6 @@ public class RequestInfo {
 		l.l(me,
 				"setOriginalMatrix: computed totalWorkTodo (" + totalWorkToDo + "). Duration: "
 						+ (System.currentTimeMillis() - startTime) + " ms");
-		return true;
 	}
 
 	public boolean getChangeSign() {
