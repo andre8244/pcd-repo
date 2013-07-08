@@ -13,9 +13,6 @@ import localhost_client.*;
 //import andreafWindows8dualCore_client.*;
 //import leardini_linux.*;
 //import leardini_mac.*;
-//import marco_almawifi_client.*;
-//import andreaf_almawifi_client.*;
-//import leardini_almawifi_client.*;
 
 public class Worker extends UntypedActor {
 
