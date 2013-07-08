@@ -64,8 +64,10 @@ public class CallbackThread extends Thread {
 				lastPercentage = percentage;
 				eta = (int) ((System.currentTimeMillis() - startTime) / (double)(10 * percentage) - elapsedTimeSecs);
 			}
-			view.updateReqData(percentage, elapsedTimeSecs, eta);
-
+			if (!response.isDone()){
+				view.updateReqData(percentage, elapsedTimeSecs, eta);
+			}
+				
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException ex) {
