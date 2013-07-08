@@ -10,9 +10,6 @@ import localhost_client.*;
 //import andreafWindows8dualCore_client.*;
 //import leardini_linux.*;
 //import leardini_mac.*;
-//import marco_almawifi_client.*;
-//import andreaf_almawifi_client.*;
-//import leardini_almawifi_client.*;
 
 public class PollingThread extends Thread{
 	private String reqId;
@@ -40,10 +37,8 @@ public class PollingThread extends Thread{
 				lastPercentage = percentage;
 				eta = (int) ((System.currentTimeMillis() - startTime) / (double)(10 * percentage) - elapsedTimeSecs);
 			}
-			if (!response.isDone()){
-				view.updateReqData(percentage, elapsedTimeSecs, eta);
-			}
-
+			view.updateReqData(percentage, elapsedTimeSecs, eta);
+			
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException ex) {
