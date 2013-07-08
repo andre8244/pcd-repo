@@ -15,7 +15,7 @@ public class GaussJob {
 	 * Constructs the data structure.
 	 * 
 	 * @param reqId the request the job belongs to
-	 * @param rows the set of rows of the job
+	 * @param nRows the number of rows of the job
 	 * @param rowNumber the index of the first row of the job
 	 */
 	public GaussJob(String reqId, int nRows, int rowNumber) {
@@ -34,9 +34,9 @@ public class GaussJob {
 	}
 	
 	/**
-	 * Returns the set of rows of the job.
+	 * Returns the number of rows of the job.
 	 * 
-	 * @return the set of rows of the job
+	 * @return the number of rows of the job
 	 */
 	public int getNRows() {
 		return nRows;

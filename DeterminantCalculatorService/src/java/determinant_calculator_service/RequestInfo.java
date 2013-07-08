@@ -105,6 +105,7 @@ public class RequestInfo {
 		}
 	}
 
+	// serve per la oneRow
 	public void updateCurrentMatrix(double[] row, int rowNumber) {
 		matrix[rowNumber] = row;
 	}

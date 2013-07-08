@@ -26,7 +26,8 @@ public class DeterminantCalculatorManager {
 	private final int nProcessors = Runtime.getRuntime().availableProcessors();
 	private ArrayList<ActorRef> masters;
 	private ConcurrentHashMap<String, RequestInfo> requestsInfo;
-	private static Lock lock = new ReentrantLock(true);
+	private static Lock getInstanceLock = new ReentrantLock(true);
+	private static Lock computeDeterminantLock = new ReentrantLock(true);
 	private String me = "manager";
 	private int index = 0;
 	
@@ -55,7 +56,7 @@ public class DeterminantCalculatorManager {
 	 * @return an istance of the manager.
 	 */
 	public static DeterminantCalculatorManager getInstance() {
-		lock.lock();
+		getInstanceLock.lock();
 		
 		try {
 			if (instance == null) {
@@ -63,7 +64,7 @@ public class DeterminantCalculatorManager {
 			}
 			return instance;
 		} finally {
-			lock.unlock();
+			getInstanceLock.unlock();
 		}
 	}
 	
@@ -75,17 +76,18 @@ public class DeterminantCalculatorManager {
 	 * @return a <code>String</code> that identifies the request
 	 */
 	public String computeDeterminant(int order, String fileValues) {
-		lock.lock();
+		computeDeterminantLock.lock();
 		
 		try {
 			String reqId = "req" + reqNumber;
 			reqNumber = reqNumber + 1;
 			requestsInfo.put(reqId, new RequestInfo());
-			masters.get(index).tell(new Messages.Compute(order, fileValues, reqId));
+			new MatrixReader(order,fileValues,reqId,masters.get(index)).start();
+			//masters.get(index).tell(new Messages.Compute(order, fileValues, reqId));
 			index = (index + 1) % masters.size();
 			return reqId;
 		} finally {
-			lock.unlock();
+			computeDeterminantLock.unlock();
 		}
 	}
 	

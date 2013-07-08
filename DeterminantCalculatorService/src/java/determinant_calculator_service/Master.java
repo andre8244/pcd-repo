@@ -67,13 +67,15 @@ public class Master extends UntypedActor {
 	}
 
 	private void handleCompute(Messages.Compute compute) {
-		int order = compute.getOrder();
-		String fileValues = compute.getFileValues();
+		//int order = compute.getOrder();
+		//String fileValues = compute.getFileValues();
 		String reqId = compute.getReqId();
-		l.l(me, "handleCompute, reqId: " + reqId + ", order: " + order + ", workers.size():" + workers.size());
+		double[][] matrix = compute.getMatrix();
+		l.l(me, "handleCompute, reqId: " + reqId + ", order: " + matrix.length + ", workers.size():" + workers.size());
 		RequestInfo requestInfo = manager.getRequestInfo(reqId);
-		MatrixReader matrixReader = new MatrixReader();
-		boolean set = requestInfo.setOriginalMatrix(matrixReader.read(order, fileValues));
+		//MatrixReader matrixReader = new MatrixReader();
+		//boolean set = requestInfo.setOriginalMatrix(matrixReader.read(order, fileValues));
+		boolean set = requestInfo.setOriginalMatrix(matrix);
 
 		if (!set) {
 			l.l(me, reqId + ", matrix Error !!!");
@@ -179,17 +181,11 @@ public class Master extends UntypedActor {
 		double[][] rows = mrr.getRows();
 		int rowNumber = mrr.getRowNumber();
 
-		for (int i = 0; i < workers.size(); i++) {
-			// works.size è generalmente uguale al numero di richieste in corso, tranne in casi di failure
-			ArrayList<GaussJob> works = workers.get(i).getJobs();
-
-			for (int j = 0; j < works.size(); j++) {
-				if (works.get(j).getReqId().equals(reqId) && works.get(j).getRowNumber() == rowNumber) {
-					workers.get(i).removeJob(works.get(j));
-					break;
-				}
-			}
+		if(!removeJob(getSender(),reqId,rowNumber)){
+			l.l(me, reqId + ", job non valido!");
+			return;
 		}
+
 		RequestInfo requestInfo = manager.getRequestInfo(reqId);
 		int nRowsDone = requestInfo.updateRowsDone(rows.length);
 		l.l(me, reqId + ", receive rows from " + rowNumber + " to " + (rowNumber + rows.length - 1) + "(" + rows.length
@@ -228,7 +224,7 @@ public class Master extends UntypedActor {
 					long workDone = totalWorkToDo - workToDo;
 					int percentage = (int) (((double) workDone / totalWorkToDo) * 100);
 					// TODO testare la durata del calcolo di percentuale con 10000
-//					l.l(me, "percentage computation duration: " + (System.currentTimeMillis() - startTime) + " ms");
+					//l.l(me, reqId + ", percentage computation duration: " + (System.currentTimeMillis() - startTime) + " ms");
 					requestInfo.setPercentageDone(percentage);
 				}
 			} else { // matrix.length = 2
@@ -273,12 +269,16 @@ public class Master extends UntypedActor {
 				ArrayList<GaussJob> works = worker.getJobs();
 				l.l(me, worker.getRemoteAddress() + " pending request: " + works.size());
 				// nel caso di shutdown -> pending request = 0 !
-				for (int j = 0; j < works.size(); j++) {
-					String reqId = works.get(j).getReqId();
-					int nRows = works.get(j).getNRows();
-					int rowNumber = works.get(j).getRowNumber();
+				while(!works.isEmpty()){
+					// vado sempre a leggere il primo GaussJob della lista e poi lo rimuovo
+					GaussJob work = works.get(0);
+					String reqId = work.getReqId();
+					int nRows = work.getNRows();
+					int rowNumber = work.getRowNumber();
 					RequestInfo requestInfo = manager.getRequestInfo(reqId);
 
+					worker.removeJob(work); // rimuovo prima il job dal worker per liberare memoria
+					
 					// caso particolare: non abbiamo altri worker a disposizione
 					if (workers.size() < 2) {
 						l.l(me, reqId + ", WORKERS.SIZE() = 0 !!!");
@@ -287,14 +287,14 @@ public class Master extends UntypedActor {
 						continue;
 					}
 					
-					worker.removeJob(works.get(j)); // rimuovo prima il job dal worker per liberare memoria
 					//l.l(me, "index: " + index);
 					workers.get(index).addJob(reqId, nRows, rowNumber);
 					workers.get(index).getActorRef()
 							.tell(new Messages.ManyRows(reqId, requestInfo.getFirstRow(), requestInfo.getRows(nRows,rowNumber), rowNumber), getSelf());
-					//l.l(me, reqId + ", handleRemove, sent row " + rowNumber + " to " + workers.get(index).getRemoteAddress());
-					//l.l(me, reqId + ", call " + workers.get(index).getRemoteAddress()
-					//		+ " to do the job of the removed worker " + worker.getRemoteAddress());
+					l.l(me, reqId + ", handleRemove, sent rows from " + rowNumber + " to " + (rowNumber + nRows - 1) + "("
+							+ nRows + " rows) to " + workers.get(index).getRemoteAddress());
+					l.l(me, reqId + ", call " + workers.get(index).getRemoteAddress()
+							+ " to do the job of the removed worker " + worker.getRemoteAddress());
 				}
 				// shutdown
 				workers.remove(i);
@@ -325,17 +325,17 @@ public class Master extends UntypedActor {
 		for (int i = 0; i < (workers.size()); i++) {
 			// number of rows to send to worker i:
 			nRowsToSend = (int) (Math.round((i + 1) * nRowsPerWorker) - nRowsSent);
-			l.l(me, "nRowsToSend: " + nRowsToSend);
+			//l.l(me, reqId + ", nRowsToSend: " + nRowsToSend);
 
 			if (nRowsToSend > 0) {
 
 				int maxNRowsPerMsg = MAX_ELEMS_PER_MSG / currentOrder; // MAX_ELEMS_PER_MSG deve essere maggiore dell'ordine massimo possibile
 
 				int nMsgToSend = (int) (nRowsToSend / maxNRowsPerMsg);
-				l.l(me, "nMsgToSend with " + (maxNRowsPerMsg*currentOrder) + " elements: " + nMsgToSend);
+				//l.l(me, reqId + ", nMsgToSend with " + (maxNRowsPerMsg*currentOrder) + " elements: " + nMsgToSend);
 
 				int nRowsOfFirstMsg = nRowsToSend % maxNRowsPerMsg;
-				l.l(me, "nRowsOfFirstMsg: " + nRowsOfFirstMsg);
+				//l.l(me, reqId + ", nRowsOfFirstMsg: " + nRowsOfFirstMsg);
 
 				if (nRowsOfFirstMsg != 0) {
 					workers.get(i).addJob(reqId, nRowsOfFirstMsg, nRowsSent + 1);
@@ -389,6 +389,25 @@ public class Master extends UntypedActor {
 		//sendOneRowPerMsg(requestInfo,reqId);
 		return false;
 	}
+	
+	private boolean removeJob(ActorRef worker, String reqId, int rowNumber){
+		for (int i = 0; i < workers.size(); i++) {
+			if (workers.get(i).getRemoteAddress().equals(worker.path().toString())){
+				// works.size è generalmente uguale al numero di richieste in corso di quel master, tranne in casi di failure
+				ArrayList<GaussJob> works = workers.get(i).getJobs();
+
+				for (int j = 0; j < works.size(); j++) {
+					l.l(me, "work n." + j + ": " + works.get(j).getRowNumber() + ", reqId: " + works.get(j).getReqId());
+					if (works.get(j).getReqId().equals(reqId) && works.get(j).getRowNumber() == rowNumber) {
+						workers.get(i).removeJob(works.get(j));
+						l.l(me, "worker remove job: " + workers.get(i).getRemoteAddress());
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
 
 	private void handleWorkerFailure(String workerSystem) {
 		String[] tokens;
@@ -406,16 +425,20 @@ public class Master extends UntypedActor {
 				ArrayList<GaussJob> works = worker.getJobs();
 				l.l(me, worker.getRemoteAddress() + " pending request: " + works.size());
 				// nel caso di shutdown -> pending request = 0 !
-				for (int j = 0; j < works.size(); j++) {
+				while(!works.isEmpty()){
 					if (first) {
 						index = (i + 1) % workers.size();
 						first = false;
 					}
-					String reqId = works.get(j).getReqId();
-					int nRows = works.get(j).getNRows();
-					int rowNumber = works.get(j).getRowNumber();
+					// vado sempre a leggere il primo GaussJob della lista e poi lo rimuovo
+					GaussJob work = works.get(0);
+					String reqId = work.getReqId();
+					int nRows = work.getNRows();
+					int rowNumber = work.getRowNumber();
 					RequestInfo requestInfo = manager.getRequestInfo(reqId);
 
+					worker.removeJob(work); // rimuovo prima il job dal worker per liberare memoria
+					
 					// caso particolare: non abbiamo altri worker a disposizione
 					if (workers.size() < 2) {
 						l.l(me, reqId + ", WORKERS.SIZE() = 0 !!!");
@@ -424,8 +447,6 @@ public class Master extends UntypedActor {
 						continue;
 					}
 					
-					worker.removeJob(works.get(j)); // rimuovo prima il job dal worker per liberare memoria
-
 					for (int k = 0; k < workers.size(); k++) {
 						index = index % workers.size();
 						tokens = workers.get(index).getRemoteAddress().split("/user");
@@ -438,7 +459,7 @@ public class Master extends UntypedActor {
 							l.l(me, reqId + ", call " + workers.get(index).getRemoteAddress()
 									+ " to do the job of the dead worker " + worker.getRemoteAddress());
 
-							if (j == works.size() - 1 && index < i) {
+							if (works.isEmpty() && index < i) {
 								index = (index + 1) % workers.size();
 							}
 							break;
