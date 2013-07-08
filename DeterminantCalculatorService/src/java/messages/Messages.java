@@ -14,25 +14,13 @@ public class Messages {
 	 */
 	public static class Compute implements Serializable {
 		
-		//private final int order;
-		//private final String fileValues;
 		private final String reqId;
 		private final double[][] matrix;
 		
-		public Compute(/*int order, String fileValues, */String reqId, double[][] matrix) {
-			//this.order = order;
-			//this.fileValues = fileValues;
+		public Compute(String reqId, double[][] matrix) {
 			this.reqId = reqId;
 			this.matrix = matrix;
 		}
-		
-		/*public int getOrder() {
-			return order;
-		}
-		
-		public String getFileValues() {
-			return fileValues;
-		}*/
 		
 		public String getReqId() {
 			return reqId;
