@@ -67,7 +67,7 @@ public class Master extends UntypedActor {
 		String reqId = compute.getReqId();
 		double[][] matrix = compute.getMatrix();
 		l.l(me, "handleCompute, reqId: " + reqId + ", order: " + matrix.length + ", workers.size():" + workers.size());
-		RequestInfo requestInfo = manager.getRequestInfo(reqId);
+		RequestManager requestInfo = manager.getRequestInfo(reqId);
 
 		requestInfo.setOriginalMatrix(matrix);
 
@@ -90,7 +90,7 @@ public class Master extends UntypedActor {
 			return;
 		}
 
-		RequestInfo requestInfo = manager.getRequestInfo(reqId);
+		RequestManager requestInfo = manager.getRequestInfo(reqId);
 		int nRowsDone = requestInfo.updateRowsDone(rows.length);
 		//l.l(me, reqId + ", receive rows from " + rowNumber + " to " + (rowNumber + rows.length - 1) + "(" + rows.length
 		//		+ " rows)");
@@ -181,7 +181,7 @@ public class Master extends UntypedActor {
 					String reqId = job.getReqId();
 					int nRows = job.getNRows();
 					int rowNumber = job.getRowNumber();
-					RequestInfo requestInfo = manager.getRequestInfo(reqId);
+					RequestManager requestInfo = manager.getRequestInfo(reqId);
 
 					workerToRemove.removeJob(job);
 
@@ -194,7 +194,7 @@ public class Master extends UntypedActor {
 					}
 					//l.l(me, "index: " + index);
 
-					// Reassigning the jobs of the worker removed
+					// Reassigning the jobs of the worker to remove
 					workers.get(index).addJob(reqId, nRows, rowNumber);
 					workers.get(index).getActorRef()
 							.tell(new Messages.Rows(reqId, requestInfo.getFirstRow(), requestInfo.getRows(nRows, rowNumber), rowNumber), getSelf());
@@ -211,7 +211,7 @@ public class Master extends UntypedActor {
 		}
 	}
 
-	private void sendRowsToWorkers(RequestInfo requestInfo, String reqId) {
+	private void sendRowsToWorkers(RequestManager requestInfo, String reqId) {
 		int currentOrder = requestInfo.getCurrentOrder();
 		double nRowsPerWorker = (double) (currentOrder - 1) / workers.size();
 		// l.l(me, "nRowsPerWorker: " + nRowsPerWorker);
@@ -261,7 +261,7 @@ public class Master extends UntypedActor {
 	 * @param reqId the request of interest
 	 * @return <code>true</code> if a zero column is 	 * detected, <code>false</code> otherwise
 	 */
-	private boolean gauss(RequestInfo requestInfo, String reqId) {
+	private boolean gauss(RequestManager requestInfo, String reqId) {
 		boolean swapped = false;
 
 		if (requestInfo.getFirstElement() == 0) {
@@ -309,9 +309,9 @@ public class Master extends UntypedActor {
 		int index = 0;
 
 		for (int i = 0; i < workers.size(); i++) {
-			tokens = workers.get(i).getRemoteAddress().split("/user");
+			tokens = workers.get(i).getRemoteAddress().split("/user"); // TODO unire con la riga sotto
 			String workerINodeAddress = tokens[0];
-			l.l(me, "workerINodeAddress: " + workerINodeAddress);
+//			l.l(me, "workerINodeAddress: " + workerINodeAddress);
 
 			if (workerINodeAddress.equals(workerNodeFailedAddress)) {
 				WorkerInfo workerToRemove = workers.get(i);
@@ -329,7 +329,7 @@ public class Master extends UntypedActor {
 					String reqId = job.getReqId();
 					int nRows = job.getNRows();
 					int rowNumber = job.getRowNumber();
-					RequestInfo requestInfo = manager.getRequestInfo(reqId);
+					RequestManager requestInfo = manager.getRequestInfo(reqId);
 
 					workerToRemove.removeJob(job);
 

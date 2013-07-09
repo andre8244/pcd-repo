@@ -6,9 +6,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import log.l;
 
-public class RequestInfo {
+public class RequestManager {
 
-	private String me = "requestInfo";
+	private String me = "requestManager";
 	private double[][] matrix;
 	private int matrixLength;
 	private int nRowsDone; // TODO forse meglio rinominare
@@ -21,7 +21,7 @@ public class RequestInfo {
 	private CountDownLatch computationEnded;
 	private static Lock lock;
 
-	public RequestInfo() {
+	public RequestManager() {
 		tempDeterminant = 1;
 		finalDeterminant = -0.0; // -0.0 is not a valid result
 		percentageDone = 0;
@@ -105,7 +105,7 @@ public class RequestInfo {
 	public void updateCurrentMatrix(double[] row, int rowNumber) {
 		matrix[rowNumber] = row;
 	}
-	
+
 	public void updateCurrentMatrix(double[][] rows, int rowNumber) {
 		System.arraycopy(rows, 0, matrix, rowNumber, rows.length);
 	}
@@ -125,7 +125,7 @@ public class RequestInfo {
 		matrix = subMatrix;
 		nRowsDone = 0;
 	}
-	
+
 	public void updateTempDeterminant() {
 		tempDeterminant = tempDeterminant * matrix[0][0];
 	}
@@ -134,7 +134,7 @@ public class RequestInfo {
 		tempDeterminant = tempDeterminant * matrix[1][1];
 		return tempDeterminant;
 	}
-	
+
 	public boolean swapFirtsRow() {
 		for (int i = 1; i < matrix.length; i++) {
 			if (matrix[i][0] != 0) {
@@ -146,25 +146,25 @@ public class RequestInfo {
 		}
 		return false;
 	}
-		
+
 	public int updateRowsDone(int n) {
 		nRowsDone = nRowsDone + n;
 		return nRowsDone;
 	}
-	
+
 	public double[] getFirstRow() {
 		return matrix[0];
 	}
-	
+
 	public double getFirstElement() {
 		return matrix[0][0];
 	}
-		
-	
+
+
 	public double[] getRow(int rowNumber) {
 		return matrix[rowNumber];
 	}
-	
+
 	public double[][] getRows(int size, int rowNumber) {
 		double[][] rows = new double[size][matrix.length];
 		for (int i = 0; i < rows.length; i++) {

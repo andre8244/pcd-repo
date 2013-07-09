@@ -20,11 +20,11 @@ public class MatrixReaderThread extends Thread {
 	private int order;
 	private String fileValues;
 	private String reqId;
-	private RequestInfo requestInfo;
+	private RequestManager requestInfo;
 	private ActorRef master;
 	private static String me = "matrixReader";
 
-	public MatrixReaderThread(int order, String fileValues, String reqId, RequestInfo requestInfo, ActorRef master) {
+	public MatrixReaderThread(int order, String fileValues, String reqId, RequestManager requestInfo, ActorRef master) {
 		this.order = order;
 		this.fileValues = fileValues;
 		this.reqId = reqId;

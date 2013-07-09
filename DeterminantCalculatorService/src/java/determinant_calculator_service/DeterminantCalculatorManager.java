@@ -25,7 +25,7 @@ public class DeterminantCalculatorManager {
 	private int reqNumber;
 	private final int nProcessors = Runtime.getRuntime().availableProcessors();
 	private ArrayList<ActorRef> masters;
-	private ConcurrentHashMap<String, RequestInfo> requestsInfo;
+	private ConcurrentHashMap<String, RequestManager> requestsInfo;
 	private static Lock getInstanceLock = new ReentrantLock(true);
 	private static Lock computeDeterminantLock = new ReentrantLock(true);
 	private String me = "manager";
@@ -47,7 +47,7 @@ public class DeterminantCalculatorManager {
 				}
 			}), masterId));
 		}
-		requestsInfo = new ConcurrentHashMap<String, RequestInfo>();
+		requestsInfo = new ConcurrentHashMap<String, RequestManager>();
 	}
 
 	/**
@@ -81,9 +81,9 @@ public class DeterminantCalculatorManager {
 		try {
 			String reqId = "req" + reqNumber;
 			reqNumber = reqNumber + 1;
-			RequestInfo requestInfo = new RequestInfo();
-			requestsInfo.put(reqId, requestInfo);
-			new MatrixReaderThread(order, fileValues, reqId, requestInfo, masters.get(masterIndex)).start();
+			RequestManager requestManager = new RequestManager();
+			requestsInfo.put(reqId, requestManager);
+			new MatrixReaderThread(order, fileValues, reqId, requestManager, masters.get(masterIndex)).start();
 			masterIndex = (masterIndex + 1) % masters.size();
 			return reqId;
 		} finally {
@@ -98,7 +98,7 @@ public class DeterminantCalculatorManager {
 	 * @return an estimation of percentage of a previously requested computation.
 	 */
 	public int getPercentageDone(String reqId) {
-		RequestInfo requestInfo = requestsInfo.get(reqId);
+		RequestManager requestInfo = requestsInfo.get(reqId);
 
 		if (requestInfo != null) {
 			return requestInfo.getPercentageDone();
@@ -115,7 +115,7 @@ public class DeterminantCalculatorManager {
 	 * @return the determinant computed
 	 */
 	public double getResult(String reqId) {
-		RequestInfo requestInfo = requestsInfo.get(reqId);
+		RequestManager requestInfo = requestsInfo.get(reqId);
 
 		if (requestInfo != null) {
 			// blocking operation
@@ -154,7 +154,7 @@ public class DeterminantCalculatorManager {
 	 * @param reqId the request of interest
 	 * @return a <code>RequestInfo</code>
 	 */
-	public RequestInfo getRequestInfo(String reqId) {
+	public RequestManager getRequestInfo(String reqId) {
 		return requestsInfo.get(reqId);
 	}
 }
