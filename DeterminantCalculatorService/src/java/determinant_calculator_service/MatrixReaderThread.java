@@ -15,7 +15,7 @@ import log.l;
  * An utility class to read the values of a matrix from a HTTP or local URL.
  *
  */
-public class MatrixReader extends Thread {
+public class MatrixReaderThread extends Thread {
 
 	private int order;
 	private String fileValues;
@@ -24,7 +24,7 @@ public class MatrixReader extends Thread {
 	private ActorRef master;
 	private static String me = "matrixReader";
 
-	public MatrixReader(int order, String fileValues, String reqId, RequestInfo requestInfo, ActorRef master) {
+	public MatrixReaderThread(int order, String fileValues, String reqId, RequestInfo requestInfo, ActorRef master) {
 		this.order = order;
 		this.fileValues = fileValues;
 		this.reqId = reqId;
