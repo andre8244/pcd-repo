@@ -38,7 +38,7 @@ public class RequestManager {
 		totalWorkToDo = 0;
 
 		/*
-		 * sum the elements of all the submatrices to be computed example: order = 1000 -> totalWorkToDo = (999 * 1000)
+		 * sum the elements of all the submatrices to be computed example: order = 1000 -> totalWorkToDo = (999 * 1000) +
 		 * + (998 * 999) + ... + (1 * 2)
 		 */
 		long startTime = System.currentTimeMillis();
