@@ -33,14 +33,11 @@ public class UserApp extends JFrame implements ActionListener {
 	//private static final String INITIAL_FILE_VALUES = System.getProperty("user.home") + System.getProperty("file.separator") + "matrix.txt";
 	private static final String INITIAL_FILE_VALUES = "http://pcddeterminant.altervista.org/matrix100@-4.23e84.txt";
 	private static final int INITIAL_ORDER = 100;
+	private boolean connected = false;
 
 	public UserApp() {
 		super("User App");
-
-		DeterminantCalculatorService_Service service =
-				new DeterminantCalculatorService_Service();
-		servicePort = service.getDeterminantCalculatorServicePort();
-
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Container cp = getContentPane();
 		globalPanel = new JPanel();
@@ -115,6 +112,12 @@ public class UserApp extends JFrame implements ActionListener {
 	}
 
 	private void handleCompute() {
+		if(!connected){
+			connected = true;
+			DeterminantCalculatorService_Service service =
+				new DeterminantCalculatorService_Service();
+			servicePort = service.getDeterminantCalculatorServicePort();
+		}		
 		int order;
 
 		try {
