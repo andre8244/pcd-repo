@@ -17,7 +17,6 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
-import log.l;
 import messages.Messages;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -38,7 +37,6 @@ public class WorkerNodeApp extends JFrame implements ActionListener {
 	private final int nProcessors = Runtime.getRuntime().availableProcessors();
 	private ActorSystem actorSystem;
 	private ArrayList<ActorRef> workers;
-	private String me = "workerNodeApp";
 	
 	public WorkerNodeApp() {
 		super("Worker Node App");
@@ -88,7 +86,6 @@ public class WorkerNodeApp extends JFrame implements ActionListener {
 		
 		if (workers.size() < nWorkersToDeploy) {
 			int nWorkersToAdd = nWorkersToDeploy - workers.size();
-			l.l(me, "nWorkersToAdd: " + nWorkersToAdd);
 			
 			for (int i = 0; i < nWorkersToAdd; i++) {
 				String workerId = "worker" + i + "-" + System.currentTimeMillis();
@@ -97,7 +94,6 @@ public class WorkerNodeApp extends JFrame implements ActionListener {
 			refreshWorkersDeployedLabel(workers.size());
 		} else if (workers.size() > nWorkersToDeploy) {
 			int nWorkersToRemove = workers.size() - nWorkersToDeploy;
-			l.l(me, "nWorkersToRemove: " + nWorkersToRemove);
 			
 			for (int i = 0; i < nWorkersToRemove; i++) {
 				int last = workers.size() - 1;

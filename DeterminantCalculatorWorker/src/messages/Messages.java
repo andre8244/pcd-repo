@@ -64,7 +64,7 @@ public class Messages {
 		}
 	}
 
-	public static class Remove implements Serializable { // TODO da eliminare?
+	public static class Remove implements Serializable {
 
 		public Remove() {
 		}

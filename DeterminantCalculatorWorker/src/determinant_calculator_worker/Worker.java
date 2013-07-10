@@ -1,7 +1,6 @@
 package determinant_calculator_worker;
 
 import messages.Messages;
-import log.l;
 import akka.actor.Address;
 import akka.actor.UntypedActor;
 import akka.remote.RemoteActorRefProvider;
@@ -49,7 +48,6 @@ public class Worker extends UntypedActor {
 	}
 
 	private void handleRows(Messages.Rows manyRows) {
-		//l.l(me, "computing rows...");
 		String reqId = manyRows.getReqId();
 		double[] firstRow = manyRows.getFirstRow();
 		double[][] rows = manyRows.getRows();
@@ -64,17 +62,17 @@ public class Worker extends UntypedActor {
             }
         }
 		getSender().tell(new Messages.RowsResult(reqId, rows, rowNumber), getSelf());
-        //l.l(me, reqId + ", sent rows from " + rowNumber + " to " + (rowNumber+rows.length-1) + " to master");
+		//System.out.println("["+me+"] "+ reqId + ", sent rows from " + rowNumber + " to " + (rowNumber+rows.length-1) + " to master");
 	}
 
 	private void handleRemove() {
 		servicePort.removeWorker(remoteAddress);
-		//l.l(me, "worker removed");
+		System.out.println("["+me+"] worker removed");
 		this.getContext().stop(this.getSelf());
 	}
 
 	private void handleAddWorkerAck() {
-		l.l(me, "worker registered to master: " + this.getSender().path().toString());
+		System.out.println("["+me+"] worker registered to master: " + this.getSender().path().toString());
 	}
 
 }

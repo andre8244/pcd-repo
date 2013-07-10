@@ -69,22 +69,5 @@
         <delete dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_2"/>
         <delete dir="${build.generated.sources.dir}/jax-ws/leardini_mac"/>
     </target>
-    <target name="wsimport-client-DeterminantCalculatorService_5" depends="wsimport-init">
-        <mkdir dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_5"/>
-        <property name="wsdl-DeterminantCalculatorService_5" location="xml-resources/web-service-references/DeterminantCalculatorService_5/wsdl/25.124.124.114_8080/DeterminantCalculatorService/DeterminantCalculatorService.wsdl"/>
-        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_5" destdir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_5" wsdl="${wsdl-DeterminantCalculatorService_5}" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" wsdlLocation="http://25.124.124.114:8080/DeterminantCalculatorService/DeterminantCalculatorService?wsdl" xnocompile="true" xendorsed="true" package="leardini_linux">
-            <depends file="${wsdl-DeterminantCalculatorService_5}"/>
-            <produces dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_5"/>
-        </wsimport>
-        <copy todir="${build.generated.sources.dir}/jax-ws">
-            <fileset dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_5">
-                <include name="**/*.java"/>
-            </fileset>
-        </copy>
-    </target>
-    <target name="wsimport-client-clean-DeterminantCalculatorService_5" depends="-init-project">
-        <delete dir="${build.generated.dir}/jax-wsCache/DeterminantCalculatorService_5"/>
-        <delete dir="${build.generated.sources.dir}/jax-ws/leardini_linux"/>
-    </target>
-    <target name="wsimport-client-generate" depends="wsimport-client-DeterminantCalculatorService, wsimport-client-DeterminantCalculatorService_1, wsimport-client-DeterminantCalculatorService_2, wsimport-client-DeterminantCalculatorService_5"/>
+    <target name="wsimport-client-generate" depends="wsimport-client-DeterminantCalculatorService, wsimport-client-DeterminantCalculatorService_1, wsimport-client-DeterminantCalculatorService_2"/>
 </project>
