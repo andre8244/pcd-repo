@@ -1,6 +1,5 @@
 package determinant_calculator_user;
 
-import log.l;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -10,21 +9,14 @@ import java.util.Random;
 public class MatrixFileGenerator {
 
 	private BufferedWriter writer;
-	private static String me = "matrixUtil";
 
 	public void generate(int order, double minAbs, double maxAbs, String fileName) {
-		long startTime = System.currentTimeMillis();
 		Random rand = new Random();
-
-
-		File file = new File(fileName);
-		l.l("MATRIXUTIL ", file.getAbsolutePath());
 
 		try {
 			writer = new BufferedWriter(new FileWriter(fileName));
 			double val;
-			//l.l(me, "Writing matrix to file...");
-
+			
 			for (int row = 0; row < order; row++) {
 				for (int col = 0; col < order; col++) {
 					val = minAbs + rand.nextDouble() * (maxAbs - minAbs);
@@ -37,11 +29,7 @@ public class MatrixFileGenerator {
 						writer.write(val + " ");
 					}
 				}
-			//	if (row % 500 == 0) {
-					//l.l(me, (int) ((double) row / order * 100) + " %");
-			//	}
 			}
-			//l.l(me, "matrix wrote to file, duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {

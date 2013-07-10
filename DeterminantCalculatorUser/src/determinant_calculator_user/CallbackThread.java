@@ -19,7 +19,6 @@ public class CallbackThread extends Thread {
 	private DeterminantCalculatorService servicePort;
 	private AsynchFrame view;
 	private long startTime;
-	private String me = "callbackThread";
 
 	public CallbackThread(String reqId, DeterminantCalculatorService servicePort, AsynchFrame view) {
 		this.reqId = reqId;
@@ -29,7 +28,6 @@ public class CallbackThread extends Thread {
 
 	@Override
 	public void run() {
-		// definizione dell'handler
 		AsyncHandler<GetResultResponse> asyncHandler = new AsyncHandler<GetResultResponse>() {
 			@Override
 			public void handleResponse(Response<GetResultResponse> response) {

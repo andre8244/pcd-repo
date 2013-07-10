@@ -21,7 +21,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import log.l;
 
 public class UserApp extends JFrame implements ActionListener {
 
@@ -31,10 +30,9 @@ public class UserApp extends JFrame implements ActionListener {
 	private ButtonGroup group = new ButtonGroup();
 	private JButton computeButton;
 	private DeterminantCalculatorService servicePort;
-	private static final String INITIAL_FILE_VALUES = System.getProperty("user.home") + System.getProperty("file.separator") + "matrix.txt";
-	//private static final String INITIAL_FILE_VALUES = "http://pcddeterminant.altervista.org/matrix100@-4.23e84.txt";
-	private static final int INITIAL_ORDER = 1000;
-	private String me = "userApp";
+	//private static final String INITIAL_FILE_VALUES = System.getProperty("user.home") + System.getProperty("file.separator") + "matrix.txt";
+	private static final String INITIAL_FILE_VALUES = "http://pcddeterminant.altervista.org/matrix100@-4.23e84.txt";
+	private static final int INITIAL_ORDER = 100;
 
 	public UserApp() {
 		super("User App");
@@ -69,7 +67,7 @@ public class UserApp extends JFrame implements ActionListener {
 		pollingButton.addActionListener(this);
 		synchronousButton = new JRadioButton("Synchronous");
 		synchronousButton.addActionListener(this);
-		// setActionCommand!!
+		
 		group.add(callbackButton);
 		group.add(pollingButton);
 		group.add(synchronousButton);
@@ -127,6 +125,7 @@ public class UserApp extends JFrame implements ActionListener {
 		}
 		String fileValues = fileValuesText.getText();
 
+		// per generare una matrice in un file locale, usare il seguente path:
 		if (fileValues.equals(System.getProperty("user.home") + System.getProperty("file.separator") + "matrix.txt")) {
 			MatrixFileGenerator generator = new MatrixFileGenerator();
 			generator.generate(order, 0.01, 0.02, fileValues);

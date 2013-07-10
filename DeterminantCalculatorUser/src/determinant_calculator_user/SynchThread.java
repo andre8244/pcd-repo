@@ -8,8 +8,6 @@ import localhost_client.*;
 //import andreafWindows8dualCore_client.*;
 //import leardini_linux.*;
 //import leardini_mac.*;
-//import leardini_linux_192_168_0_7.*;
-//import linux_ethernet.*;
 
 public class SynchThread extends Thread {
 
