@@ -39,7 +39,7 @@ public class DeterminantCalculatorManager {
 
 		for (int i = 0; i < nProcessors; i++) {
 			String masterId = "master-" + i;
-			// masters.add(system.actorOf(new Props(Master.class), masterId));
+			// create several masters passing the istance of the Manager
 			masters.add(system.actorOf(new Props(new UntypedActorFactory() {
 				@Override
 				public Actor create() {

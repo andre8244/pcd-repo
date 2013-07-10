@@ -43,9 +43,7 @@ public class MatrixReaderThread extends Thread {
 	public void run() {
 		l.l(me, reqId + ", writing list");
 		long startTime = System.currentTimeMillis();
-		// TODO provati anche: ArrayList<ArrayList<Double>> e HashMap<Integer,HashMap<Integer,Double>> ma meno
-		// performanti
-		double[][] matrix = new double[order][order];
+		double[][] matrix = new double[order][order]; //ArrayList<ArrayList<Double>> e HashMap<Integer,HashMap<Integer,Double>> sono meno performanti
 		BufferedReader reader;
 
 		try {
@@ -68,9 +66,9 @@ public class MatrixReaderThread extends Thread {
 					return;
 				}
 
-				if (nLines % 500 == 0) {
-					l.l(me, reqId + ", wrote " + nLines + " lines in list");
-				}
+			//	if (nLines % 500 == 0) {
+					//l.l(me, reqId + ", wrote " + nLines + " lines in list");
+			//	}
 				tokens = line.split(" ");
 
 				// every line must have <order> elements
@@ -107,8 +105,8 @@ public class MatrixReaderThread extends Thread {
 			requestManager.setFinalDeterminant(-0.0);
 			return;
 		}
-		l.l(me, reqId + ", finished reading file and writing list: " + ((System.currentTimeMillis() - startTime) / (double) 1000)
-				+ " sec");
+		//l.l(me, reqId + ", finished reading file and writing list: " + ((System.currentTimeMillis() - startTime) / (double) 1000)
+		//		+ " sec");
 		master.tell(new Messages.Compute(reqId, matrix));
 	}
 }

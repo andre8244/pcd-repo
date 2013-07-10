@@ -43,12 +43,11 @@ public class RequestManager {
 		 */
 		long startTime = System.currentTimeMillis();
 
-		for (long i = matrixLength; i > 0; i--) {
+		for (long i = matrixLength-1; i > 0; i--) {
 			totalWorkToDo += i * (i + 1);
 		}
-		l.l(me,
-				"setOriginalMatrix: computed totalWorkTodo (" + totalWorkToDo + "). Duration: "
-						+ (System.currentTimeMillis() - startTime) + " ms");
+		//l.l(me,"setOriginalMatrix: computed totalWorkTodo (" + totalWorkToDo + "). Duration: "
+		//		+ (System.currentTimeMillis() - startTime) + " ms");
 	}
 
 	public boolean getChangeSign() {
@@ -99,11 +98,6 @@ public class RequestManager {
 		} finally {
 			lock.unlock();
 		}
-	}
-
-	// serve per la oneRow
-	public void updateCurrentMatrix(double[] row, int rowNumber) {
-		matrix[rowNumber] = row;
 	}
 
 	public void updateCurrentMatrix(double[][] rows, int rowNumber) {
@@ -158,11 +152,6 @@ public class RequestManager {
 
 	public double getFirstElement() {
 		return matrix[0][0];
-	}
-
-
-	public double[] getRow(int rowNumber) {
-		return matrix[rowNumber];
 	}
 
 	public double[][] getRows(int size, int rowNumber) {
