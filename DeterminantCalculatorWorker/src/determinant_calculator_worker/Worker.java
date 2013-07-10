@@ -6,14 +6,13 @@ import akka.actor.Address;
 import akka.actor.UntypedActor;
 import akka.remote.RemoteActorRefProvider;
 // IMPORT DEL WEB SERVICE CLIENT:
-//import localhost_client.*;
+import localhost_client.*;
 //import marco_client.*;
 //import marcoXP_client.*;
 //import andreaf_client.*;
 //import andreafWindows8dualCore_client.*;
 //import leardini_linux.*;
 //import leardini_mac.*;
-import leardini_linux_192_168_0_7.*;
 
 public class Worker extends UntypedActor {
 
@@ -50,7 +49,7 @@ public class Worker extends UntypedActor {
 	}
 
 	private void handleRows(Messages.Rows manyRows) {
-		l.l(me, "computing rows...");
+		//l.l(me, "computing rows...");
 		String reqId = manyRows.getReqId();
 		double[] firstRow = manyRows.getFirstRow();
 		double[][] rows = manyRows.getRows();
@@ -65,12 +64,12 @@ public class Worker extends UntypedActor {
             }
         }
 		getSender().tell(new Messages.RowsResult(reqId, rows, rowNumber), getSelf());
-        l.l(me, reqId + ", sent rows from " + rowNumber + " to " + (rowNumber+rows.length-1) + " to master");
+        //l.l(me, reqId + ", sent rows from " + rowNumber + " to " + (rowNumber+rows.length-1) + " to master");
 	}
 
 	private void handleRemove() {
 		servicePort.removeWorker(remoteAddress);
-		l.l(me, "worker removed");
+		//l.l(me, "worker removed");
 		this.getContext().stop(this.getSelf());
 	}
 
