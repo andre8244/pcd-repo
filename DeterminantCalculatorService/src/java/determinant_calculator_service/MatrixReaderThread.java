@@ -20,15 +20,15 @@ public class MatrixReaderThread extends Thread {
 	private int order;
 	private String fileValues;
 	private String reqId;
-	private RequestManager requestInfo;
+	private RequestManager requestManager;
 	private ActorRef master;
 	private static String me = "matrixReader";
 
-	public MatrixReaderThread(int order, String fileValues, String reqId, RequestManager requestInfo, ActorRef master) {
+	public MatrixReaderThread(int order, String fileValues, String reqId, RequestManager requestManager, ActorRef master) {
 		this.order = order;
 		this.fileValues = fileValues;
 		this.reqId = reqId;
-		this.requestInfo = requestInfo;
+		this.requestManager = requestManager;
 		this.master = master;
 	}
 
@@ -63,8 +63,8 @@ public class MatrixReaderThread extends Thread {
 				// the number of lines can't be greater than the order
 				if (nLines == order) {
 					l.l(me, reqId + ", Order error!");
-					requestInfo.setPercentageDone(100);
-					requestInfo.setFinalDeterminant(-0.0);
+					requestManager.setPercentageDone(100);
+					requestManager.setFinalDeterminant(-0.0);
 					return;
 				}
 
@@ -76,8 +76,8 @@ public class MatrixReaderThread extends Thread {
 				// every line must have <order> elements
 				if (tokens.length != order) {
 					l.l(me, reqId + ", Order error!");
-					requestInfo.setPercentageDone(100);
-					requestInfo.setFinalDeterminant(-0.0);
+					requestManager.setPercentageDone(100);
+					requestManager.setFinalDeterminant(-0.0);
 					return;
 				}
 
@@ -92,19 +92,19 @@ public class MatrixReaderThread extends Thread {
 			// the number of lines can't be less than the order
 			if (order != nLines) {
 				l.l(me, reqId + ", Order error!");
-				requestInfo.setPercentageDone(100);
-				requestInfo.setFinalDeterminant(-0.0);
+				requestManager.setPercentageDone(100);
+				requestManager.setFinalDeterminant(-0.0);
 				return;
 			}
 		} catch (FileNotFoundException ex) {
 			ex.printStackTrace();
-			requestInfo.setPercentageDone(100);
-			requestInfo.setFinalDeterminant(-0.0);
+			requestManager.setPercentageDone(100);
+			requestManager.setFinalDeterminant(-0.0);
 			return;
 		} catch (IOException ex) {
 			ex.printStackTrace();
-			requestInfo.setPercentageDone(100);
-			requestInfo.setFinalDeterminant(-0.0);
+			requestManager.setPercentageDone(100);
+			requestManager.setFinalDeterminant(-0.0);
 			return;
 		}
 		l.l(me, reqId + ", finished reading file and writing list: " + ((System.currentTimeMillis() - startTime) / (double) 1000)

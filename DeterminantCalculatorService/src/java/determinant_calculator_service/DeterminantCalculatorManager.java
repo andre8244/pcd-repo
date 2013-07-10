@@ -25,16 +25,16 @@ public class DeterminantCalculatorManager {
 	private int reqNumber;
 	private final int nProcessors = Runtime.getRuntime().availableProcessors();
 	private ArrayList<ActorRef> masters;
-	private ConcurrentHashMap<String, RequestManager> requestsInfo;
+	private ConcurrentHashMap<String, RequestManager> requests;
 	private static Lock getInstanceLock = new ReentrantLock(true);
-	private static Lock computeDeterminantLock = new ReentrantLock(true);
+	private Lock computeDeterminantLock = new ReentrantLock(true);
 	private String me = "manager";
 	private int masterIndex = 0;
 
 	private DeterminantCalculatorManager() {
 		reqNumber = 0;
 		masters = new ArrayList<ActorRef>();
-		final DeterminantCalculatorManager manager = this;
+		final DeterminantCalculatorManager manager = this; // passed to the masters
 		ActorSystem system = ActorSystem.create("masterSystem", ConfigFactory.load().getConfig("masterSystem"));
 
 		for (int i = 0; i < nProcessors; i++) {
@@ -47,7 +47,7 @@ public class DeterminantCalculatorManager {
 				}
 			}), masterId));
 		}
-		requestsInfo = new ConcurrentHashMap<String, RequestManager>();
+		requests = new ConcurrentHashMap<String, RequestManager>();
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class DeterminantCalculatorManager {
 			String reqId = "req" + reqNumber;
 			reqNumber = reqNumber + 1;
 			RequestManager requestManager = new RequestManager();
-			requestsInfo.put(reqId, requestManager);
+			requests.put(reqId, requestManager);
 			new MatrixReaderThread(order, fileValues, reqId, requestManager, masters.get(masterIndex)).start();
 			masterIndex = (masterIndex + 1) % masters.size();
 			return reqId;
@@ -98,10 +98,10 @@ public class DeterminantCalculatorManager {
 	 * @return an estimation of percentage of a previously requested computation.
 	 */
 	public int getPercentageDone(String reqId) {
-		RequestManager requestInfo = requestsInfo.get(reqId);
+		RequestManager requestManager = requests.get(reqId);
 
-		if (requestInfo != null) {
-			return requestInfo.getPercentageDone();
+		if (requestManager != null) {
+			return requestManager.getPercentageDone();
 		} else {
 			l.l(me, reqId + ": invalid requestId");
 			return -1;
@@ -115,11 +115,11 @@ public class DeterminantCalculatorManager {
 	 * @return the determinant computed
 	 */
 	public double getResult(String reqId) {
-		RequestManager requestInfo = requestsInfo.get(reqId);
+		RequestManager requestManager = requests.get(reqId);
 
-		if (requestInfo != null) {
+		if (requestManager != null) {
 			// blocking operation
-			return requestInfo.getFinalDeterminant();
+			return requestManager.getFinalDeterminant();
 		} else {
 			l.l(me, reqId + ": invalid requestId");
 			return -0.0;
@@ -149,12 +149,12 @@ public class DeterminantCalculatorManager {
 	}
 
 	/**
-	 * Returns the <code>RequestInfo</code> associated to the given <code>reqId</code>.
+	 * Returns the <code>RequestManager</code> associated to the given <code>reqId</code>.
 	 *
 	 * @param reqId the request of interest
-	 * @return a <code>RequestInfo</code>
+	 * @return a <code>RequestManager</code>
 	 */
-	public RequestManager getRequestInfo(String reqId) {
-		return requestsInfo.get(reqId);
+	public RequestManager getRequestManager(String reqId) {
+		return requests.get(reqId);
 	}
 }

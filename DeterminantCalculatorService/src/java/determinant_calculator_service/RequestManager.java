@@ -19,7 +19,7 @@ public class RequestManager {
 	private boolean changeSign;
 	private long startTime;
 	private CountDownLatch computationEnded;
-	private static Lock lock;
+	private Lock lock;
 
 	public RequestManager() {
 		tempDeterminant = 1;
@@ -167,6 +167,7 @@ public class RequestManager {
 
 	public double[][] getRows(int size, int rowNumber) {
 		double[][] rows = new double[size][matrix.length];
+
 		for (int i = 0; i < rows.length; i++) {
 			rows[i] = matrix[rowNumber + i];
 		}
