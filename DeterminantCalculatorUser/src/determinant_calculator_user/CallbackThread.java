@@ -5,15 +5,13 @@ import java.util.concurrent.Future;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Response;
 // IMPORT DEL WEB SERVICE CLIENT:
-//import localhost_client.*;
+import localhost_client.*;
 //import marco_client.*;
 //import marcoXP_client.*;
 //import andreaf_client.*;
 //import andreafWindows8dualCore_client.*;
 //import leardini_linux.*;
 //import leardini_mac.*;
-//import leardini_linux_192_168_0_7.*;
-import linux_ethernet.*;
 
 public class CallbackThread extends Thread {
 
@@ -68,7 +66,7 @@ public class CallbackThread extends Thread {
 			}
 
 			try {
-				Thread.sleep(10000); // TODO 1000
+				Thread.sleep(1000);
 			} catch (InterruptedException ex) {
 				ex.printStackTrace();
 			}

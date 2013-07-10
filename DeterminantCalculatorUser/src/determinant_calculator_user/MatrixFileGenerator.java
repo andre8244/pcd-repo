@@ -23,7 +23,7 @@ public class MatrixFileGenerator {
 		try {
 			writer = new BufferedWriter(new FileWriter(fileName));
 			double val;
-			l.l(me, "Writing matrix to file...");
+			//l.l(me, "Writing matrix to file...");
 
 			for (int row = 0; row < order; row++) {
 				for (int col = 0; col < order; col++) {
@@ -37,11 +37,11 @@ public class MatrixFileGenerator {
 						writer.write(val + " ");
 					}
 				}
-				if (row % 500 == 0) {
-					l.l(me, (int) ((double) row / order * 100) + " %");
-				}
+			//	if (row % 500 == 0) {
+					//l.l(me, (int) ((double) row / order * 100) + " %");
+			//	}
 			}
-			l.l(me, "matrix wrote to file, duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
+			//l.l(me, "matrix wrote to file, duration: " + ((System.currentTimeMillis() - startTime) / (double) 1000) + " sec");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
