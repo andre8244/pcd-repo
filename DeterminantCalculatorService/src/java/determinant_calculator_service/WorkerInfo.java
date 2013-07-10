@@ -57,11 +57,11 @@ public class WorkerInfo {
 	 * Adds a job to the list of jobs.
 	 * 
 	 * @param reqId the request the job belongs to
-	 * @param rows the set of rows of the <code>GaussJob</code> to add
+	 * @param nRows the number of rows of the <code>GaussJob</code> to add
 	 * @param rowNumber the index of the first row of the <code>GaussJob</code> to add
 	 */
-	public void addJob(String reqId, int nRows, int offset) {
-		jobs.add(new GaussJob(reqId, nRows, offset));
+	public void addJob(String reqId, int nRows, int rowNumber) {
+		jobs.add(new GaussJob(reqId, nRows, rowNumber));
 	}
 	
 	/**

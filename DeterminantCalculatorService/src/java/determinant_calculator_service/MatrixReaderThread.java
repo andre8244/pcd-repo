@@ -9,8 +9,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import messages.Messages;
 
-import log.l;
-
 /**
  * An utility class to read the values of a matrix from a HTTP or local URL.
  *
@@ -32,18 +30,10 @@ public class MatrixReaderThread extends Thread {
 		this.master = master;
 	}
 
-	/**
-	 * Reads the values of a matrix from a HTTP or local URL
-	 *
-	 * @param order the order of the matrix
-	 * @param filePath the HTTP or local URL of the matrix file
-	 * @return an array of array of <code>double </code> containing the values of the matrix
-	 */
+	//TODO javadoc
 	@Override
 	public void run() {
-		l.l(me, reqId + ", writing list");
-		long startTime = System.currentTimeMillis();
-		double[][] matrix = new double[order][order]; //ArrayList<ArrayList<Double>> e HashMap<Integer,HashMap<Integer,Double>> sono meno performanti
+		double[][] matrix = new double[order][order];
 		BufferedReader reader;
 
 		try {
@@ -60,20 +50,16 @@ public class MatrixReaderThread extends Thread {
 			while (line != null) {
 				// the number of lines can't be greater than the order
 				if (nLines == order) {
-					l.l(me, reqId + ", Order error!");
+					System.err.println(reqId + ", order error.");
 					requestManager.setPercentageDone(100);
 					requestManager.setFinalDeterminant(-0.0);
 					return;
 				}
-
-			//	if (nLines % 500 == 0) {
-					//l.l(me, reqId + ", wrote " + nLines + " lines in list");
-			//	}
 				tokens = line.split(" ");
 
 				// every line must have <order> elements
 				if (tokens.length != order) {
-					l.l(me, reqId + ", Order error!");
+					System.err.println(reqId + ", order error.");
 					requestManager.setPercentageDone(100);
 					requestManager.setFinalDeterminant(-0.0);
 					return;
@@ -89,7 +75,7 @@ public class MatrixReaderThread extends Thread {
 
 			// the number of lines can't be less than the order
 			if (order != nLines) {
-				l.l(me, reqId + ", Order error!");
+				System.err.println(reqId + ", order error.");
 				requestManager.setPercentageDone(100);
 				requestManager.setFinalDeterminant(-0.0);
 				return;
@@ -105,8 +91,6 @@ public class MatrixReaderThread extends Thread {
 			requestManager.setFinalDeterminant(-0.0);
 			return;
 		}
-		//l.l(me, reqId + ", finished reading file and writing list: " + ((System.currentTimeMillis() - startTime) / (double) 1000)
-		//		+ " sec");
 		master.tell(new Messages.Compute(reqId, matrix));
 	}
 }

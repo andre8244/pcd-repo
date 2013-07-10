@@ -2,7 +2,6 @@ package determinant_calculator_service;
 
 import java.util.ArrayList;
 
-import log.l;
 import messages.Messages;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
@@ -19,7 +18,7 @@ public class Master extends UntypedActor {
 	private ArrayList<WorkerInfo> workers;
 	private DeterminantCalculatorManager manager;
 	private String me;
-	private static final int MAX_ELEMS_PER_MSG = 10000000; // default: 10 milioni
+	private static final int MAX_ELEMS_PER_MSG = 10000000; // default: 10 millions
 
 	/**
 	 * Constructs a master actor.
@@ -52,11 +51,11 @@ public class Master extends UntypedActor {
 			handleRemoveWorker(rw);
 		} else if (msg instanceof RemoteClientWriteFailed) {
 			RemoteClientWriteFailed rcwf = (RemoteClientWriteFailed) msg;
-			l.l(me, "Remote Client Write Failed: " + rcwf.getRemoteAddress().toString());
+			System.out.println("Remote Client Write Failed: " + rcwf.getRemoteAddress().toString());
 			handleWorkerFailure(rcwf.getRemoteAddress().toString());
 		} else if (msg instanceof RemoteClientShutdown) {
 			RemoteClientShutdown rcs = (RemoteClientShutdown) msg;
-			l.l(me, "Remote Client Shutdown: " + rcs.getRemoteAddress().toString());
+			System.out.println("Remote Client Shutdown: " + rcs.getRemoteAddress().toString());
 			handleWorkerFailure(rcs.getRemoteAddress().toString());
 		} else {
 			unhandled(msg);
@@ -66,13 +65,13 @@ public class Master extends UntypedActor {
 	private void handleCompute(Messages.Compute compute) {
 		String reqId = compute.getReqId();
 		double[][] matrix = compute.getMatrix();
-		//l.l(me, "handleCompute, reqId: " + reqId + ", order: " + matrix.length + ", workers.size():" + workers.size());
+		System.out.println("Received new request: "+ reqId + " for the matrix of order: "+ matrix.length);
 		RequestManager requestManager = manager.getRequestManager(reqId);
 
 		requestManager.setOriginalMatrix(matrix);
 
 		if (workers.isEmpty()) {
-			l.l(me, reqId + ", WORKERS.SIZE() = 0 !!!");
+			System.err.println("No worker available");
 			requestManager.setPercentageDone(100);
 			requestManager.setFinalDeterminant(-0.0);
 			return;
@@ -86,31 +85,27 @@ public class Master extends UntypedActor {
 		int rowNumber = rr.getRowNumber();
 
 		if (!removeJob(getSender(), reqId, rowNumber)) {
-			//l.l(me, reqId + ", job non valido!");
+			// message already reassigned
 			return;
 		}
 
 		RequestManager requestManager = manager.getRequestManager(reqId);
 		int nRowsDone = requestManager.updateRowsDone(rows.length);
-		//l.l(me, reqId + ", receive rows from " + rowNumber + " to " + (rowNumber + rows.length - 1) + "(" + rows.length
-		//		+ " rows)");
-		//l.l(me, reqId + ", nRowsDone: " + nRowsDone);
+		//System.out.println(reqId + ", receive rows from " + rowNumber + " to " + (rowNumber + rows.length - 1) + 
+		//						" (" + rows.length + " rows)");
 
 		requestManager.updateCurrentMatrix(rows, rowNumber);
 		int currentOrder = requestManager.getCurrentOrder();
 
 		if (nRowsDone == currentOrder - 1) {
-//			if (currentOrder % 500 == 0) {
-			//l.l(me,
-			//		reqId + ", received all rows, submatrix " + currentOrder + ". Duration: "
+			//System.out.println(reqId + ", received all rows, submatrix " + currentOrder + ". Duration: "
 			//		+ ((System.currentTimeMillis() - requestManager.getStartTime()) / (double) 1000) + " sec");
-//			}
 
 			if (currentOrder > 2) {
 				requestManager.subMatrix();
 
 				if (workers.isEmpty()) {
-					l.l(me, reqId + ", WORKERS.SIZE() = 0 !!!");
+					System.err.println("No worker available");
 					requestManager.setPercentageDone(100);
 					requestManager.setFinalDeterminant(-0.0);
 					return;
@@ -118,7 +113,6 @@ public class Master extends UntypedActor {
 				boolean zeroColumn = gauss(requestManager, reqId);
 
 				if (!zeroColumn) {
-					long startTime = System.currentTimeMillis();
 					long totalWorkToDo = requestManager.getTotalWorkToDo();
 					long workToDo = 0;
 
@@ -127,25 +121,20 @@ public class Master extends UntypedActor {
 					}
 					long workDone = totalWorkToDo - workToDo;
 					int percentage = (int) (((double) workDone / totalWorkToDo) * 100);
-					//l.l(me, reqId + ", percentage computation duration: " + (System.currentTimeMillis() - startTime) + " ms");
 					requestManager.setPercentageDone(percentage);
 				}
 			} else { // matrix.length = 2
-				//l.l(me,
-				//		reqId + ", received ALL rows, submatrix " + currentOrder + ". Duration: "
-				//		+ ((System.currentTimeMillis() - requestManager.getStartTime()) / (double) 1000) + " sec");
+				System.out.println(reqId+ ", determinant computed. Duration: "
+						+ ((System.currentTimeMillis() - requestManager.getStartTime()) / (double) 1000) + " sec");
 				double determinant = requestManager.updateLastTempDeterminant();
 				requestManager.setPercentageDone(100);
 
 				if (determinant == 0) { // needed when determinant = -0.0
-					//l.l(me, reqId + ", determinant == 0 || determinant == -0, determinant: " + determinant);
 					requestManager.setFinalDeterminant(0);
 				} else {
 					if (!requestManager.getChangeSign()) {
-						//l.l(me, reqId + ", NOT CHANGING SIGN: determinant: " + determinant);
 						requestManager.setFinalDeterminant(determinant);
 					} else {
-						//l.l(me, reqId + ", CHANGING SIGN: determinant: " + (-determinant));
 						requestManager.setFinalDeterminant(-determinant);
 					}
 				}
@@ -159,7 +148,7 @@ public class Master extends UntypedActor {
 		WorkerInfo worker = new WorkerInfo(remoteAddress, actorRef);
 		workers.add(0, worker);
 		actorRef.tell(new Messages.AddWorkerAck(), getSelf());
-		l.l(me, worker.getRemoteAddress() + " added, workers size: " + workers.size());
+		System.out.println("["+me+"] " +worker.getRemoteAddress() + " added. Number of workers: " + workers.size());
 	}
 
 	private void handleRemoveWorker(Messages.RemoveWorker rw) {
@@ -171,9 +160,7 @@ public class Master extends UntypedActor {
 				// index of the worker to reassign the jobs to
 				int index = (i + 1) % workers.size();
 				ArrayList<GaussJob> jobsToReassign = workerToRemove.getJobs();
-				//l.l(me, workerToRemove.getRemoteAddress() + " pending request: " + jobsToReassign.size());
-				// nel caso di shutdown -> pending request = 0 !
-
+				
 				while (!jobsToReassign.isEmpty()) {
 					// vado sempre a leggere il primo GaussJob della lista e poi lo rimuovo
 					GaussJob job = jobsToReassign.get(0);
@@ -184,27 +171,21 @@ public class Master extends UntypedActor {
 
 					workerToRemove.removeJob(job);
 
-					// caso particolare: non abbiamo altri worker a disposizione
 					if (workers.size() < 2) {
-						l.l(me, reqId + ", WORKERS.SIZE() = 0 !!!");
+						System.err.println("No worker available");
 						requestManager.setPercentageDone(100);
 						requestManager.setFinalDeterminant(-0.0);
 						continue;
 					}
-					//l.l(me, "index: " + index);
-
 					// Reassigning the jobs of the worker to remove
 					workers.get(index).addJob(reqId, nRows, rowNumber);
 					workers.get(index).getActorRef()
 							.tell(new Messages.Rows(reqId, requestManager.getFirstRow(), requestManager.getRows(nRows, rowNumber), rowNumber), getSelf());
-					//l.l(me, reqId + ", handleRemove, sent rows from " + rowNumber + " to " + (rowNumber + nRows - 1) + "("
-					//		+ nRows + " rows) to " + workers.get(index).getRemoteAddress());
-					//l.l(me, reqId + ", call " + workers.get(index).getRemoteAddress()
-					//		+ " to do the job of the removed worker " + workerToRemove.getRemoteAddress());
+					System.out.println(reqId + ", reassigned rows from " + rowNumber + " to " + (rowNumber + nRows - 1) + " ("
+										+ nRows + " rows) to " + workers.get(index).getRemoteAddress());
 				}
-				// shutdown
 				workers.remove(i);
-				l.l(me, workerToRemove.getRemoteAddress() + " removed, workers size: " + workers.size());
+				//System.out.println(workerToRemove.getRemoteAddress() + " removed. Number of workers: " + workers.size());
 				return;
 			}
 		}
@@ -213,41 +194,32 @@ public class Master extends UntypedActor {
 	private void sendRowsToWorkers(RequestManager requestManager, String reqId) {
 		int currentOrder = requestManager.getCurrentOrder();
 		double nRowsPerWorker = (double) (currentOrder - 1) / workers.size();
-		// l.l(me, "nRowsPerWorker: " + nRowsPerWorker);
 		int nRowsSent = 0;
 		int nRowsToSend;
 
 		for (int i = 0; i < (workers.size()); i++) {
 			// number of rows to send to worker i:
 			nRowsToSend = (int) (Math.round((i + 1) * nRowsPerWorker) - nRowsSent);
-			//l.l(me, reqId + ", nRowsToSend: " + nRowsToSend);
-
+			
 			if (nRowsToSend > 0) {
-
 				int maxNRowsPerMsg = MAX_ELEMS_PER_MSG / currentOrder; // MAX_ELEMS_PER_MSG deve essere maggiore dell'ordine massimo possibile
-
 				int nMsgToSend = (int) (nRowsToSend / maxNRowsPerMsg);
-				//l.l(me, reqId + ", nMsgToSend with " + (maxNRowsPerMsg*currentOrder) + " elements: " + nMsgToSend);
-
 				int nRowsOfFirstMsg = nRowsToSend % maxNRowsPerMsg;
-				//l.l(me, reqId + ", nRowsOfFirstMsg: " + nRowsOfFirstMsg);
-
+				
 				if (nRowsOfFirstMsg != 0) {
 					workers.get(i).addJob(reqId, nRowsOfFirstMsg, nRowsSent + 1);
-					//l.l(me, "preparing message...");
 					workers.get(i).getActorRef()
 							.tell(new Messages.Rows(reqId, requestManager.getFirstRow(), requestManager.getRows(nRowsOfFirstMsg, nRowsSent + 1), nRowsSent + 1), getSelf());
-					//l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + nRowsOfFirstMsg) + "("
+					//System.out.println(reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + nRowsOfFirstMsg) + " ("
 					//		+ nRowsOfFirstMsg + " rows) to " + workers.get(i).getRemoteAddress());
 					nRowsSent += nRowsOfFirstMsg;
 				}
 
 				for (int j = 0; j < nMsgToSend; j++) {
 					workers.get(i).addJob(reqId, maxNRowsPerMsg, nRowsSent + 1);
-					//l.l(me, "preparing message...");
 					workers.get(i).getActorRef()
 							.tell(new Messages.Rows(reqId, requestManager.getFirstRow(), requestManager.getRows(maxNRowsPerMsg, nRowsSent + 1), nRowsSent + 1), getSelf());
-					//l.l(me, reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + maxNRowsPerMsg) + "("
+					//System.out.println(reqId + ", sent rows from " + (nRowsSent + 1) + " to " + (nRowsSent + maxNRowsPerMsg) + " ("
 					//		+ maxNRowsPerMsg + " rows) to " + workers.get(i).getRemoteAddress());
 					nRowsSent += maxNRowsPerMsg;
 				}
@@ -262,13 +234,13 @@ public class Master extends UntypedActor {
 	 * @param reqId the request of interest
 	 * @return <code>true</code> if a zero column is 	 * detected, <code>false</code> otherwise
 	 */
-	private boolean gauss(RequestManager requestManager, String reqId) {
+	private boolean gauss(RequestManager requestManager, String reqId) { // TODO aggiungere requestManager alla doc
 		boolean swapped = false;
 		if (requestManager.getFirstElement() == 0) {
 			swapped = requestManager.swapFirtsRow();
 
 			if (!swapped) {
-				l.l(me, reqId + ", zero column! determinant = 0. Duration: "
+				System.out.println(reqId + ", zero column found. Determinant = 0. Duration: "
 						+ ((System.currentTimeMillis() - requestManager.getStartTime()) / (double) 1000) + " sec");
 				requestManager.setPercentageDone(100);
 				requestManager.setFinalDeterminant(0);
@@ -286,7 +258,6 @@ public class Master extends UntypedActor {
 	private boolean removeJob(ActorRef worker, String reqId, int rowNumber) {
 		for (int i = 0; i < workers.size(); i++) {
 			if (workers.get(i).getRemoteAddress().equals(worker.path().toString())) {
-				// works.size è generalmente uguale al numero di richieste in corso di quel master, tranne in casi di failure
 				ArrayList<GaussJob> works = workers.get(i).getJobs();
 
 				for (int j = 0; j < works.size(); j++) {
@@ -301,21 +272,15 @@ public class Master extends UntypedActor {
 	}
 
 	private void handleWorkerFailure(String workerNodeFailedAddress) {
-		//l.l(me, "handleWorkerFailure");
-		String[] tokens;
 		boolean first = true;
 		int index = 0;
 
 		for (int i = 0; i < workers.size(); i++) {
-			tokens = workers.get(i).getRemoteAddress().split("/user"); // TODO unire con la riga sotto
-			String workerINodeAddress = tokens[0];
-//			l.l(me, "workerINodeAddress: " + workerINodeAddress);
+			String workerINodeAddress = workers.get(i).getRemoteAddress().split("/user")[0];
 
 			if (workerINodeAddress.equals(workerNodeFailedAddress)) {
 				WorkerInfo workerToRemove = workers.get(i);
 				ArrayList<GaussJob> jobsToReassign = workerToRemove.getJobs();
-				//l.l(me, workerToRemove.getRemoteAddress() + " pending request: " + jobsToReassign.size());
-				// nel caso di shutdown -> pending request = 0 !
 
 				while (!jobsToReassign.isEmpty()) {
 					if (first) {
@@ -331,9 +296,8 @@ public class Master extends UntypedActor {
 
 					workerToRemove.removeJob(job);
 
-					// caso particolare: non abbiamo altri worker a disposizione
 					if (workers.size() < 2) {
-						l.l(me, reqId + ", WORKERS.SIZE() = 0 !!!");
+						System.err.println("No worker available");
 						requestManager.setPercentageDone(100);
 						requestManager.setFinalDeterminant(-0.0);
 						continue;
@@ -341,15 +305,14 @@ public class Master extends UntypedActor {
 
 					for (int k = 0; k < workers.size(); k++) {
 						index = index % workers.size();
-						tokens = workers.get(index).getRemoteAddress().split("/user");
+						String workerIndexNodeAddress = workers.get(index).getRemoteAddress().split("/user")[0];
 
-						if (!tokens[0].equals(workerNodeFailedAddress)) {
-							//l.l(me, "index: " + index);
+						if (!workerIndexNodeAddress.equals(workerNodeFailedAddress)) {
 							workers.get(index).addJob(reqId, nRows, rowNumber);
 							workers.get(index).getActorRef()
 									.tell(new Messages.Rows(reqId, requestManager.getFirstRow(), requestManager.getRows(nRows, rowNumber), rowNumber), getSelf());
-							//l.l(me, reqId + ", reassigning to " + workers.get(index).getRemoteAddress()
-							//		+ " the job of the dead worker " + workerToRemove.getRemoteAddress());
+							System.out.println(reqId + ", reassigned rows from " + rowNumber + " to " + (rowNumber + nRows - 1) + " ("
+										+ nRows + " rows) to " + workers.get(index).getRemoteAddress());
 
 							if (jobsToReassign.isEmpty() && index < i) {
 								index = (index + 1) % workers.size();
@@ -359,10 +322,8 @@ public class Master extends UntypedActor {
 						index = (index + 1) % workers.size();
 					}
 				}
-				// shutdown
 				workers.remove(i);
-				l.l(me, workerToRemove.getRemoteAddress() + " removed, workers size: " + workers.size());
-				i--;
+				i--; // decremento indice per non saltare nessun elemento
 			}
 		}
 	}

@@ -5,7 +5,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import log.l;
 import messages.Messages;
 import akka.actor.Actor;
 import akka.actor.ActorRef;
@@ -39,7 +38,6 @@ public class DeterminantCalculatorManager {
 
 		for (int i = 0; i < nProcessors; i++) {
 			String masterId = "master-" + i;
-			// create several masters passing the istance of the Manager
 			masters.add(system.actorOf(new Props(new UntypedActorFactory() {
 				@Override
 				public Actor create() {
@@ -57,7 +55,7 @@ public class DeterminantCalculatorManager {
 	 */
 	public static DeterminantCalculatorManager getInstance() {
 		getInstanceLock.lock();
-
+		
 		try {
 			if (instance == null) {
 				instance = new DeterminantCalculatorManager();
@@ -103,7 +101,7 @@ public class DeterminantCalculatorManager {
 		if (requestManager != null) {
 			return requestManager.getPercentageDone();
 		} else {
-			l.l(me, reqId + ": invalid requestId");
+			System.err.println(reqId + ": invalid requestId");
 			return -1;
 		}
 	}
@@ -121,7 +119,7 @@ public class DeterminantCalculatorManager {
 			// blocking operation
 			return requestManager.getFinalDeterminant();
 		} else {
-			l.l(me, reqId + ": invalid requestId");
+			System.err.println(reqId + ": invalid requestId");
 			return -0.0;
 		}
 	}

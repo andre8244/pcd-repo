@@ -4,14 +4,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import log.l;
 
 public class RequestManager {
 
-	private String me = "requestManager";
 	private double[][] matrix;
 	private int matrixLength;
-	private int nRowsDone; // TODO forse meglio rinominare
+	private int nRowsDone;
 	private long totalWorkToDo;
 	private int percentageDone;
 	private double tempDeterminant;
@@ -41,13 +39,9 @@ public class RequestManager {
 		 * sum the elements of all the submatrices to be computed example: order = 1000 -> totalWorkToDo = (999 * 1000) +
 		 * + (998 * 999) + ... + (1 * 2)
 		 */
-		long startTime = System.currentTimeMillis();
-
-		for (long i = matrixLength-1; i > 0; i--) {
+		for (long i = matrixLength - 1; i > 0; i--) {
 			totalWorkToDo += i * (i + 1);
 		}
-		//l.l(me,"setOriginalMatrix: computed totalWorkTodo (" + totalWorkToDo + "). Duration: "
-		//		+ (System.currentTimeMillis() - startTime) + " ms");
 	}
 
 	public boolean getChangeSign() {
