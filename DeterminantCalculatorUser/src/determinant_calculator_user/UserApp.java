@@ -1,7 +1,7 @@
 package determinant_calculator_user;
 
 // IMPORT DEL WEB SERVICE CLIENT:
-import localhost_client.*;
+//import localhost_client.*;
 //import marco_client.*;
 //import marcoXP_client.*;
 //import andreaf_client.*;
@@ -9,7 +9,7 @@ import localhost_client.*;
 //import leardini_linux.*;
 //import leardini_mac.*;
 //import leardini_linux_192_168_0_7.*;
-//import linux_ethernet.*;
+import linux_ethernet.*;
 
 import java.awt.Container;
 import java.awt.event.ActionEvent;
