@@ -27,7 +27,6 @@ public class DeterminantCalculatorManager {
 	private ConcurrentHashMap<String, RequestManager> requests;
 	private static Lock getInstanceLock = new ReentrantLock(true);
 	private Lock computeDeterminantLock = new ReentrantLock(true);
-	private String me = "manager";
 	private int masterIndex = 0;
 
 	private DeterminantCalculatorManager() {
