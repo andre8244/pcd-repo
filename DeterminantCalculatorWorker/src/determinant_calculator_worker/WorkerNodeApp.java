@@ -38,6 +38,9 @@ public class WorkerNodeApp extends JFrame implements ActionListener {
 	private ActorSystem actorSystem;
 	private ArrayList<ActorRef> workers;
 	
+	/**
+	 * Constructs and displays the GUI of the application.
+	 */
 	public WorkerNodeApp() {
 		super("Worker Node App");
 		workers = new ArrayList<>();
@@ -76,6 +79,11 @@ public class WorkerNodeApp extends JFrame implements ActionListener {
 		setVisible(true);
 	}
 	
+	/**
+	 * Application main.
+	 * 
+	 * @param args
+	 */
 	public static void main(String args[]) {
 		new WorkerNodeApp();
 	}
