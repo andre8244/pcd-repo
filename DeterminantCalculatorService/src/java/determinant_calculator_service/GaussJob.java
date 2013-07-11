@@ -1,8 +1,8 @@
 package determinant_calculator_service;
 
 /**
- * A data structure that stores the informations about a job to be performed by a worker actor. A job represents a
- * portion of a matrix. The Gaussian elimination algorithm is executed on every portion of a matrix by a worker actor.
+ * A data structure that stores the informations about a job to be performed by a worker actor. A job represents a block
+ * of adjacent rows of a matrix. The Gauss algorithm is executed on every block by a worker actor.
  * 
  */
 public class GaussJob {

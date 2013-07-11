@@ -16,10 +16,10 @@ import com.typesafe.config.ConfigFactory;
 
 /**
  * The manager of the requests sent to the web service.
- *
+ * 
  */
 public class DeterminantCalculatorManager {
-
+	
 	private static DeterminantCalculatorManager instance;
 	private int reqNumber;
 	private final int nProcessors = Runtime.getRuntime().availableProcessors();
@@ -28,13 +28,13 @@ public class DeterminantCalculatorManager {
 	private static Lock getInstanceLock = new ReentrantLock(true);
 	private Lock computeDeterminantLock = new ReentrantLock(true);
 	private int masterIndex = 0;
-
+	
 	private DeterminantCalculatorManager() {
 		reqNumber = 0;
 		masters = new ArrayList<ActorRef>();
 		final DeterminantCalculatorManager manager = this; // passed to the masters
 		ActorSystem system = ActorSystem.create("masterSystem", ConfigFactory.load().getConfig("masterSystem"));
-
+		
 		for (int i = 0; i < nProcessors; i++) {
 			String masterId = "master-" + i;
 			masters.add(system.actorOf(new Props(new UntypedActorFactory() {
@@ -46,10 +46,10 @@ public class DeterminantCalculatorManager {
 		}
 		requests = new ConcurrentHashMap<String, RequestManager>();
 	}
-
+	
 	/**
 	 * Returns an istance of the manager, using the singleton pattern.
-	 *
+	 * 
 	 * @return an istance of the manager.
 	 */
 	public static DeterminantCalculatorManager getInstance() {
@@ -64,17 +64,17 @@ public class DeterminantCalculatorManager {
 			getInstanceLock.unlock();
 		}
 	}
-
+	
 	/**
-	 * Create a new determinant computation request and forwards it to a master actor.
-	 *
+	 * Create a new determinant computation request.
+	 * 
 	 * @param order the order of the matrix
 	 * @param fileValues the URL to the file that stores the values of the matrix
-	 * @return a <code>String</code> that identifies the request
+	 * @return a {@code String} that identifies the request
 	 */
 	public String computeDeterminant(int order, String fileValues) {
 		computeDeterminantLock.lock();
-
+		
 		try {
 			String reqId = "req" + reqNumber;
 			reqNumber = reqNumber + 1;
@@ -87,16 +87,16 @@ public class DeterminantCalculatorManager {
 			computeDeterminantLock.unlock();
 		}
 	}
-
+	
 	/**
 	 * Returns an estimation of percentage of a previously requested computation.
-	 *
+	 * 
 	 * @param reqId the request of interest
 	 * @return an estimation of percentage of a previously requested computation.
 	 */
 	public int getPercentageDone(String reqId) {
 		RequestManager requestManager = requests.get(reqId);
-
+		
 		if (requestManager != null) {
 			return requestManager.getPercentageDone();
 		} else {
@@ -104,16 +104,16 @@ public class DeterminantCalculatorManager {
 			return -1;
 		}
 	}
-
+	
 	/**
 	 * Returns the determinant computed
-	 *
+	 * 
 	 * @param reqId the request of interest
 	 * @return the determinant computed
 	 */
 	public double getResult(String reqId) {
 		RequestManager requestManager = requests.get(reqId);
-
+		
 		if (requestManager != null) {
 			// blocking operation
 			return requestManager.getFinalDeterminant();
@@ -122,10 +122,10 @@ public class DeterminantCalculatorManager {
 			return -0.0;
 		}
 	}
-
+	
 	/**
 	 * Adds a worker actor to the system.
-	 *
+	 * 
 	 * @param remoteAddress the remote path of the worker actor
 	 */
 	public void addWorker(String remoteAddress) {
@@ -133,10 +133,10 @@ public class DeterminantCalculatorManager {
 			masters.get(i).tell(new Messages.AddWorker(remoteAddress));
 		}
 	}
-
+	
 	/**
 	 * Removes a worker actor from the system.
-	 *
+	 * 
 	 * @param remoteAddress the remote path of the worker actor
 	 */
 	public void removeWorker(String remoteAddress) {
@@ -144,10 +144,10 @@ public class DeterminantCalculatorManager {
 			masters.get(i).tell(new Messages.RemoveWorker(remoteAddress));
 		}
 	}
-
+	
 	/**
 	 * Returns the <code>RequestManager</code> associated to the given <code>reqId</code>.
-	 *
+	 * 
 	 * @param reqId the request of interest
 	 * @return a <code>RequestManager</code>
 	 */

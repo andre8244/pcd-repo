@@ -1,27 +1,37 @@
 package determinant_calculator_service;
 
-import akka.actor.ActorRef;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+
 import messages.Messages;
+import akka.actor.ActorRef;
 
 /**
- * An utility class to read the values of a matrix from a HTTP or local URL.
- *
+ * An thread that reads the values of a matrix from a HTTP or local URL.
+ * 
  */
 public class MatrixReaderThread extends Thread {
-
+	
 	private int order;
 	private String fileValues;
 	private String reqId;
 	private RequestManager requestManager;
 	private ActorRef master;
 	private static String me = "matrixReader";
-
+	
+	/**
+	 * Constructs the {@code MatrixReaderThread}.
+	 * 
+	 * @param order the order of the matrix
+	 * @param fileValues the URL to the file that stores the values of the matrix
+	 * @param reqId a {@code String} that identifies the request
+	 * @param requestManager the {@code RequestManager} of the request
+	 * @param master
+	 */
 	public MatrixReaderThread(int order, String fileValues, String reqId, RequestManager requestManager, ActorRef master) {
 		this.order = order;
 		this.fileValues = fileValues;
@@ -29,13 +39,12 @@ public class MatrixReaderThread extends Thread {
 		this.requestManager = requestManager;
 		this.master = master;
 	}
-
-	//TODO javadoc
+	
 	@Override
 	public void run() {
 		double[][] matrix = new double[order][order];
 		BufferedReader reader;
-
+		
 		try {
 			if (fileValues.contains("http://")) {
 				URL url = new URL(fileValues);
@@ -46,7 +55,7 @@ public class MatrixReaderThread extends Thread {
 			String line = reader.readLine();
 			String[] tokens;
 			int nLines = 0;
-
+			
 			while (line != null) {
 				// the number of lines can't be greater than the order
 				if (nLines == order) {
@@ -56,7 +65,7 @@ public class MatrixReaderThread extends Thread {
 					return;
 				}
 				tokens = line.split(" ");
-
+				
 				// every line must have <order> elements
 				if (tokens.length != order) {
 					System.err.println(reqId + ", order error.");
@@ -64,7 +73,7 @@ public class MatrixReaderThread extends Thread {
 					requestManager.setFinalDeterminant(-0.0);
 					return;
 				}
-
+				
 				for (int j = 0; j < tokens.length; j++) {
 					matrix[nLines][j] = Double.parseDouble(tokens[j]);
 				}
@@ -72,7 +81,7 @@ public class MatrixReaderThread extends Thread {
 				nLines++;
 			}
 			reader.close();
-
+			
 			// the number of lines can't be less than the order
 			if (order != nLines) {
 				System.err.println(reqId + ", order error.");
