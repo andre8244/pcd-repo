@@ -1,14 +1,9 @@
 package determinant_calculator_user;
 
-// IMPORT DEL WEB SERVICE CLIENT:
-import localhost_client.*;
-//import marco_client.*;
-//import andreaf_client.*;
-//import leardini_mac.*;
-
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -19,6 +14,16 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
+//IMPORT DEL WEB SERVICE CLIENT:
+import localhost_client.*;
+//import marco_client.*;
+//import andreaf_client.*;
+//import leardini_mac.*;
+
+/**
+ * An application to request determinant computations to the web service.
+ *
+ */
 public class UserApp extends JFrame implements ActionListener {
 
 	private JPanel globalPanel, topPanel, centralPanel, bottomPanel;
@@ -27,14 +32,18 @@ public class UserApp extends JFrame implements ActionListener {
 	private ButtonGroup group = new ButtonGroup();
 	private JButton computeButton;
 	private DeterminantCalculatorService servicePort;
-	//private static final String INITIAL_FILE_VALUES = System.getProperty("user.home") + System.getProperty("file.separator") + "matrix.txt";
+	// private static final String INITIAL_FILE_VALUES = System.getProperty("user.home") +
+	// System.getProperty("file.separator") + "matrix.txt";
 	private static final String INITIAL_FILE_VALUES = "http://pcddeterminant.altervista.org/matrix100@-4.23e84.txt";
 	private static final int INITIAL_ORDER = 100;
 	private boolean connected = false;
 
+	/**
+	 * Constructs and displays the GUI of the application.
+	 */
 	public UserApp() {
 		super("User App");
-		
+
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Container cp = getContentPane();
 		globalPanel = new JPanel();
@@ -61,7 +70,7 @@ public class UserApp extends JFrame implements ActionListener {
 		pollingButton.addActionListener(this);
 		synchronousButton = new JRadioButton("Synchronous");
 		synchronousButton.addActionListener(this);
-		
+
 		group.add(callbackButton);
 		group.add(pollingButton);
 		group.add(synchronousButton);
@@ -91,6 +100,11 @@ public class UserApp extends JFrame implements ActionListener {
 		setVisible(true);
 	}
 
+	/**
+	 * Application main.
+	 *
+	 * @param args
+	 */
 	public static void main(String args[]) {
 		new UserApp();
 	}
@@ -101,6 +115,7 @@ public class UserApp extends JFrame implements ActionListener {
 
 		if (cmd.equals("Compute determinant")) {
 			new Thread() {
+				@Override
 				public void run() {
 					handleCompute();
 				}
@@ -109,12 +124,11 @@ public class UserApp extends JFrame implements ActionListener {
 	}
 
 	private void handleCompute() {
-		if(!connected){
+		if (!connected) {
 			connected = true;
-			DeterminantCalculatorService_Service service =
-				new DeterminantCalculatorService_Service();
+			DeterminantCalculatorService_Service service = new DeterminantCalculatorService_Service();
 			servicePort = service.getDeterminantCalculatorServicePort();
-		}		
+		}
 		int order;
 
 		try {
@@ -125,7 +139,7 @@ public class UserApp extends JFrame implements ActionListener {
 		}
 		String fileValues = fileValuesText.getText();
 
-		// per generare una matrice in un file locale, usare il seguente path:
+		// per generare una matrice in un file locale e calcolarene il determinante, usare il seguente path:
 		if (fileValues.equals(System.getProperty("user.home") + System.getProperty("file.separator") + "matrix.txt")) {
 			MatrixFileGenerator generator = new MatrixFileGenerator();
 			generator.generate(order, 0.01, 0.02, fileValues);
