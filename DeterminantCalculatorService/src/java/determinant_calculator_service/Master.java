@@ -197,12 +197,14 @@ public class Master extends UntypedActor {
 		int nRowsSent = 0;
 		int nRowsToSend;
 
+		int maxNRowsPerMsg = MAX_ELEMS_PER_MSG / currentOrder; // MAX_ELEMS_PER_MSG deve essere maggiore dell'ordine massimo possibile
+		
 		for (int i = 0; i < (workers.size()); i++) {
 			// number of rows to send to worker i:
 			nRowsToSend = (int) (Math.round((i + 1) * nRowsPerWorker) - nRowsSent);
 			
 			if (nRowsToSend > 0) {
-				int maxNRowsPerMsg = MAX_ELEMS_PER_MSG / currentOrder; // MAX_ELEMS_PER_MSG deve essere maggiore dell'ordine massimo possibile
+				
 				int nMsgToSend = (int) (nRowsToSend / maxNRowsPerMsg);
 				int nRowsOfFirstMsg = nRowsToSend % maxNRowsPerMsg;
 				
