@@ -8,6 +8,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -27,16 +28,23 @@ import localhost_client.*;
 public class UserApp extends JFrame implements ActionListener {
 
 	private JPanel globalPanel, topPanel, centralPanel, bottomPanel;
-	private JTextField orderText, fileValuesText;
+	private JTextField orderText;
+	private JComboBox cbFileValues;
 	private JRadioButton synchronousButton, pollingButton, callbackButton;
 	private ButtonGroup group = new ButtonGroup();
 	private JButton computeButton;
 	private DeterminantCalculatorService servicePort;
-	// private static final String INITIAL_FILE_VALUES = System.getProperty("user.home") +
-	// System.getProperty("file.separator") + "matrix.txt";
-	private static final String INITIAL_FILE_VALUES = "http://pcddeterminant.altervista.org/matrix100@-4.23e84.txt";
 	private static final int INITIAL_ORDER = 100;
 	private boolean connected = false;
+	private static final String[] FILE_VALUES = {
+		"http://pcddeterminant.altervista.org/matrix100@-4.23e84.txt",
+		"http://pcddeterminant.altervista.org/matrix2@3.txt",
+		"http://pcddeterminant.altervista.org/matrix200@8.13e-178.txt",
+		"http://pcddeterminant.altervista.org/matrix300@6.03e60.txt",
+		"http://pcddeterminant.altervista.org/matrix1000@3.84e163.txt",
+		"http://pcddeterminant.altervista.org/matrix2000@1.15e-44.txt",
+		System.getProperty("user.home") + System.getProperty("file.separator") + "matrix.txt"
+	};
 
 	/**
 	 * Constructs and displays the GUI of the application.
@@ -53,10 +61,12 @@ public class UserApp extends JFrame implements ActionListener {
 
 		orderText = new JTextField("" + INITIAL_ORDER, 5);
 		orderText.setHorizontalAlignment(JTextField.RIGHT);
-		fileValuesText = new JTextField("" + INITIAL_FILE_VALUES, 40);
+		cbFileValues = new JComboBox(FILE_VALUES);
+		cbFileValues.setEditable(true);
+		cbFileValues.addActionListener(this);
 
 		topPanel.add(new JLabel("File values:"));
-		topPanel.add(fileValuesText);
+		topPanel.add(cbFileValues);
 		topPanel.add(new JLabel("Order:"));
 		topPanel.add(orderText);
 
@@ -137,7 +147,7 @@ public class UserApp extends JFrame implements ActionListener {
 			ex.printStackTrace();
 			return;
 		}
-		String fileValues = fileValuesText.getText();
+		String fileValues = (String) cbFileValues.getSelectedItem();
 
 		// per generare una matrice in un file locale e calcolarene il determinante, usare il seguente path:
 		if (fileValues.equals(System.getProperty("user.home") + System.getProperty("file.separator") + "matrix.txt")) {
